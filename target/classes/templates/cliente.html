@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Cliente</title>
+</head>
+<body>
+    <h1>Crear cliente</h1>
+
+    <form th:action="@{/crearCliente}" th:object="${cliente}" method="post">
+        <label for="nombreLegal">Nombre legal:</label>
+        <input type="text" id="nombreLegal" name="nombreLegal" required><br>
+        <label for="direccionLegal">Dirección legal:</label>
+        <input type="text" id="direccionLegal" name="direccionLegal" required><br>
+        <label for="dinero">Capital:</label>
+        <input type="number" id="dinero" name="dinero" required><br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br>
+        <label for="idBanco">Banco:</label>
+        <select name="idBanco" id="idBanco" >
+            <option value="1" itemid="1">Santander</option>
+            <option value="2" itemid="2">BBVA</option>
+            <option value="3" itemid="3">La Caixa</option>
+            <option value="4" itemid="4">ING</option>
+        </select><br>
+        <input type="submit" value="Crear">
+    </form>
+
+
+</body>
+</html>
