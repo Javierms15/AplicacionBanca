@@ -1,6 +1,8 @@
 package com.example.demo.models.entity;
 
+import com.example.demo.models.dao.IBancoDao;
 import jakarta.persistence.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Objects;
 
@@ -26,6 +28,10 @@ public class ClienteEntity {
     @Basic
     @Column(name = "id_banco")
     private int idBanco;
+
+
+
+
 
     public int getIdCliente() {
         return idCliente;

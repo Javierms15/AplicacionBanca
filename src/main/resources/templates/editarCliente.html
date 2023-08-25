@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+    <title>Editar cliente</title>
+</head>
+<body>
+<h1>Editar cliente</h1>
+
+<form th:action="@{/editarClienteSave}" th:object="${cliente}" method="post">
+    <label for="nombreLegal">Nombre legal:</label>
+    <input type="text" th:field="*{nombreLegal}" id="nombreLegal" name="nombreLegal" required><br>
+    <label for="direccionLegal">Dirección legal:</label>
+    <input type="text" th:field="*{direccionLegal}" id="direccionLegal" name="direccionLegal" required><br>
+    <label for="dinero">Capital:</label>
+    <input type="number" th:field="*{dinero}" id="dinero" name="dinero" required><br>
+    <label for="email">Email:</label>
+    <input type="email" th:field="*{email}" id="email" name="email" required><br>
+    <label for="idBanco">Banco:</label>
+    <select name="idBanco" th:field="*{idBanco}" id="idBanco" required>
+        <option value="1" itemid="1">Santander</option>
+        <option value="2" itemid="2">BBVA</option>
+        <option value="3" itemid="3">La Caixa</option>
+        <option value="4" itemid="4">ING</option>
+    </select><br>
+    <input type="hidden" th:field="*{idCliente}" name="idCliente" id="idCliente">
+    <input type="submit" value="Editar">
+</form>
+
+<form th:action="@{/listarClientes}">
+    <input type="submit" value="Atrás">
+</form>
+
+
+</body>
+</html>

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+    <title>Lista clientes</title>
+</head>
+<body>
+
+<form th:action="@{/filtrar}" method="post">
+    <input type="text"  name="valor" id="valor">
+    <select name="filtro" id="filtro">
+        <option value="nombre">Nombre legal</option>
+        <option value="direccion">Dirección legal</option>
+        <option value="dinero">Capital</option>
+        <option value="email">Email</option>
+        <option value="banco">Banco</option>
+        <option value=""></option>
+    </select>
+
+    <input type="submit" value="Filtrar">
+</form>
+
+
+<table>
+    <thead>
+    <tr>
+        <td>Nombre legal</td>
+        <td>Dirección legal</td>
+        <td>Capital</td>
+        <td>Email</td>
+        <td>Banco</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="cliente: ${clientes}">
+        <td th:text="${cliente.nombreLegal}"></td>
+        <td th:text="${cliente.direccionLegal}"></td>
+        <td th:text="${cliente.dinero}"></td>
+        <td th:text="${cliente.email}"></td>
+        <td th:text="${cliente.idBanco}"></td>
+        <td><a th:href="@{editarCliente/} + ${cliente.idCliente}" th:text="Editar"></a></td>
+        <td><a th:href="@{eliminarCliente/} + ${cliente.idCliente}" th:text="Eliminar"></a></td>
+
+    </tr>
+    </tbody>
+</table>
+<form action="/nuevoCliente">
+    <button type="submit">Nuevo cliente</button>
+</form>
+</body>
+</html>
