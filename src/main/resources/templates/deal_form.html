@@ -7,7 +7,7 @@
 
 <body>
 	<form th:action="@{/deal/save}" th:object="${deal}" method="post">
-		<input type="hidden" class="form-control" th:field="*{idDeal}"/>
+		<input type="hidden" class="form-control" th:field="*{idDeal}" />
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Estado</label>
 			<div class="col-sm-6">
@@ -50,11 +50,10 @@
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Tipo</label>
 			<div class="col-sm-6">
-				<input type="radio" name="tipo" id="tipo1" th:field="*{tipo}" th:value="SOLE_LENDER" class="col-sm-2"
-					checked />
-				<label class="col-form-label col-sm-2" for="tipo1">Sole lender</label>
-				<input type="radio" name="tipo" id="tipo2" th:field="*{tipo}" th:value="SYNDICATED" class="col-sm-2" />
-				<label class="col-form-label col-sm-2" for="tipo2">Syndicated</label>
+				<select class="form-control" th:field="*{tipo}">
+					<option value="SOLE_LENDER">Sole lender</option>
+					<option value="SYNDICATED">Syndicated</option>
+				</select>
 			</div>
 		</div>
 		<div class="form-group row">
@@ -77,7 +76,7 @@
 		</div>
 
 	</form>
-
+	<a href="/deal"><button>Volver</button></a>
 </body>
 
 </html>
