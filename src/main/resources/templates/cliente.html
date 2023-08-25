@@ -2,6 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
     <title>Cliente</title>
 </head>
 <body>
@@ -24,6 +25,10 @@
             <option value="4" itemid="4">ING</option>
         </select><br>
         <input type="submit" value="Crear">
+    </form>
+
+    <form th:action="@{/listarClientes}">
+        <input type="submit" value="Atrás">
     </form>
 
 
