@@ -15,8 +15,8 @@ public class UsuarioEntity {
     @Column(name = "nombre")
     private String nombre;
     @Basic
-    @Column(name = "contrasena")
-    private String contrasena;
+    @Column(name = "contraseña")
+    private String contraseña;
     @Basic
     @Column(name = "rol")
     private Object rol;
@@ -40,12 +40,12 @@ public class UsuarioEntity {
         this.nombre = nombre;
     }
 
-    public String getContrasena() {
-        return contrasena;
+    public String getContraseña() {
+        return contraseña;
     }
 
-    public void setContrasena(String contrasena) {
-        this.contrasena = contrasena;
+    public void setContraseña(String contraseña) {
+        this.contraseña = contraseña;
     }
 
     public Object getRol() {
@@ -69,11 +69,11 @@ public class UsuarioEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UsuarioEntity that = (UsuarioEntity) o;
-        return idUsuario == that.idUsuario && Objects.equals(nombre, that.nombre) && Objects.equals(contrasena, that.contrasena) && Objects.equals(rol, that.rol) && Objects.equals(banco, that.banco);
+        return idUsuario == that.idUsuario && Objects.equals(nombre, that.nombre) && Objects.equals(contraseña, that.contraseña) && Objects.equals(rol, that.rol) && Objects.equals(banco, that.banco);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idUsuario, nombre, contrasena, rol, banco);
+        return Objects.hash(idUsuario, nombre, contraseña, rol, banco);
     }
 }
