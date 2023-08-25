@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<<<<<<< HEAD
+=======
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+>>>>>>> origin/master
+    <title>Menu Usuarios</title>
+</head>
+<body>
+
+    <form th:action="@{/usuario/crearUsuario}" th:object="${usuario}" method="post">
+        <input type="text" name="nombre" id="nombre" required>
+        <input type="text" name="contrasena" id="contrasena" required>
+        <select name="rol" id="rol" required>
+            <option value="ADMIN">Administrador</option>
+            <option value="BANCA">Banca</option>
+        </select>
+
+        <input type="submit">
+    </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <td>Id</td>
+                    <td>Nombre</td>
+                    <td>Contraseña</td>
+                    <td>Rol</td>
+                    <td>Banco</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="usuario: ${usuarios}">
+                    <td th:text="${usuario.idUsuario}"></td>
+                    <td th:text="${usuario.nombre}"></td>
+                    <td th:text="${usuario.contrasena}"></td>
+                    <td th:text="${usuario.rol}"></td>
+                    <td th:text="${usuario.banco}"></td>
+                    <td><a th:href="@{usuario/formEditar/} + ${usuario.idUsuario}" th:text="Editar"></a></td>
+                    <td><a th:href="@{usuario/eliminar/} + ${usuario.idUsuario}" th:text="Eliminar"></a></td>
+                </tr>
+            </tbody>
+        </table>
+
+<<<<<<< HEAD
+
+
+
+=======
+>>>>>>> origin/master
+</body>
+</html>
