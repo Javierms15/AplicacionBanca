@@ -9,9 +9,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.demo.models.dao.IBancoDao;
+import com.example.demo.models.entity.BancoEntity;
 import com.example.demo.models.entity.DealEntity;
+import com.example.demo.models.entity.ParticipanteEntity;
 import com.example.demo.models.service.DealServiceImpl;
+import com.example.demo.models.service.ParticipanteServiceImpl;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 @RequestMapping("/deal")
@@ -19,6 +26,12 @@ public class DealController {
 
 	@Autowired
 	DealServiceImpl dealService;
+
+	@Autowired
+	ParticipanteServiceImpl participanteService;
+
+	@Autowired
+	IBancoDao bancoDao;
 
 	@GetMapping({ "", "/" })
 	public String ver(Model model) {
@@ -121,9 +134,46 @@ public class DealController {
 		return "deal/deal_form";
 	}
 
+	@PostMapping("/banks")
+	public String banks(DealEntity deal, Model model) {
+		model.addAttribute("deal", deal);
+		List<BancoEntity> bancos = (List<BancoEntity>) bancoDao.findAll();
+		model.addAttribute("bancos", bancos);
+		return "deal/deal_add_banks";
+	}
+
 	@PostMapping("/save")
-	public String save(DealEntity deal) {
+	public String save(DealEntity deal, @RequestParam(name = "banco") int id,
+			@RequestParam(name = "agente") int agenteId, HttpServletRequest req) {
+		ParticipanteEntity participante;
 		dealService.save(deal);
+		if (((String) deal.getTipo()).equals("SOLE_LENDER")) {
+			System.out.println(id);
+			participante = new ParticipanteEntity();
+			participante.setIdBanco(id);
+			participante.setIdDeal(deal.getIdDeal());
+			participante.setAgente((byte) 1);
+			participanteService.save(participante);
+		} else {
+			String[] bancoReq = req.getParameterValues("banco");
+			for (String bancoIdStr : bancoReq) {
+				System.out.println(bancoIdStr);
+				participante = new ParticipanteEntity();
+				try {
+					int bancoId = Integer.parseInt(bancoIdStr);
+					participante.setIdBanco(bancoId);
+					if (bancoId == agenteId) {
+						participante.setAgente((byte) 1);
+					} else {
+						participante.setAgente((byte) 0);
+					}
+				} catch (NumberFormatException e) {
+					throw new RuntimeException("BancoId no valido en DealController - save");
+				}
+				participante.setIdDeal(deal.getIdDeal());
+				participanteService.save(participante);
+			}
+		}
 		return "redirect:/deal";
 	}
 

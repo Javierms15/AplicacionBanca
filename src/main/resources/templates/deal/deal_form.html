@@ -6,7 +6,7 @@
 </head>
 
 <body>
-	<form th:action="@{/deal/save}" th:object="${deal}" method="post">
+	<form th:action="@{/deal/banks}" th:object="${deal}" method="post">
 		<input type="hidden" class="form-control" th:field="*{idDeal}" />
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Estado</label>
