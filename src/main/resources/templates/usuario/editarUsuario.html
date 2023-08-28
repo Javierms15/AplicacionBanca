@@ -1,21 +1,68 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Editar Usuario</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
+    <title>Editar usuario</title>
 </head>
 <body>
 
-<form th:action="@{/usuario/editarUsuario}" th:object="${usuario}" method="post" >
-    <input type="text" th:field="*{nombre}" name="nombre" id="nombre" required >
-    <input type="text" th:field="*{contrasena}" name="contrasena" id="contrasena" required>
-    <select name="rol" th:field="*{rol}" id="rol" required>
-        <option value="ADMIN">Administrador</option>
-        <option value="BANCA">Banca</option>
-    </select>
-    <input type="hidden" th:field="*{idUsuario}" name="idUsuario" id="idUsuario">
+<header th:replace="layout/layout :: header"></header>
 
-    <input type="submit">
-</form>
+<div class="container py-4">
+    <div class="card bg-dark text-white">
+
+        <div class="card-header" style="font-size: xx-large">Editar Usuario</div>
+
+        <div class="card-body">
+
+            <form th:action="@{/usuario/editarUsuario}" th:object="${usuario}" method="post">
+
+
+                <div class="row mb-3">
+                    <label for="contrasena" class="col-sm-2 col-form-label">Nombre</label>
+                    <div class="col-sm-10">
+                        <input type="text" th:field="*{nombre}" name="nombre" id="nombre" required class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="contrasena" class="col-sm-2 col-form-label">Contraseña</label>
+                    <div class="col-sm-10">
+                        <input type="text" th:field="*{contrasena}" name="contrasena" id="contrasena" required
+                               class="form-control">
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="rol" class="col-sm-2 col-form-label">Rol</label>
+                    <div class="col-sm-10">
+                        <select name="rol" th:field="*{rol}" id="rol" required class="form-control">
+                            <option value="ADMIN">Administrador</option>
+                            <option value="BANCA">Banca</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <label for="rol" class="col-sm-2 col-form-label">Rol</label>
+                    <div class="col-sm-10">
+                        <select name="banco" id="banco" th:field="*{banco}" class="form-control">
+                            <option th:value="${null}" th:text="${'No pertenece a ningun banco'}"></option>
+                            <option th:each="banco: ${bancos}" th:value="${banco.idBanco}"
+                                    th:text="${banco.nombre}"></option>
+                        </select>
+                    </div>
+                </div>
+
+                <input type="hidden" th:field="*{idUsuario}" name="idUsuario" id="idUsuario">
+
+                <input type="submit" class="btn btn-primary" value="Editar Usuario">
+            </form>
+
+        </div>
+
+    </div>
+</div>
 
 
 </body>

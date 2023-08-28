@@ -4,7 +4,6 @@ import com.example.demo.models.dao.IBancoDao;
 import com.example.demo.models.dao.IClienteDao;
 import com.example.demo.models.entity.BancoEntity;
 import com.example.demo.models.entity.ClienteEntity;
-import com.example.demo.models.entity.UsuarioEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -13,10 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Controller
-public class PruebaController {
+public class ClienteController {
 
 	@Autowired
 	private IClienteDao clienteDao;
@@ -27,8 +25,10 @@ public class PruebaController {
 	@RequestMapping("/nuevoCliente")
 	public String mostrarPantallaNuevoCliente(Model model){
 		ClienteEntity cliente=new ClienteEntity();
+		List<BancoEntity> bancos= (List<BancoEntity>) bancoDao.findAll();
+		model.addAttribute("bancos",bancos);
 		model.addAttribute("cliente",cliente);
-		return"cliente";
+		return"cliente/cliente";
 	}
 
 	@PostMapping("/crearCliente")
@@ -41,7 +41,9 @@ public class PruebaController {
 	public String mostrarClientes(Model model){
 		List<ClienteEntity> clientes= (List<ClienteEntity>) clienteDao.findAll();
 		model.addAttribute("clientes",clientes);
-		return "listaClientes";
+		List<BancoEntity> bancos= (List<BancoEntity>) bancoDao.findAll();
+		model.addAttribute("bancos",bancos);
+		return "cliente/listaClientes";
 	}
 
 	@RequestMapping("eliminarCliente/{id}")
@@ -52,12 +54,14 @@ public class PruebaController {
 	}
 
 	@RequestMapping("editarCliente/{id}")
-	public String editarCliente(@PathVariable(value = "id") int id, Map<String, Object> model) {
+	public String editarCliente(@PathVariable(value = "id") int id, Map<String, Object> model, Model Model) {
 
 		ClienteEntity cliente = clienteDao.findById(id).orElse(null);
 		model.put("cliente", cliente);
+		List<BancoEntity> bancos= (List<BancoEntity>) bancoDao.findAll();
+		Model.addAttribute("bancos",bancos);
 
-		return "editarCliente";
+		return "cliente/editarCliente";
 	}
 
 	@RequestMapping(value = "/editarClienteSave", method = RequestMethod.POST)
@@ -84,7 +88,7 @@ public class PruebaController {
 			clientes= (List<ClienteEntity>) clienteDao.findAll();
 		}
 		model.addAttribute("clientes",clientes);
-		return "listaClientes";
+		return "cliente/listaClientes";
 	}
 
 }

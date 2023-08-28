@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Lista Facility</title>
+</head>
+<body>
+
+<form th:action="@{/filtrarFacility}" method="post">
+    <input type="text"  name="valor" id="valor">
+    <select name="filtro" id="filtro">
+        <option value="id">ID</option>
+        <option value="tipo">Tipo</option>
+        <option value="estado">Estado</option>
+        <option value="cantidad">Cantidad</option>
+        <option value="creacion">Fecha Creación</option>
+        <option value="efectiva">Fecha Efectiva</option>
+        <option value="finalizacion">Fecha Finalización</option>
+        <option value="deal">Deal</option>
+
+        <option value=""></option>
+    </select>
+
+    <input type="submit" value="Filtrar">
+</form>
+
+
+<table>
+    <thead>
+    <tr>
+        <td>ID</td>
+        <td>Tipo</td>
+        <td>Estado</td>
+        <td>Cantidad</td>
+        <td>Fecha Creación</td>
+        <td>Fecha Efectiva</td>
+        <td>Fecha Finalización</td>
+        <td>Deal</td>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="facility: ${facilitys}">
+        <td th:text="${facility.idFacility}"></td>
+        <td th:text="${facility.tipo}"></td>
+        <td th:text="${facility.estado}"></td>
+        <td th:text="${facility.cantidad}"></td>
+        <td th:text="${facility.fechaCreacion}"></td>
+        <td th:text="${facility.fechaEfectiva}"></td>
+        <td th:text="${facility.fechaFinalizacion}"></td>
+        <td th:text="${facility.deal}"></td>
+        <td><a th:href="@{editarFacility/} + ${facility.idFacility}" th:text="Editar"></a></td>
+        <td><a th:href="@{eliminarFacility/} + ${facility.idFacility}" th:text="Eliminar"></a></td>
+
+    </tr>
+    </tbody>
+</table>
+<form action="/nuevaFacility">
+    <button type="submit">Nueva facility</button>
+</form>
+</body>
+</html>
