@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8" />
+</head>
+
+<body>
+	<a th:href="@{/outstanding/create}"><button>Nuevo Outstanding</button></a>
+	<p>Filtrar:</p>
+	<form th:action="@{/outstanding}" th:object="${filter}" method="post">
+		<div>
+			<label>Cantidad Restante:</label>
+			<input type="text" class="form-control" th:field="*{cantidadRestante}" />
+		</div>
+		<div>
+			<label>Fecha Efectiva:</label>
+			<input type="date" class="form-control" th:field="*{fechaEfectiva}" />
+		</div>
+		<div>
+			<label>Fecha Creacion:</label>
+			<input type="date" class="form-control" th:field="*{fechaCreacion}" />
+		</div>
+		<div>
+			<label>Fecha Finalizacion:</label>
+			<input type="date" class="form-control" th:field="*{fechaFinalizacion}" />
+		</div>
+		<div>
+			<label>Pago Principal:</label>
+			<input type="text" class="form-control" th:field="*{pagoPrincipal}" />
+		</div>
+		<div>
+			<label>Pago Intereses:</label>
+			<input type="text" class="form-control" th:field="*{pagoIntereses}" />
+		</div>
+		<div>
+			<label>Tipo Interes:</label>
+			<select class="form-control" th:field="*{tipoInteres}">
+				<option value="">---</option>
+				<option value="1">Interes1</option>
+			</select>
+		</div>
+		<div>
+			<label>Tipo Cobros:</label>
+			<select class="form-control" th:field="*{tipoCobros}">
+				<option value="">---</option>
+				<option value="MANUAL">Manual</option>
+				<option value="AUTOMATICO">Automatico</option>
+			</select>
+		</div>
+		<div>
+			<label>Periodicidad:</label>
+			<select class="form-control" th:field="*{periodicidad}">
+				<option value="">---</option>
+				<option value="SEMANAL">Semanal</option>
+				<option value="MENSUAL">Mensual</option>
+				<option value="TRIMESTRAL">Trimestral</option>
+			</select>
+		</div>
+		<div>
+			<label>Cantidad Cobro Periodico:</label>
+			<input type="text" class="form-control" th:field="*{cantidadCobroPeriodico}" />
+		</div>
+		<div>
+			<label>Facility:</label>
+			<input type="text" class="form-control" th:field="*{facility}" />
+		</div>
+		<div class="form-group row">
+			<div class="col-sm-6">
+				<input type="submit" class="btn btn-secondary" value="Filtrar" />
+			</div>
+		</div>
+	</form>
+	<table>
+		<thead class="thead-inverse">
+			<tr>
+				<th>ID</th>
+				<th>Cantidad Restante</th>
+				<th>Fecha Efectiva</th>
+				<th>Fecha Creacion</th>
+				<th>Fecha Finalizacion</th>
+				<th>Pago Principal</th>
+				<th>Pago Intereses</th>
+				<th>Tipo Interes</th>
+				<th>Tipo Cobros</th>
+				<th>Periodicidad</th>
+				<th>Cantidad Cobro Periodico</th>
+				<th>Facility</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr th:each="out: ${outs}">
+				<td th:text="${out.idOutstanding}"></td>
+				<td th:text="${out.cantidadRestante}"></td>
+				<td th:text="${out.fechaEfectiva}"></td>
+				<td th:text="${out.fechaCreacion}"></td>
+				<td th:text="${out.fechaFinalizacion}"></td>
+				<td th:text="${out.pagoPrincipal}"></td>
+				<td th:text="${out.pagoIntereses}"></td>
+				<td th:text="${out.tipoInteres}"></td>
+				<td th:text="${out.tipoCobros}"></td>
+				<td th:text="${out.periodicidad}"></td>
+				<td th:text="${out.cantidadCobroPeriodico}"></td>
+				<td th:text="${out.facility}"></td>
+				<td><a th:href="@{/outstanding/edit/} + ${out.idOutstanding}">Editar</a></td>
+				<td><a th:href="@{/outstanding/delete/} + ${out.idOutstanding}">Borrar</a></td>
+			</tr>
+		</tbody>
+	</table>
+</body>
+
+</html>

@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<meta charset="UTF-8" />
+</head>
+
+<body>
+	<form th:action="@{/outstanding/save}" th:object="${out}" method="post">
+		<input type="hidden" class="form-control" th:field="*{idOutstanding}" />
+		<div class="form-group row">
+			<label class="col-sm-2 col-form-label">Cantidad Restante</label>
+			<div class="col-sm-6">
+				<input type="text" th:field="*{cantidadRestante}" class="form-control" />
+			</div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-2 col-form-label">Fecha Efectiva</label>
+			<div class="col-sm-6">
+				<input type="date" th:field="*{fechaEfectiva}" class="form-control" />
+			</div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-2 col-form-label">Fecha Creacion</label>
+			<div class="col-sm-6">
+				<input type="date" th:field="*{fechaCreacion}" class="form-control" />
+			</div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-2 col-form-label">Fecha finalizacion</label>
+			<div class="col-sm-6">
+				<input type="date" th:field="*{fechaFinalizacion}" class="form-control" />
+			</div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-2 col-form-label">Pago Principal</label>
+			<div class="col-sm-6">
+				<input type="text" th:field="*{pagoPrincipal}" class="form-control" />
+			</div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-2 col-form-label">Pago Intereses</label>
+			<div class="col-sm-6">
+				<input type="text" th:field="*{pagoIntereses}" class="form-control" />
+			</div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-2 col-form-label">Tipo Interes</label>
+			<div class="col-sm-6">
+				<input type="text" th:field="*{tipoInteres}" class="form-control" />
+			</div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-2 col-form-label">Tipo Cobros</label>
+			<div class="col-sm-6">
+				<select class="form-control" th:field="*{tipoCobros}">
+					<option value="MANUAL">Manual</option>
+					<option value="AUTOMATICO">Automatico</option>
+				</select>
+			</div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-2 col-form-label">Periodicidad</label>
+			<div class="col-sm-6">
+				<select class="form-control" th:field="*{periodicidad}">
+					<option value="SEMANAL">Semanal</option>
+					<option value="MENSUAL">Mensual</option>
+					<option value="TRIMESTRAL">Trimestral</option>
+				</select>
+			</div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-2 col-form-label">Cantidad Cobro Periodico</label>
+			<div class="col-sm-6">
+				<input type="text" th:field="*{cantidadCobroPeriodico}" class="form-control" />
+			</div>
+		</div>
+		<div class="form-group row">
+			<label class="col-sm-2 col-form-label">Facility</label>
+			<div class="col-sm-6">
+				<input type="text" th:field="*{facility}" class="form-control" />
+			</div>
+		</div>
+
+		<div class="form-group row">
+			<div class="col-sm-6">
+				<input type="submit" th:value="${buttonText}" class="btn btn-secondary" />
+			</div>
+		</div>
+
+	</form>
+	<a href="/outstanding"><button>Volver</button></a>
+</body>
+
+</html>
