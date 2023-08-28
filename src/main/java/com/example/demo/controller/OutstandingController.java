@@ -26,7 +26,7 @@ public class OutstandingController {
 		model.addAttribute("outs", outs);
 		OutstandingFilter filter = new OutstandingFilter();
 		model.addAttribute("filter", filter);
-		return "out_all";
+		return "outstanding/out_all";
 	}
 
 	class OutstandingFilter {
@@ -139,7 +139,7 @@ public class OutstandingController {
 				filter.facility);
 		model.addAttribute("outs", outs);
 		model.addAttribute("filter", filter);
-		return "out_all";
+		return "outstanding/out_all";
 	}
 
 	@GetMapping("/create")
@@ -147,7 +147,7 @@ public class OutstandingController {
 		OutstandingEntity out = new OutstandingEntity();
 		model.addAttribute("out", out);
 		model.addAttribute("buttonText", "Crear Outstanding");
-		return "out_form";
+		return "outstanding/out_form";
 	}
 
 	@PostMapping("/save")
@@ -167,6 +167,6 @@ public class OutstandingController {
 		OutstandingEntity out = outstandingService.findOne(id);
 		model.addAttribute("out", out);
 		model.addAttribute("buttonText", "Actualizar Outstanding");
-		return "out_form";
+		return "outstanding/out_form";
 	}
 }

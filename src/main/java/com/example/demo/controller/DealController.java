@@ -26,7 +26,7 @@ public class DealController {
 		model.addAttribute("deals", deals);
 		DealFilter filter = new DealFilter();
 		model.addAttribute("filter", filter);
-		return "deal_all";
+		return "deal/deal_all";
 	}
 
 	class DealFilter {
@@ -110,7 +110,7 @@ public class DealController {
 				filter.cantidadPrestamo, filter.cantidadAbonada, filter.cantidadAPagar, filter.descuento);
 		model.addAttribute("deals", deals);
 		model.addAttribute("filter", filter);
-		return "deal_all";
+		return "deal/deal_all";
 	}
 
 	@GetMapping("/create")
@@ -118,7 +118,7 @@ public class DealController {
 		DealEntity deal = new DealEntity();
 		model.addAttribute("deal", deal);
 		model.addAttribute("buttonText", "Crear Deal");
-		return "deal_form";
+		return "deal/deal_form";
 	}
 
 	@PostMapping("/save")
@@ -138,6 +138,6 @@ public class DealController {
 		DealEntity deal = dealService.findOne(id);
 		model.addAttribute("deal", deal);
 		model.addAttribute("buttonText", "Actualizar Deal");
-		return "deal_form";
+		return "deal/deal_form";
 	}
 }
