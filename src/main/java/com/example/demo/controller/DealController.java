@@ -122,7 +122,7 @@ public class DealController {
 	}
 
 	@PostMapping("/save")
-	public String save(DealEntity deal, Model model) {
+	public String save(DealEntity deal) {
 		dealService.save(deal);
 		return "redirect:/deal";
 	}

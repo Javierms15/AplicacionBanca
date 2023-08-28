@@ -36,7 +36,7 @@ public class DealCustom {
 			qtipo = " d.tipo like :tipo";
 		}
 		if (!cliente.equals("")) {
-			qcliente = " d.cliente like :cliente";
+			qcliente = " d.cliente = :cliente";
 		}
 		if (!cantidadPrestamo.equals("")) {
 			qcantidadPrestamo = " d.cantidadPrestamo = :cantidadPrestamo";

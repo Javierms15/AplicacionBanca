@@ -57,13 +57,13 @@ public class DealServiceImpl implements IDealService {
 				Integer.parseInt(cliente);
 			}
 			if (cantidadPrestamo != "") {
-				Integer.parseInt(cantidadPrestamo);
+				Double.parseDouble(cantidadPrestamo);
 			}
 			if (cantidadAbonada != "") {
-				Integer.parseInt(cantidadAbonada);
+				Double.parseDouble(cantidadAbonada);
 			}
 			if (cantidadAPagar != "") {
-				Integer.parseInt(cantidadAPagar);
+				Double.parseDouble(cantidadAPagar);
 			}
 			if (descuento != "") {
 				Integer.parseInt(descuento);
