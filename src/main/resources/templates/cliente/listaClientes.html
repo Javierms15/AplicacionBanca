@@ -38,7 +38,8 @@
         <td th:text="${cliente.direccionLegal}"></td>
         <td th:text="${cliente.dinero}"></td>
         <td th:text="${cliente.email}"></td>
-        <td th:text="${cliente.idBanco}"></td>
+        <td th:if="${cliente.idBanco == null}"></td>
+        <td th:else th:each="banco : ${bancos}" th:if="${banco.idBanco == cliente.idBanco}" th:utext="${banco.nombre}"></td>
         <td><a th:href="@{editarCliente/} + ${cliente.idCliente}" th:text="Editar"></a></td>
         <td><a th:href="@{eliminarCliente/} + ${cliente.idCliente}" th:text="Eliminar"></a></td>
 
