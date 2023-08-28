@@ -1,6 +1,9 @@
 package com.example.demo.controller;
 
+import com.example.demo.models.dao.IBancoDao;
+import com.example.demo.models.entity.BancoEntity;
 import com.example.demo.models.entity.UsuarioEntity;
+import com.example.demo.models.service.IBancoService;
 import com.example.demo.models.service.UsuarioServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -18,13 +21,19 @@ public class UsuarioController {
     @Autowired
     private UsuarioServiceImpl usuarioService;
 
+    @Autowired
+    private IBancoService bancoService;
+
     @RequestMapping("")
-    public String prueba(Map<String, Object> model) {
+    public String inicioUsuario(Map<String, Object> model) {
         UsuarioEntity usuario = new UsuarioEntity();
         model.put("usuario", usuario);
 
         List<UsuarioEntity> listaUsuarios = usuarioService.findAll();
         model.put("usuarios", listaUsuarios);
+
+        List<BancoEntity> listaBancos = bancoService.findAll();
+        model.put("bancos", listaBancos);
 
         return "usuario/menuUsuario";
     }
@@ -46,6 +55,9 @@ public class UsuarioController {
 
         UsuarioEntity usuario = usuarioService.findOne(id);
         model.put("usuario", usuario);
+
+        List<BancoEntity> listaBancos = bancoService.findAll();
+        model.put("bancos", listaBancos);
 
         return "usuario/editarUsuario";
     }
