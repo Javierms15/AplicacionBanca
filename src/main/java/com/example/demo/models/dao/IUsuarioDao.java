@@ -7,5 +7,6 @@ import java.util.List;
 
 public interface IUsuarioDao extends CrudRepository<UsuarioEntity, Integer> {
 
+    public UsuarioEntity findUsuarioEntityByNombreAndAndContrasena(String nombre, String contrasena);
 
 }

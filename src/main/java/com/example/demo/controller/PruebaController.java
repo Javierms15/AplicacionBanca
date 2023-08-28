@@ -24,11 +24,6 @@ public class PruebaController {
 	@Autowired
 	private IBancoDao bancoDao;
 
-	@RequestMapping("/")
-	public String prueba() {
-		return "prueba";
-	}
-
 	@RequestMapping("/nuevoCliente")
 	public String mostrarPantallaNuevoCliente(Model model){
 		ClienteEntity cliente=new ClienteEntity();
