@@ -5,6 +5,7 @@ import com.example.demo.models.dao.IDealDao;
 import com.example.demo.models.dao.IFacilityDao;
 import com.example.demo.models.entity.DealEntity;
 import com.example.demo.models.entity.FacilityEntity;
+import com.example.demo.models.service.IDealService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -20,13 +21,13 @@ public class FacilityController {
     private IFacilityDao facilityDao;
 
     @Autowired
-    private IDealDao dealDao;
+    private IDealService dealService;
 
 
     @RequestMapping("/nuevaFacility")
     public String mostrarPantallaNuevaFacility(Model model){
         FacilityEntity facility=new FacilityEntity();
-        List<DealEntity> deals=dealDao.findAll();
+        List<DealEntity> deals=dealService.findAll();
         model.addAttribute("deals",deals);
         model.addAttribute("facility",facility);
         return"facility/facility";
@@ -34,7 +35,10 @@ public class FacilityController {
 
     @PostMapping("/crearFacility")
     public String crearFacility(Model model, FacilityEntity facility){
-        facilityDao.save(facility);
+        if(facilityDao.obtenerSumaFacilityDeal(facility.getDeal())+facility.getCantidad()<=dealService.findOne(facility.getDeal()).getCantidadPrestamo()) {
+            facilityDao.save(facility);
+        }
+        // AÑADIR ALARMA DE ERROR
         return "redirect:/listarFacility";
     }
 
@@ -58,7 +62,7 @@ public class FacilityController {
         FacilityEntity facility = facilityDao.findById(id).orElse(null);
         model.put("facility", facility);
 
-        List<DealEntity> deals=dealDao.findAll();
+        List<DealEntity> deals=dealService.findAll();
         Model.addAttribute("deals",deals);
         return "facility/facility_edit";
     }
