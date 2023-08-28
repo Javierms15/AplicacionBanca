@@ -221,7 +221,6 @@ public class OutstandingCustom {
 		if (!qfacility.equals("")) {
 			q.setParameter("facility", facility);
 		}
-		System.out.println("WWW");
 
 		return q.getResultList();
 	}
