@@ -6,23 +6,54 @@
 </head>
 <body>
 
-<form th:action="@{/filtrarFacility}" method="post">
-    <input type="text"  name="valor" id="valor">
-    <select name="filtro" id="filtro">
-        <option value="id">ID</option>
-        <option value="tipo">Tipo</option>
-        <option value="estado">Estado</option>
-        <option value="cantidad">Cantidad</option>
-        <option value="creacion">Fecha Creación</option>
-        <option value="efectiva">Fecha Efectiva</option>
-        <option value="finalizacion">Fecha Finalización</option>
-        <option value="deal">Deal</option>
+<form th:action="@{/filtrarFacility}" th:object="${filter}" method="post">
+        <div>
+            <label>Tipo:</label>
+            <select class="form-control" th:field="*{tipo}">
+                <option value="">---</option>
+                <option value="TERM">Term</option>
+                <option value="REVOLVER">Revolver</option>
+            </select>
+        </div>
+        <div>
+            <label>Estado:</label>
+            <select class="form-control" th:field="*{estado}">
+                <option value="">---</option>
+                <option value="PENDING">Pending</option>
+                <option value="APPROVED">Approved</option>
+                <option value="CLOSED">Closed</option>
+            </select>
+        </div>
+        <div>
+            <label>Cantidad:</label>
+            <input type="text" class="form-control" th:field="*{cantidad}" pattern="^\d*(\.\d{1,2})?$" title="Solo se permiten números con hasta 2 decimales" />
+        </div>
+        <div>
+            <label>Fecha de creación:</label>
+            <input type="date" class="form-control" th:field="*{fechaCreacion}" />
+        </div>
+        <div>
+            <label>Fecha efectiva:</label>
+            <input type="date" class="form-control" th:field="*{fechaEfectiva}" />
+        </div>
+        <div>
+            <label>Fecha de finalización:</label>
+            <input type="date" class="form-control" th:field="*{fechaFinalizacion}" />
+        </div>
+        <div>
+            <label>Deal:</label>
+            <select  th:field="*{deal}">
+                <option value="">---</option>
+                <option th:each="deal: ${deals}" th:value="${deal.idDeal}" th:itemid="${deal.idDeal}" th:text="${deal.idDeal}"></option>
+            </select><br>
+        </div>
 
-        <option value=""></option>
-    </select>
-
-    <input type="submit" value="Filtrar">
-</form>
+        <div class="form-group row">
+            <div class="col-sm-6">
+                <input type="submit" class="btn btn-secondary" value="Filtrar" />
+            </div>
+        </div>
+    </form>
 
 
 <table>

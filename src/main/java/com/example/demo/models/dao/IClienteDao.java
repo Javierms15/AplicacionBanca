@@ -2,12 +2,13 @@ package com.example.demo.models.dao;
 
 import com.example.demo.models.entity.BancoEntity;
 import com.example.demo.models.entity.ClienteEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
-public interface IClienteDao extends CrudRepository<ClienteEntity,Integer> {
+public interface IClienteDao extends JpaRepository<ClienteEntity,Integer> {
 
     @Query("select c from ClienteEntity c where c.nombreLegal like :nombre")
     public List<ClienteEntity> findByNombre(String nombre);
