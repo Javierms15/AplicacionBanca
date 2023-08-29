@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
     <meta charset="UTF-8">
     <title>Lista Facility</title>
 </head>
 <body>
 
-<form th:action="@{/filtrarFacility}" th:object="${filter}" method="post">
+<header th:replace="layout/layout :: header"></header>
+
+
+    <form th:action="@{/filtrarFacility}" th:object="${filter}" method="post">
         <div>
             <label>Tipo:</label>
             <select class="form-control" th:field="*{tipo}">
@@ -56,7 +60,7 @@
     </form>
 
 
-<table>
+<table th:if="${!facilitys.isEmpty}">
     <thead>
     <tr>
         <td>ID</td>
@@ -85,6 +89,9 @@
     </tr>
     </tbody>
 </table>
+
+<p th:if="${facilitys.isEmpty}">No existen </p>
+
 <form action="/nuevaFacility">
     <button type="submit">Nueva facility</button>
 </form>

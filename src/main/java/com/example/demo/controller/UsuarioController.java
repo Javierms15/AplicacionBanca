@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
@@ -39,14 +40,16 @@ public class UsuarioController {
     }
 
     @RequestMapping("/crearUsuario")
-    public String crearUsuario(UsuarioEntity usuario) {
+    public String crearUsuario(UsuarioEntity usuario, RedirectAttributes flash) {
         usuarioService.save(usuario);
+        flash.addFlashAttribute("success", "Usuario " + usuario.getNombre() + " creado correctamente");
         return "redirect:/usuario";
     }
 
     @RequestMapping("/eliminar/{id}")
-    public String eliminar(@PathVariable(value = "id") int id) {
+    public String eliminar(@PathVariable(value = "id") int id, RedirectAttributes flash) {
         usuarioService.delete(id);
+        flash.addFlashAttribute("success", "Usuario eliminado correctamente");
         return "redirect:/usuario";
     }
 
@@ -63,8 +66,9 @@ public class UsuarioController {
     }
 
     @RequestMapping(value = "/editarUsuario", method = RequestMethod.POST)
-    public String eliminar(UsuarioEntity usuario) {
+    public String eliminar(UsuarioEntity usuario, RedirectAttributes flash) {
         usuarioService.save(usuario);
+        flash.addFlashAttribute("success", "Usuario " + usuario.getNombre() + " editado correctamente");
         return "redirect:/usuario";
     }
 }

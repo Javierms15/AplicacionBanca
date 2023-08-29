@@ -2,10 +2,21 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
 	<meta charset="UTF-8" />
 </head>
 
 <body>
+
+<header th:replace="layout/layout :: header"></header>
+
+<div class="container py-4">
+	<div class="card bg-dark text-white">
+
+		<div class="card-header" style="font-size: xx-large">Crear deal</div>
+
+		<div class="card-body">
+
 	<form th:action="@{/deal/banks}" th:object="${deal}" method="post">
 		<input type="hidden" class="form-control" th:field="*{idDeal}" />
 		<div class="form-group row">
@@ -76,7 +87,13 @@
 		</div>
 
 	</form>
-	<a href="/deal"><button>Volver</button></a>
+
+		</div>
+
+	</div>
+</div>
+
+	<a href="/deal" class="btn btn-warning btn-xs"><button>Volver</button></a>
 </body>
 
 </html>

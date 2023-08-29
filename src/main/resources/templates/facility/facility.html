@@ -1,36 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
     <meta charset="UTF-8">
     <title>Facility</title>
 </head>
 <body>
 
+<header th:replace="layout/layout :: header"></header>
+
 <h1>Crear facility</h1>
 
 <form th:action="@{/crearFacility}" th:object="${facility}" method="post">
     <label for="tipo">Tipo</label>
-    <select name="tipo" id="tipo" required>
+    <select name="tipo" id="tipo" th:field="*{tipo}" required>
         <option value="TERM" itemid="TERM">TERM</option>
         <option value="REVOLVER" itemid="REVOLVER">REVOLVER</option>
     </select><br>
     <label for="estado">Estado:</label>
-    <select name="estado" id="estado" required>
+    <select name="estado" id="estado" th:field="*{estado}" required>
         <option value="PENDING" itemid="PENDING">PENDING</option>
         <option value="APPROVED" itemid="APPROVED">APPROVED</option>
         <option value="CLOSED" itemid="CLOSED">CLOSED</option>
     </select><br>
     <label for="cantidad">Cantidad:</label>
-    <input type="number" id="cantidad" name="cantidad" required><br>
+    <input type="number" id="cantidad" name="cantidad" th:field="*{cantidad}" required><br>
     <label for="fechaCreacion">Fecha creación:</label>
-    <input type="date" id="fechaCreacion" name="fechaCreacion" required><br>
+    <input type="date" id="fechaCreacion" name="fechaCreacion" th:field="*{fechaCreacion}" required><br>
     <label for="fechaEfectiva">Fecha efectiva:</label>
-    <input type="date" id="fechaEfectiva" name="fechaEfectiva" required><br>
+    <input type="date" id="fechaEfectiva" name="fechaEfectiva" th:field="*{fechaEfectiva}" required><br>
     <label for="fechaFinalizacion">Fecha finalización:</label>
-    <input type="date" id="fechaFinalizacion" name="fechaFinalizacion" required><br>
+    <input type="date" id="fechaFinalizacion" name="fechaFinalizacion" th:field="*{fechaFinalizacion}" required><br>
     <label for="deal">Deal:</label>
-    <select  name="deal" id="deal" required>
-        <option th:each="deal: ${deals}" th:value="${deal.idDeal}" th:itemid="${deal.idDeal}" th:text="${deal.idDeal}"></option>
+    <select name="deal" id="deal" required th:field="*{deal}">
+        <option th:each="deal: ${deals}" th:value="${deal.idDeal}" th:itemid="${deal.idDeal}"
+                th:text="${deal.idDeal}"></option>
     </select><br>
 
     <input type="submit" value="Crear">

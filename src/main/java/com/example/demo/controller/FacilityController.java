@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
@@ -30,30 +31,32 @@ public class FacilityController {
 
     @RequestMapping("/nuevaFacility")
     public String mostrarPantallaNuevaFacility(Model model){
-        FacilityEntity facility=new FacilityEntity();
-        List<DealEntity> deals=dealService.findAll();
-        model.addAttribute("deals",deals);
-        model.addAttribute("facility",facility);
-        return"facility/facility";
+        FacilityEntity facility = new FacilityEntity();
+        List<DealEntity> deals = dealService.findAll();
+        model.addAttribute("deals", deals);
+        model.addAttribute("facility", facility);
+        return "facility/facility";
     }
 
     @PostMapping("/crearFacility")
-    public String crearFacility(Model model, FacilityEntity facility){
-        int aux1= facility.getDeal();
-        Double aux2=facility.getCantidad();
+    public String crearFacility(Model model, FacilityEntity facility, RedirectAttributes flash){
 
-        Double dinero = facilityDao.obtenerSumaFacilityDeal(aux1);
-        if(dinero!=null) {
-            if (dinero + aux2 <= dealService.findOne(facility.getDeal()).getCantidadPrestamo()) {
-                facilityDao.save(facility);
-            }
+        Double sumaTotalAcumulada = facilityDao.obtenerSumaFacilityDeal(facility.getDeal()) == null? 0 : facilityDao.obtenerSumaFacilityDeal(facility.getDeal());
+        Double sumaTotalTeorica = sumaTotalAcumulada + facility.getCantidad();
+        Double totalPrestamoDeal = dealService.findOne(facility.getDeal()).getCantidadPrestamo();
+
+        if(sumaTotalTeorica <= totalPrestamoDeal) {
+            facilityDao.save(facility);
+            flash.addFlashAttribute("success", "Facility creada correctamente");
+            return "redirect:/listarFacility";
         }else{
-            if (aux2 <= dealService.findOne(facility.getDeal()).getCantidadPrestamo()) {
-                facilityDao.save(facility);
-            }
+            model.addAttribute("error", "La cantidad total de la facility no puede superar los " + (totalPrestamoDeal - sumaTotalAcumulada));
+            facility.setCantidad(0);
+            model.addAttribute("facility", facility);
+            List<DealEntity> deals = dealService.findAll();
+            model.addAttribute("deals", deals);
+            return "facility/facility";
         }
-        // AÑADIR ALARMA DE ERROR
-        return "redirect:/listarFacility";
     }
 
     @RequestMapping("/listarFacility")
@@ -68,9 +71,10 @@ public class FacilityController {
     }
 
     @RequestMapping("eliminarFacility/{id}")
-    public String eliminar(@PathVariable(value = "id") int id) {
+    public String eliminar(@PathVariable(value = "id") int id,  RedirectAttributes flash) {
         FacilityEntity facility=facilityDao.findById(id).orElse(null);
         facilityDao.delete(facility);
+        flash.addFlashAttribute("success", "Facility eliminada correctamente");
         return "redirect:/listarFacility";
     }
 
@@ -80,15 +84,34 @@ public class FacilityController {
         FacilityEntity facility = facilityDao.findById(id).orElse(null);
         model.put("facility", facility);
 
-        List<FacilityEntity> deals=facilityService.findAll();
+        List<DealEntity> deals=dealService.findAll();
         Model.addAttribute("deals",deals);
+
         return "facility/facility_edit";
     }
 
     @RequestMapping(value = "/editarFacilitySave", method = RequestMethod.POST)
-    public String editarFacilitySave(FacilityEntity facility) {
-        facilityDao.save(facility);
-        return "redirect:/listarFacility";
+    public String editarFacilitySave(FacilityEntity facility, RedirectAttributes flash, Model model) {
+
+
+
+        Double sumaTotalAcumulada = facilityDao.obtenerSumaFacilityDeal(facility.getDeal()) == null? 0 : facilityDao.obtenerSumaFacilityDeal(facility.getDeal());
+        sumaTotalAcumulada-= facilityDao.findById(facility.getIdFacility()).orElse(null).getCantidad();
+        Double sumaTotalTeorica = sumaTotalAcumulada + facility.getCantidad();
+        Double totalPrestamoDeal = dealService.findOne(facility.getDeal()).getCantidadPrestamo();
+
+        if(sumaTotalTeorica <= totalPrestamoDeal) {
+            facilityDao.save(facility);
+            flash.addFlashAttribute("success", "Facility creada correctamente");
+            return "redirect:/listarFacility";
+        }else{
+            model.addAttribute("error", "La cantidad total de la facility no puede superar los " + (totalPrestamoDeal - sumaTotalAcumulada));
+            facility.setCantidad(0);
+            model.addAttribute("facility", facility);
+            List<DealEntity> deals = dealService.findAll();
+            model.addAttribute("deals", deals);
+            return "facility/facility_edit";
+        }
     }
 
     @RequestMapping(value = "/filtrarFacility")

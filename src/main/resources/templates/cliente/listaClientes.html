@@ -7,6 +7,8 @@
 </head>
 <body>
 
+<header th:replace="layout/layout :: header"></header>
+
 <form th:action="@{/filtrar}" method="post">
     <input type="text"  name="valor" id="valor">
     <select name="filtro" id="filtro">
