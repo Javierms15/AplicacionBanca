@@ -11,7 +11,7 @@
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Estado</label>
 			<div class="col-sm-6">
-				<select class="form-control" th:field="*{estado}">
+				<select class="form-control" th:field="*{estado}" required>
 					<option value="PENDING">Pending</option>
 					<option value="APPROVED">Approved</option>
 					<option value="CLOSED">Closed</option>
@@ -21,25 +21,28 @@
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Cantidad Prestamo</label>
 			<div class="col-sm-6">
-				<input type="text" th:field="*{cantidadPrestamo}" class="form-control" />
+				<input type="text" th:field="*{cantidadPrestamo}" pattern="^\d*(\.\d{1,2})?$"
+					title="Solo se permiten números con hasta 2 decimales" class="form-control" required />
 			</div>
 		</div>
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Cantidad Abonada</label>
 			<div class="col-sm-6">
-				<input type="text" th:field="*{cantidadAbonada}" class="form-control" />
+				<input type="text" th:field="*{cantidadAbonada}" pattern="^\d*(\.\d{1,2})?$"
+					title="Solo se permiten números con hasta 2 decimales" class="form-control" required />
 			</div>
 		</div>
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Cantidad A Pagar</label>
 			<div class="col-sm-6">
-				<input type="text" th:field="*{cantidadAPagar}" class="form-control" />
+				<input type="text" th:field="*{cantidadAPagar}" pattern="^\d*(\.\d{1,2})?$"
+					title="Solo se permiten números con hasta 2 decimales" class="form-control" required />
 			</div>
 		</div>
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Moneda</label>
 			<div class="col-sm-6">
-				<select class="form-control" th:field="*{moneda}">
+				<select class="form-control" th:field="*{moneda}" required>
 					<option value="EUR">Euro</option>
 					<option value="USD">Dolar estadounidense</option>
 					<option value="JPY">Yen</option>
@@ -50,7 +53,7 @@
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Tipo</label>
 			<div class="col-sm-6">
-				<select class="form-control" th:field="*{tipo}">
+				<select class="form-control" th:field="*{tipo}" required>
 					<option value="SOLE_LENDER">Sole lender</option>
 					<option value="SYNDICATED">Syndicated</option>
 				</select>
@@ -59,13 +62,18 @@
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Descuento</label>
 			<div class="col-sm-6">
-				<input type="text" th:field="*{descuento}" class="form-control" />
+				<select class="form-control" th:field="*{descuento}" required>
+					<option value="0">NO</option>
+					<option value="1">SI</option>
+				</select>
 			</div>
 		</div>
 		<div class="form-group row">
-			<label class="col-sm-2 col-form-label">Cliente ID</label>
+			<label class="col-sm-2 col-form-label">Cliente</label>
 			<div class="col-sm-6">
-				<input type="text" th:field="*{cliente}" class="form-control" />
+				<select class="form-control" th:field="*{cliente}" required>
+					<option th:each="cliente: ${clientes}" th:value="${cliente.idCliente}" th:text="${cliente.nombreLegal}"></option>
+				</select>
 			</div>
 		</div>
 

@@ -38,23 +38,34 @@
 		</div>
 		<div>
 			<label>Cantidad Prestamo:</label>
-			<input type="text" class="form-control" th:field="*{cantidadPrestamo}" />
+			<input type="text" class="form-control" th:field="*{cantidadPrestamo}" pattern="^\d*(\.\d{1,2})?$"
+				title="Solo se permiten números con hasta 2 decimales" />
 		</div>
 		<div>
 			<label>Cantidad Abonada:</label>
-			<input type="text" class="form-control" th:field="*{cantidadAbonada}" />
+			<input type="text" class="form-control" th:field="*{cantidadAbonada}" pattern="^\d*(\.\d{1,2})?$"
+				title="Solo se permiten números con hasta 2 decimales" />
 		</div>
 		<div>
 			<label>Cantidad A Pagar:</label>
-			<input type="text" class="form-control" th:field="*{cantidadAPagar}" />
+			<input type="text" class="form-control" th:field="*{cantidadAPagar}" pattern="^\d*(\.\d{1,2})?$"
+				title="Solo se permiten números con hasta 2 decimales" />
 		</div>
 		<div>
 			<label>Descuento:</label>
-			<input type="text" class="form-control" th:field="*{descuento}" />
+			<select class="form-control" th:field="*{descuento}">
+				<option value="">---</option>
+				<option value="0">No</option>
+				<option value="1">SI</option>
+			</select>
 		</div>
 		<div>
 			<label>Cliente:</label>
-			<input type="text" class="form-control" th:field="*{cliente}" />
+			<select class="form-control" th:field="*{cliente}">
+				<option value="">---</option>
+				<option th:each="cliente: ${clientes}" th:value="${cliente.idCliente}" th:text="${cliente.nombreLegal}">
+				</option>
+			</select>
 		</div>
 		<div class="form-group row">
 			<div class="col-sm-6">
@@ -85,8 +96,9 @@
 				<td th:text="${deal.cantidadAPagar}"></td>
 				<td th:text="${deal.moneda}"></td>
 				<td th:text="${deal.tipo}"></td>
-				<td th:text="${deal.descuento}"></td>
-				<td th:text="${deal.cliente}"></td>
+				<td th:text="${deal.descuento == 0 ? 'NO' : 'SI'}"></td>
+				<td th:each="cliente: ${clientes}" th:if="${deal.cliente == cliente.idCliente}"
+					th:text="${cliente.nombreLegal}"></td>
 				<td><a th:href="@{/deal/edit/} + ${deal.idDeal}">Editar</a></td>
 				<td><a th:href="@{/deal/delete/} + ${deal.idDeal}">Borrar</a></td>
 			</tr>

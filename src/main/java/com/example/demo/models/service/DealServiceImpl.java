@@ -52,26 +52,6 @@ public class DealServiceImpl implements IDealService {
 			return findAll();
 		}
 
-		try {
-			if (cliente != "") {
-				Integer.parseInt(cliente);
-			}
-			if (cantidadPrestamo != "") {
-				Double.parseDouble(cantidadPrestamo);
-			}
-			if (cantidadAbonada != "") {
-				Double.parseDouble(cantidadAbonada);
-			}
-			if (cantidadAPagar != "") {
-				Double.parseDouble(cantidadAPagar);
-			}
-			if (descuento != "") {
-				Integer.parseInt(descuento);
-			}
-		} catch (NumberFormatException e) {
-			return findAll();
-		}
-
 		return dealCustom.filtradoDeal(estado, moneda, tipo, cliente, cantidadPrestamo, cantidadAbonada, cantidadAPagar,
 				descuento);
 	}

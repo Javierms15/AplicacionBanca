@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.models.entity.BancoEntity;
+import com.example.demo.models.entity.ClienteEntity;
 import com.example.demo.models.entity.DealEntity;
 import com.example.demo.models.entity.ParticipanteEntity;
 import com.example.demo.models.service.IBancoService;
+import com.example.demo.models.service.IClienteService;
 import com.example.demo.models.service.IDealService;
 import com.example.demo.models.service.IParticipanteService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,11 +34,16 @@ public class DealController {
 	@Autowired
 	IBancoService bancoService;
 
+	@Autowired
+	IClienteService clienteService;
+	
 	@GetMapping({ "", "/" })
 	public String ver(Model model) {
 		List<DealEntity> deals = dealService.findAll();
 		model.addAttribute("deals", deals);
 		DealFilter filter = new DealFilter();
+		List<ClienteEntity> clientes = clienteService.findAll();
+		model.addAttribute("clientes", clientes);
 		model.addAttribute("filter", filter);
 		return "deal/deal_all";
 	}
@@ -121,6 +128,8 @@ public class DealController {
 		List<DealEntity> deals = dealService.filter(filter.estado, filter.moneda, filter.tipo, filter.cliente,
 				filter.cantidadPrestamo, filter.cantidadAbonada, filter.cantidadAPagar, filter.descuento);
 		model.addAttribute("deals", deals);
+		List<ClienteEntity> clientes = clienteService.findAll();
+		model.addAttribute("clientes", clientes);
 		model.addAttribute("filter", filter);
 		return "deal/deal_all";
 	}
@@ -129,6 +138,8 @@ public class DealController {
 	public String crear(Model model) {
 		DealEntity deal = new DealEntity();
 		model.addAttribute("deal", deal);
+		List<ClienteEntity> clientes = clienteService.findAll();
+		model.addAttribute("clientes", clientes);
 		model.addAttribute("buttonText", "Crear Deal");
 		return "deal/deal_form";
 	}
@@ -143,7 +154,7 @@ public class DealController {
 
 	@PostMapping("/save")
 	public String save(DealEntity deal, @RequestParam(name = "banco") int id,
-			@RequestParam(name = "agente") int agenteId, HttpServletRequest req) {
+			@RequestParam(name = "agente", required = false) Integer agenteId, HttpServletRequest req) {
 		ParticipanteEntity participante;
 		dealService.save(deal);
 		if (((String) deal.getTipo()).equals("SOLE_LENDER")) {
@@ -184,6 +195,8 @@ public class DealController {
 	public String edit(@PathVariable int id, Model model) {
 		DealEntity deal = dealService.findOne(id);
 		model.addAttribute("deal", deal);
+		List<ClienteEntity> clientes = clienteService.findAll();
+		model.addAttribute("clientes", clientes);
 		model.addAttribute("buttonText", "Actualizar Deal");
 		return "deal/deal_form";
 	}
