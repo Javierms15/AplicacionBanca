@@ -1,6 +1,6 @@
 HELP.md
-/target/
 !/target/AplicacionBanca-0.0.1-SNAPSHOT.jar
+
 ### STS ###
 .metadata
 .apt_generated
