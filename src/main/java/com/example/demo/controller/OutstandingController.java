@@ -16,6 +16,7 @@ import com.example.demo.models.entity.TipoInteresEntity;
 import com.example.demo.models.service.IFacilityService;
 import com.example.demo.models.service.IOutstandingService;
 import com.example.demo.models.service.ITipoInteresService;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/outstanding")
@@ -173,14 +174,16 @@ public class OutstandingController {
 	}
 
 	@PostMapping("/save")
-	public String save(OutstandingEntity out) {
+	public String save(OutstandingEntity out, RedirectAttributes flash) {
 		outstandingService.save(out);
+		flash.addFlashAttribute("success", "Outstanding guardado correctamente");
 		return "redirect:/outstanding";
 	}
 
 	@GetMapping("/delete/{id}")
-	public String delete(@PathVariable int id) {
+	public String delete(@PathVariable int id, RedirectAttributes flash) {
 		outstandingService.delete(id);
+		flash.addFlashAttribute("success", "Outstanding eliminado correctamente");
 		return "redirect:/outstanding";
 	}
 
