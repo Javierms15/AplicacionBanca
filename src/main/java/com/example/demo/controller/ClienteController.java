@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,8 +33,10 @@ public class ClienteController {
 	}
 
 	@PostMapping("/crearCliente")
-	public String crearCliente(Model model, ClienteEntity cliente){
+	public String crearCliente(Model model, ClienteEntity cliente, RedirectAttributes flash){
 		clienteDao.save(cliente);
+		flash.addFlashAttribute("success", "Cliente " + cliente.getNombreLegal() + " creado correctamente");
+
 		return "redirect:/listarClientes";
 	}
 
@@ -47,9 +50,10 @@ public class ClienteController {
 	}
 
 	@RequestMapping("eliminarCliente/{id}")
-	public String eliminar(@PathVariable(value = "id") int id) {
+	public String eliminar(@PathVariable(value = "id") int id, RedirectAttributes flash) {
 		ClienteEntity cliente=clienteDao.findById(id).orElse(null);
 		clienteDao.delete(cliente);
+		flash.addFlashAttribute("success", "Cliente eliminado correctamente");
 		return "redirect:/listarClientes";
 	}
 
@@ -60,13 +64,13 @@ public class ClienteController {
 		model.put("cliente", cliente);
 		List<BancoEntity> bancos= (List<BancoEntity>) bancoDao.findAll();
 		Model.addAttribute("bancos",bancos);
-
 		return "cliente/editarCliente";
 	}
 
 	@RequestMapping(value = "/editarClienteSave", method = RequestMethod.POST)
-	public String editarClienteSave(ClienteEntity cliente) {
+	public String editarClienteSave(ClienteEntity cliente, RedirectAttributes flash) {
 		clienteDao.save(cliente);
+		flash.addFlashAttribute("success", "Cliente " + cliente.getNombreLegal() + " creado correctamente");
 		return "redirect:/listarClientes";
 	}
 

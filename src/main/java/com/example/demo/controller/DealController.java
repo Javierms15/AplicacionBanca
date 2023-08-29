@@ -20,6 +20,7 @@ import com.example.demo.models.service.IClienteService;
 import com.example.demo.models.service.IDealService;
 import com.example.demo.models.service.IParticipanteService;
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/deal")
@@ -154,7 +155,7 @@ public class DealController {
 
 	@PostMapping("/save")
 	public String save(DealEntity deal, @RequestParam(name = "banco") int id,
-			@RequestParam(name = "agente", required = false) Integer agenteId, HttpServletRequest req) {
+			@RequestParam(name = "agente", required = false) Integer agenteId, HttpServletRequest req, RedirectAttributes flash) {
 		ParticipanteEntity participante;
 		dealService.save(deal);
 		if (((String) deal.getTipo()).equals("SOLE_LENDER")) {
@@ -182,12 +183,14 @@ public class DealController {
 				participanteService.save(participante);
 			}
 		}
+		flash.addFlashAttribute("success", "Deal guardado correctamente");
 		return "redirect:/deal";
 	}
 
 	@GetMapping("/delete/{id}")
-	public String delete(@PathVariable int id) {
+	public String delete(@PathVariable int id, RedirectAttributes flash) {
 		dealService.delete(id);
+		flash.addFlashAttribute("success", "Deal eliminado correctamente");
 		return "redirect:/deal";
 	}
 

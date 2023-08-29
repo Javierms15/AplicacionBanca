@@ -5,17 +5,20 @@ import com.example.demo.models.entity.FacilityEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import org.springframework.context.annotation.Bean;
+import org.springframework.stereotype.Repository;
 
+import java.sql.Date;
 import java.util.List;
-
+@Repository
 public class FacilityCustom {
 
     @PersistenceContext
     EntityManager em;
 
-    public List<FacilityEntity> filtradoFacility(String id, String tipo, String estado, String cantidad,
+    public List<FacilityEntity> filtradoFacility(String tipo, String estado, String cantidad,
                                              String fechaCreacion, String fechaEfectiva, String fechaFinalizacion, String deal) {
-        String qid = "";
+
         String qtipo = "";
         String qestado = "";
         String qcantidad = "";
@@ -24,9 +27,7 @@ public class FacilityCustom {
         String qfechaFinalizacion = "";
         String qdeal = "";
 
-        if (!id.equals("")) {
-            qestado = " d.idFacility like :id";
-        }
+
         if (!tipo.equals("")) {
             qtipo = " d.tipo like :tipo";
         }
@@ -52,16 +53,8 @@ public class FacilityCustom {
         String query = "SELECT d FROM FacilityEntity d WHERE";
 
         boolean x = false;
-        if (!id.equals("")) {
-            query += qid;
-            x = true;
-        }
 
         if (!tipo.equals("")) {
-            if (x) {
-                query += " AND ";
-                x = false;
-            }
 
             query += qtipo;
             x = true;
@@ -128,9 +121,7 @@ public class FacilityCustom {
         }
 
         Query q = this.em.createQuery(query);
-        if (!qid.equals("")) {
-            q.setParameter("id", id);
-        }
+
 
         if (!qtipo.equals("")) {
             q.setParameter("tipo", tipo);
@@ -145,15 +136,18 @@ public class FacilityCustom {
         }
 
         if (!qfechaCreacion.equals("")) {
-            q.setParameter("fechaCreacion", fechaCreacion);
+            Date fechaCreacion2 = Date.valueOf(fechaCreacion);
+            q.setParameter("fechaCreacion", fechaCreacion2);
         }
 
         if (!qfechaFinalizacion.equals("")) {
-            q.setParameter("fechaFinalizacion", fechaFinalizacion);
+            Date fechaFinalizacion2 = Date.valueOf(fechaFinalizacion);
+            q.setParameter("fechaFinalizacion", fechaFinalizacion2);
         }
 
         if (!qfechaEfectiva.equals("")) {
-            q.setParameter("fechaEfectiva", fechaEfectiva);
+            Date fechaEfectiva2 = Date.valueOf(fechaEfectiva);
+            q.setParameter("fechaEfectiva", fechaEfectiva2);
         }
 
         if (!qdeal.equals("")) {
