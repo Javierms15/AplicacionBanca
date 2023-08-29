@@ -11,13 +11,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.demo.models.dao.IBancoDao;
 import com.example.demo.models.entity.BancoEntity;
 import com.example.demo.models.entity.DealEntity;
 import com.example.demo.models.entity.ParticipanteEntity;
-import com.example.demo.models.service.DealServiceImpl;
-import com.example.demo.models.service.ParticipanteServiceImpl;
-
+import com.example.demo.models.service.IBancoService;
+import com.example.demo.models.service.IDealService;
+import com.example.demo.models.service.IParticipanteService;
 import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
@@ -25,13 +24,13 @@ import jakarta.servlet.http.HttpServletRequest;
 public class DealController {
 
 	@Autowired
-	DealServiceImpl dealService;
+	IDealService dealService;
 
 	@Autowired
-	ParticipanteServiceImpl participanteService;
+	IParticipanteService participanteService;
 
 	@Autowired
-	IBancoDao bancoDao;
+	IBancoService bancoService;
 
 	@GetMapping({ "", "/" })
 	public String ver(Model model) {
@@ -137,7 +136,7 @@ public class DealController {
 	@PostMapping("/banks")
 	public String banks(DealEntity deal, Model model) {
 		model.addAttribute("deal", deal);
-		List<BancoEntity> bancos = (List<BancoEntity>) bancoDao.findAll();
+		List<BancoEntity> bancos = bancoService.findAll();
 		model.addAttribute("bancos", bancos);
 		return "deal/deal_add_banks";
 	}
@@ -148,7 +147,6 @@ public class DealController {
 		ParticipanteEntity participante;
 		dealService.save(deal);
 		if (((String) deal.getTipo()).equals("SOLE_LENDER")) {
-			System.out.println(id);
 			participante = new ParticipanteEntity();
 			participante.setIdBanco(id);
 			participante.setIdDeal(deal.getIdDeal());
@@ -157,7 +155,6 @@ public class DealController {
 		} else {
 			String[] bancoReq = req.getParameterValues("banco");
 			for (String bancoIdStr : bancoReq) {
-				System.out.println(bancoIdStr);
 				participante = new ParticipanteEntity();
 				try {
 					int bancoId = Integer.parseInt(bancoIdStr);

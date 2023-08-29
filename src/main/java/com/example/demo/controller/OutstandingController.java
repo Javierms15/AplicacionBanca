@@ -11,14 +11,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.example.demo.models.entity.OutstandingEntity;
-import com.example.demo.models.service.OutstandingServiceImpl;
+import com.example.demo.models.service.IOutstandingService;
 
 @Controller
 @RequestMapping("/outstanding")
 public class OutstandingController {
 
 	@Autowired
-	private OutstandingServiceImpl outstandingService;
+	private IOutstandingService outstandingService;
 
 	@GetMapping({ "", "/" })
 	public String ver(Model model) {

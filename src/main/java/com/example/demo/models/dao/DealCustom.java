@@ -17,39 +17,15 @@ public class DealCustom {
 
 	public List<DealEntity> filtradoDeal(String estado, String moneda, String tipo, String cliente,
 			String cantidadPrestamo, String cantidadAbonada, String cantidadAPagar, String descuento) {
-		String qestado = "";
-		String qmoneda = "";
-		String qtipo = "";
-		String qcliente = "";
-		String qcantidadPrestamo = "";
-		String qcantidadAbonada = "";
-		String qcantidadAPagar = "";
-		String qdescuento = "";
+		String qestado = estado.equals("") ? "" : " d.estado = :estado";
+		String qmoneda = moneda.equals("") ? "" : " d.moneda = :moneda";
+		String qtipo = tipo.equals("") ? "" : " d.tipo = :tipo";
+		String qcliente = cliente.equals("") ? "" : " d.cliente = :cliente";
+		String qcantidadPrestamo = cantidadPrestamo.equals("") ? "" : " d.cantidadPrestamo = :cantidadPrestamo";
+		String qcantidadAbonada = cantidadAbonada.equals("") ? "" : " d.cantidadAbonada = :cantidadAbonada";
+		String qcantidadAPagar = cantidadAPagar.equals("") ? "" : " d.cantidadAPagar = :cantidadAPagar";
+		String qdescuento = descuento.equals("") ? "" : " d.descuento = :descuento";
 
-		if (!estado.equals("")) {
-			qestado = " d.estado like :estado";
-		}
-		if (!moneda.equals("")) {
-			qmoneda = " d.moneda like :moneda";
-		}
-		if (!tipo.equals("")) {
-			qtipo = " d.tipo like :tipo";
-		}
-		if (!cliente.equals("")) {
-			qcliente = " d.cliente = :cliente";
-		}
-		if (!cantidadPrestamo.equals("")) {
-			qcantidadPrestamo = " d.cantidadPrestamo = :cantidadPrestamo";
-		}
-		if (!cantidadAbonada.equals("")) {
-			qcantidadAbonada = " d.cantidadAbonada = :cantidadAbonada";
-		}
-		if (!cantidadAPagar.equals("")) {
-			qcantidadAPagar = " d.cantidadAPagar = :cantidadAPagar";
-		}
-		if (!descuento.equals("")) {
-			qdescuento = " d.descuento = :descuento";
-		}
 		String query = "SELECT d FROM DealEntity d WHERE";
 
 		boolean x = false;
@@ -61,7 +37,6 @@ public class DealCustom {
 		if (!moneda.equals("")) {
 			if (x) {
 				query += " AND ";
-				x = false;
 			}
 
 			query += qmoneda;
@@ -71,7 +46,6 @@ public class DealCustom {
 		if (!tipo.equals("")) {
 			if (x) {
 				query += " AND ";
-				x = false;
 			}
 
 			query += qtipo;
@@ -81,7 +55,6 @@ public class DealCustom {
 		if (!cliente.equals("")) {
 			if (x) {
 				query += " AND ";
-				x = false;
 			}
 
 			query += qcliente;
@@ -91,7 +64,6 @@ public class DealCustom {
 		if (!cantidadPrestamo.equals("")) {
 			if (x) {
 				query += " AND ";
-				x = false;
 			}
 
 			query += qcantidadPrestamo;
@@ -101,7 +73,6 @@ public class DealCustom {
 		if (!cantidadAbonada.equals("")) {
 			if (x) {
 				query += " AND ";
-				x = false;
 			}
 
 			query += qcantidadAbonada;
@@ -111,7 +82,6 @@ public class DealCustom {
 		if (!cantidadAPagar.equals("")) {
 			if (x) {
 				query += " AND ";
-				x = false;
 			}
 
 			query += qcantidadAPagar;
@@ -121,7 +91,6 @@ public class DealCustom {
 		if (!descuento.equals("")) {
 			if (x) {
 				query += " AND ";
-				x = false;
 			}
 
 			query += qdescuento;
@@ -129,6 +98,7 @@ public class DealCustom {
 		}
 
 		Query q = this.em.createQuery(query);
+		
 		if (!qestado.equals("")) {
 			q.setParameter("estado", estado);
 		}

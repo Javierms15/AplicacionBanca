@@ -20,51 +20,18 @@ public class OutstandingCustom {
 			String fechaCreacion, String fechaFinalizacion, String pagoPrincipal, String pagoIntereses,
 			String tipoInteres, String tipoCobros, String periodicidad, String cantidadCobroPeriodico,
 			String facility) {
-		String qcantidadRestante = "";
-		String qfechaEfectiva = "";
-		String qfechaCreacion = "";
-		String qfechaFinalizacion = "";
-		String qpagoPrincipal = "";
-		String qpagoIntereses = "";
-		String qtipoInteres = "";
-		String qtipoCobros = "";
-		String qperiodicidad = "";
-		String qcantidadCobroPeriodico = "";
-		String qfacility = "";
+		String qcantidadRestante = cantidadRestante.equals("") ? "" : " o.cantidadRestante = :cantidadRestante";
+		String qfechaEfectiva = fechaEfectiva.equals("") ? "" : " o.fechaEfectiva = :fechaEfectiva";
+		String qfechaCreacion = fechaCreacion.equals("") ? "" : " o.fechaCreacion = :fechaCreacion";
+		String qfechaFinalizacion = fechaFinalizacion.equals("") ? "" : " o.fechaFinalizacion = :fechaFinalizacion";
+		String qpagoPrincipal = pagoPrincipal.equals("") ? "" : " o.pagoPrincipal = :pagoPrincipal";
+		String qpagoIntereses = pagoIntereses.equals("") ? "" : " o.pagoIntereses = :pagoIntereses";
+		String qtipoInteres = tipoInteres.equals("") ? "" : " o.tipoInteres = :tipoInteres";
+		String qtipoCobros = tipoCobros.equals("") ? "" : " o.tipoCobros = :tipoCobros";
+		String qperiodicidad = periodicidad.equals("") ? "" : " o.periodicidad = :periodicidad";
+		String qcantidadCobroPeriodico = cantidadCobroPeriodico.equals("") ? "" : " o.cantidadCobroPeriodico = :cantidadCobroPeriodico";
+		String qfacility = facility.equals("") ? "" : " o.facility = :facility";
 
-		if (!cantidadRestante.equals("")) {
-			qcantidadRestante = " o.cantidadRestante = :cantidadRestante";
-		}
-		if (!fechaEfectiva.equals("")) {
-			qfechaEfectiva = " o.fechaEfectiva = :fechaEfectiva";
-		}
-		if (!fechaCreacion.equals("")) {
-			qfechaCreacion = " o.fechaCreacion = :fechaCreacion";
-		}
-		if (!fechaFinalizacion.equals("")) {
-			qfechaFinalizacion = " o.fechaFinalizacion = :fechaFinalizacion";
-		}
-		if (!pagoPrincipal.equals("")) {
-			qpagoPrincipal = " o.pagoPrincipal = :pagoPrincipal";
-		}
-		if (!pagoIntereses.equals("")) {
-			qpagoIntereses = " o.pagoIntereses = :pagoIntereses";
-		}
-		if (!tipoInteres.equals("")) {
-			qtipoInteres = " o.tipoInteres = :tipoInteres";
-		}
-		if (!tipoCobros.equals("")) {
-			qtipoCobros = " o.tipoCobros = :tipoCobros";
-		}
-		if (!periodicidad.equals("")) {
-			qperiodicidad = " o.periodicidad = :periodicidad";
-		}
-		if (!cantidadCobroPeriodico.equals("")) {
-			qcantidadCobroPeriodico = " o.cantidadCobroPeriodico = :cantidadCobroPeriodico";
-		}
-		if (!facility.equals("")) {
-			qfacility = " o.facility = :facility";
-		}
 		String query = "SELECT o FROM OutstandingEntity o WHERE";
 
 		boolean x = false;
