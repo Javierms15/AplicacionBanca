@@ -10,8 +10,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.example.demo.models.entity.FacilityEntity;
 import com.example.demo.models.entity.OutstandingEntity;
+import com.example.demo.models.entity.TipoInteresEntity;
+import com.example.demo.models.service.IFacilityService;
 import com.example.demo.models.service.IOutstandingService;
+import com.example.demo.models.service.ITipoInteresService;
 
 @Controller
 @RequestMapping("/outstanding")
@@ -20,12 +24,22 @@ public class OutstandingController {
 	@Autowired
 	private IOutstandingService outstandingService;
 
+	@Autowired
+	private IFacilityService facilityService;
+
+	@Autowired
+	private ITipoInteresService tipoInteresService;
+	
 	@GetMapping({ "", "/" })
 	public String ver(Model model) {
 		List<OutstandingEntity> outs = outstandingService.findAll();
 		model.addAttribute("outs", outs);
 		OutstandingFilter filter = new OutstandingFilter();
 		model.addAttribute("filter", filter);
+		List<FacilityEntity> facilities = facilityService.findAll();
+		model.addAttribute("facilities", facilities);
+		List<TipoInteresEntity> tipoIntereses = tipoInteresService.findAll();
+		model.addAttribute("tipoIntereses", tipoIntereses);
 		return "outstanding/out_all";
 	}
 
@@ -139,6 +153,10 @@ public class OutstandingController {
 				filter.facility);
 		model.addAttribute("outs", outs);
 		model.addAttribute("filter", filter);
+		List<FacilityEntity> facilities = facilityService.findAll();
+		model.addAttribute("facilities", facilities);
+		List<TipoInteresEntity> tipoIntereses = tipoInteresService.findAll();
+		model.addAttribute("tipoIntereses", tipoIntereses);
 		return "outstanding/out_all";
 	}
 
@@ -147,6 +165,10 @@ public class OutstandingController {
 		OutstandingEntity out = new OutstandingEntity();
 		model.addAttribute("out", out);
 		model.addAttribute("buttonText", "Crear Outstanding");
+		List<FacilityEntity> facilities = facilityService.findAll();
+		model.addAttribute("facilities", facilities);
+		List<TipoInteresEntity> tipoIntereses = tipoInteresService.findAll();
+		model.addAttribute("tipoIntereses", tipoIntereses);
 		return "outstanding/out_form";
 	}
 

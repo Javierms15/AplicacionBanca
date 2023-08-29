@@ -37,7 +37,7 @@ public class DealController {
 
 	@Autowired
 	IClienteService clienteService;
-	
+
 	@GetMapping({ "", "/" })
 	public String ver(Model model) {
 		List<DealEntity> deals = dealService.findAll();
@@ -138,6 +138,8 @@ public class DealController {
 	@GetMapping("/create")
 	public String crear(Model model) {
 		DealEntity deal = new DealEntity();
+		deal.setEstado("PENDING");
+		deal.setCantidadAbonada(0);
 		model.addAttribute("deal", deal);
 		List<ClienteEntity> clientes = clienteService.findAll();
 		model.addAttribute("clientes", clientes);
@@ -155,8 +157,10 @@ public class DealController {
 
 	@PostMapping("/save")
 	public String save(DealEntity deal, @RequestParam(name = "banco") int id,
-			@RequestParam(name = "agente", required = false) Integer agenteId, HttpServletRequest req, RedirectAttributes flash) {
+			@RequestParam(name = "agente", required = false) Integer agenteId, HttpServletRequest req,
+			RedirectAttributes flash) {
 		ParticipanteEntity participante;
+		deal.setCantidadAPagar(deal.getCantidadPrestamo());
 		dealService.save(deal);
 		if (((String) deal.getTipo()).equals("SOLE_LENDER")) {
 			participante = new ParticipanteEntity();

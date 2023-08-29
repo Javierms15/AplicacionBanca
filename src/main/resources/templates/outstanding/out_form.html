@@ -11,49 +11,56 @@
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Cantidad Restante</label>
 			<div class="col-sm-6">
-				<input type="text" th:field="*{cantidadRestante}" class="form-control" />
+				<input type="text" th:field="*{cantidadRestante}" class="form-control" pattern="^\d*(\.\d{1,2})?$"
+					title="Solo se permiten números con hasta 2 decimales" required />
 			</div>
 		</div>
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Fecha Efectiva</label>
 			<div class="col-sm-6">
-				<input type="date" th:field="*{fechaEfectiva}" class="form-control" />
+				<input type="date" th:field="*{fechaEfectiva}" class="form-control" required />
 			</div>
 		</div>
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Fecha Creacion</label>
 			<div class="col-sm-6">
-				<input type="date" th:field="*{fechaCreacion}" class="form-control" />
+				<input type="date" th:field="*{fechaCreacion}" class="form-control" required />
 			</div>
 		</div>
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Fecha finalizacion</label>
 			<div class="col-sm-6">
-				<input type="date" th:field="*{fechaFinalizacion}" class="form-control" />
+				<input type="date" th:field="*{fechaFinalizacion}" class="form-control" required />
 			</div>
 		</div>
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Pago Principal</label>
 			<div class="col-sm-6">
-				<input type="text" th:field="*{pagoPrincipal}" class="form-control" />
+				<input type="text" th:field="*{pagoPrincipal}" class="form-control" pattern="^\d*(\.\d{1,2})?$"
+					title="Solo se permiten números con hasta 2 decimales" required />
 			</div>
 		</div>
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Pago Intereses</label>
 			<div class="col-sm-6">
-				<input type="text" th:field="*{pagoIntereses}" class="form-control" />
+				<input type="text" th:field="*{pagoIntereses}" class="form-control" pattern="^\d*(\.\d{1,2})?$"
+					title="Solo se permiten números con hasta 2 decimales" required />
 			</div>
 		</div>
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Tipo Interes</label>
 			<div class="col-sm-6">
-				<input type="text" th:field="*{tipoInteres}" class="form-control" />
+				<select class="form-control" th:field="*{tipoInteres}" required>
+					<option th:each="tipoInteres: ${tipoIntereses}" th:value="${tipoInteres.idTipoInteres}"
+						th:text="${tipoInteres.nombre}">
+					</option>
+				</select>
 			</div>
 		</div>
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Tipo Cobros</label>
 			<div class="col-sm-6">
-				<select class="form-control" th:field="*{tipoCobros}">
+				<select class="form-control" th:field="*{tipoCobros}" required>
 					<option value="MANUAL">Manual</option>
 					<option value="AUTOMATICO">Automatico</option>
 				</select>
@@ -62,7 +69,7 @@
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Periodicidad</label>
 			<div class="col-sm-6">
-				<select class="form-control" th:field="*{periodicidad}">
+				<select class="form-control" th:field="*{periodicidad}" required>
 					<option value="SEMANAL">Semanal</option>
 					<option value="MENSUAL">Mensual</option>
 					<option value="TRIMESTRAL">Trimestral</option>
@@ -72,13 +79,18 @@
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Cantidad Cobro Periodico</label>
 			<div class="col-sm-6">
-				<input type="text" th:field="*{cantidadCobroPeriodico}" class="form-control" />
+				<input type="text" th:field="*{cantidadCobroPeriodico}" class="form-control" pattern="^\d*(\.\d{1,2})?$"
+					title="Solo se permiten números con hasta 2 decimales" required />
 			</div>
 		</div>
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Facility</label>
 			<div class="col-sm-6">
-				<input type="text" th:field="*{facility}" class="form-control" />
+				<select class="form-control" th:field="*{facility}" required>
+					<option th:each="facility: ${facilities}" th:value="${facility.idFacility}"
+						th:text="${facility.idFacility}">
+					</option>
+				</select>
 			</div>
 		</div>
 
