@@ -192,6 +192,10 @@ public class OutstandingController {
 		OutstandingEntity out = outstandingService.findOne(id);
 		model.addAttribute("out", out);
 		model.addAttribute("buttonText", "Actualizar Outstanding");
+		List<TipoInteresEntity> tipoIntereses = tipoInteresService.findAll();
+		model.addAttribute("tipoIntereses", tipoIntereses);
+		List<FacilityEntity> facilities = facilityService.findAll();
+		model.addAttribute("facilities", facilities);
 		return "outstanding/out_form";
 	}
 }
