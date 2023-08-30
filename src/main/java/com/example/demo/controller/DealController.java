@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.example.demo.models.entity.*;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -48,9 +50,17 @@ public class DealController {
 	IUsuarioService usuarioService;
 
 	@GetMapping({ "", "/" })
-	public String ver(Model model) {
-		List<DealEntity> deals = dealService.findAll();
-		model.addAttribute("deals", deals);
+	public String ver(Model model, HttpSession session) {
+		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
+		if(usuario.getRol().equals("ADMIN")){
+			List<DealEntity> deals = dealService.findAll();
+			model.addAttribute("deals", deals);
+		}else{
+			List<DealEntity> deals = dealService.filter(usuario.getBanco().toString(), "", "", "", "",
+					"", "", "", "", "");
+			model.addAttribute("deals", deals);
+		}
+
 		DealFilter filter = new DealFilter();
 		model.addAttribute("filter", filter);
 		List<ClienteEntity> clientes = clienteService.findAll();
@@ -145,8 +155,9 @@ public class DealController {
 	}
 
 	@PostMapping({ "", "/" })
-	public String ver(DealFilter filter, Model model) {
-		List<DealEntity> deals = dealService.filter(filter.estado, filter.moneda, filter.tipo, filter.cliente,
+	public String ver(DealFilter filter, Model model, HttpSession session) {
+		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
+		List<DealEntity> deals = dealService.filter(usuario.getBanco().toString(), filter.estado, filter.moneda, filter.tipo, filter.cliente,
 				filter.cantidadPrestamo, filter.cantidadAbonada, filter.cantidadAPagar, filter.descuento,
 				filter.creadoPor);
 		model.addAttribute("filter", filter);

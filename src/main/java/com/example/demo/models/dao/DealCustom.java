@@ -15,7 +15,7 @@ public class DealCustom {
 	@PersistenceContext
 	EntityManager em;
 
-	public List<DealEntity> filtradoDeal(String estado, String moneda, String tipo, String cliente,
+	public List<DealEntity> filtradoDeal(String idBanco, String estado, String moneda, String tipo, String cliente,
 			String cantidadPrestamo, String cantidadAbonada, String cantidadAPagar, String descuento,
 			String creadoPor) {
 		String qestado = estado.equals("") ? "" : " d.estado = :estado";
@@ -27,8 +27,16 @@ public class DealCustom {
 		String qcantidadAPagar = cantidadAPagar.equals("") ? "" : " d.cantidadAPagar = :cantidadAPagar";
 		String qdescuento = descuento.equals("") ? "" : " d.descuento = :descuento";
 		String qcreadoPor = creadoPor.equals("") ? "" : " d.creadoPor = :creadoPor";
+		String qidBanco = idBanco.equals("") ? "" : " JOIN ClienteEntity c on c.idBanco = :idBanco and c.idCliente = d.cliente";
 
-		String query = "SELECT d FROM DealEntity d WHERE";
+		String query;
+
+		if (estado == "" && moneda == "" && tipo == "" && cliente == "" && cantidadPrestamo == ""
+				&& cantidadAbonada == "" && cantidadAPagar == "" && descuento == "") {
+			query = "SELECT d FROM DealEntity d ";
+		}else{
+			query = "SELECT d FROM DealEntity d WHERE";
+		}
 
 		boolean x = false;
 		if (!estado.equals("")) {
@@ -107,6 +115,16 @@ public class DealCustom {
 			query += qcreadoPor;
 			x = true;
 		}
+		
+		if (!idBanco.equals("")) {
+			if (x) {
+				query += " AND ";
+			}
+
+			query += qidBanco;
+			x = true;
+		}
+
 
 		Query q = this.em.createQuery(query);
 
@@ -145,7 +163,12 @@ public class DealCustom {
 		if (!qcreadoPor.equals("")) {
 			q.setParameter("creadoPor", creadoPor);
 		}
+		
+		if (!qidBanco.equals("")) {
+			q.setParameter("idBanco", idBanco);
+		}
 
 		return q.getResultList();
 	}
+
 }
