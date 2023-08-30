@@ -27,15 +27,23 @@ public class DealCustom {
 		String qcantidadAPagar = cantidadAPagar.equals("") ? "" : " d.cantidadAPagar = :cantidadAPagar";
 		String qdescuento = descuento.equals("") ? "" : " d.descuento = :descuento";
 		String qcreadoPor = creadoPor.equals("") ? "" : " d.creadoPor = :creadoPor";
-		String qidBanco = idBanco.equals("") ? "" : " JOIN ClienteEntity c on c.idBanco = :idBanco and c.idCliente = d.cliente";
+		String qidBanco = idBanco.equals("") ? ""
+				: "JOIN ClienteEntity c on c.idBanco = :idBanco and c.idCliente = d.cliente";
 
-		String query;
+		String query = "SELECT d FROM DealEntity d ";
 
-		if (estado == "" && moneda == "" && tipo == "" && cliente == "" && cantidadPrestamo == ""
-				&& cantidadAbonada == "" && cantidadAPagar == "" && descuento == "") {
-			query = "SELECT d FROM DealEntity d ";
-		}else{
-			query = "SELECT d FROM DealEntity d WHERE";
+		if (!(estado == "" && moneda == "" && tipo == "" && cliente == "" && cantidadPrestamo == ""
+				&& cantidadAbonada == "" && cantidadAPagar == "" && descuento == "" && creadoPor == "")) {
+			if (!idBanco.equals("")) {
+				query += qidBanco;
+			}
+			query += " WHERE";
+		} else {
+			if (!idBanco.equals("")) {
+				query += qidBanco;
+			} else {
+				throw new RuntimeException("No deberia ejecutarse esto");
+			}
 		}
 
 		boolean x = false;
@@ -115,17 +123,8 @@ public class DealCustom {
 			query += qcreadoPor;
 			x = true;
 		}
-		
-		if (!idBanco.equals("")) {
-			if (x) {
-				query += " AND ";
-			}
 
-			query += qidBanco;
-			x = true;
-		}
-
-
+		System.out.println(query);
 		Query q = this.em.createQuery(query);
 
 		if (!qestado.equals("")) {
@@ -163,7 +162,7 @@ public class DealCustom {
 		if (!qcreadoPor.equals("")) {
 			q.setParameter("creadoPor", creadoPor);
 		}
-		
+
 		if (!qidBanco.equals("")) {
 			q.setParameter("idBanco", idBanco);
 		}

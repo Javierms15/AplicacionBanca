@@ -45,15 +45,17 @@ public class DealServiceImpl implements IDealService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public List<DealEntity> filter(String idBanco, String estado, String moneda, String tipo, String cliente, String cantidadPrestamo,
-			String cantidadAbonada, String cantidadAPagar, String descuento, String creadoPor) {
+	public List<DealEntity> filter(String idBanco, String estado, String moneda, String tipo, String cliente,
+			String cantidadPrestamo, String cantidadAbonada, String cantidadAPagar, String descuento,
+			String creadoPor) {
 		if (estado == "" && moneda == "" && tipo == "" && cliente == "" && cantidadPrestamo == ""
-				&& cantidadAbonada == "" && cantidadAPagar == "" && descuento == "" && creadoPor == "" && idBanco == "") {
+				&& cantidadAbonada == "" && cantidadAPagar == "" && descuento == "" && creadoPor == ""
+				&& idBanco == "") {
 			return findAll();
 		}
 
-		return dealCustom.filtradoDeal(idBanco, estado, moneda, tipo, cliente, cantidadPrestamo, cantidadAbonada, cantidadAPagar,
-				descuento, creadoPor);
+		return dealCustom.filtradoDeal(idBanco, estado, moneda, tipo, cliente, cantidadPrestamo, cantidadAbonada,
+				cantidadAPagar, descuento, creadoPor);
 	}
 
 }
