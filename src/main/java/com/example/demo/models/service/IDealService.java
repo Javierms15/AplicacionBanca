@@ -14,5 +14,5 @@ public interface IDealService {
 	void delete(int id);
 
 	List<DealEntity> filter(String estado, String moneda, String tipo, String cliente, String cantidadPrestamo,
-			String cantidadAbonada, String cantidadAPagar, String descuento);
+			String cantidadAbonada, String cantidadAPagar, String descuento, String idBanco);
 }

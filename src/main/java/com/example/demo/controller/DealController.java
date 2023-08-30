@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.example.demo.models.entity.*;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,10 +14,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.example.demo.models.entity.BancoEntity;
-import com.example.demo.models.entity.ClienteEntity;
-import com.example.demo.models.entity.DealEntity;
-import com.example.demo.models.entity.ParticipanteEntity;
 import com.example.demo.models.service.IBancoService;
 import com.example.demo.models.service.IClienteService;
 import com.example.demo.models.service.IDealService;
@@ -40,9 +38,17 @@ public class DealController {
 	IClienteService clienteService;
 
 	@GetMapping({ "", "/" })
-	public String ver(Model model) {
-		List<DealEntity> deals = dealService.findAll();
-		model.addAttribute("deals", deals);
+	public String ver(Model model, HttpSession session) {
+		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
+		if(usuario.getRol().equals("ADMIN")){
+			List<DealEntity> deals = dealService.findAll();
+			model.addAttribute("deals", deals);
+		}else{
+			List<DealEntity> deals = dealService.filter("", "", "", "",
+					"", "", "", "", usuario.getBanco().toString());
+			model.addAttribute("deals", deals);
+		}
+
 		DealFilter filter = new DealFilter();
 		List<ClienteEntity> clientes = clienteService.findAll();
 		model.addAttribute("clientes", clientes);
@@ -126,9 +132,10 @@ public class DealController {
 	}
 
 	@PostMapping({ "", "/" })
-	public String ver(DealFilter filter, Model model) {
+	public String ver(DealFilter filter, Model model, HttpSession session) {
+		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
 		List<DealEntity> deals = dealService.filter(filter.estado, filter.moneda, filter.tipo, filter.cliente,
-				filter.cantidadPrestamo, filter.cantidadAbonada, filter.cantidadAPagar, filter.descuento);
+				filter.cantidadPrestamo, filter.cantidadAbonada, filter.cantidadAPagar, filter.descuento, usuario.getBanco().toString());
 		model.addAttribute("deals", deals);
 		List<ClienteEntity> clientes = clienteService.findAll();
 		model.addAttribute("clientes", clientes);
