@@ -16,7 +16,8 @@ public class DealCustom {
 	EntityManager em;
 
 	public List<DealEntity> filtradoDeal(String estado, String moneda, String tipo, String cliente,
-			String cantidadPrestamo, String cantidadAbonada, String cantidadAPagar, String descuento) {
+			String cantidadPrestamo, String cantidadAbonada, String cantidadAPagar, String descuento,
+			String creadoPor) {
 		String qestado = estado.equals("") ? "" : " d.estado = :estado";
 		String qmoneda = moneda.equals("") ? "" : " d.moneda = :moneda";
 		String qtipo = tipo.equals("") ? "" : " d.tipo = :tipo";
@@ -25,6 +26,7 @@ public class DealCustom {
 		String qcantidadAbonada = cantidadAbonada.equals("") ? "" : " d.cantidadAbonada = :cantidadAbonada";
 		String qcantidadAPagar = cantidadAPagar.equals("") ? "" : " d.cantidadAPagar = :cantidadAPagar";
 		String qdescuento = descuento.equals("") ? "" : " d.descuento = :descuento";
+		String qcreadoPor = creadoPor.equals("") ? "" : " d.creadoPor = :creadoPor";
 
 		String query = "SELECT d FROM DealEntity d WHERE";
 
@@ -97,8 +99,17 @@ public class DealCustom {
 			x = true;
 		}
 
+		if (!creadoPor.equals("")) {
+			if (x) {
+				query += " AND ";
+			}
+
+			query += qcreadoPor;
+			x = true;
+		}
+
 		Query q = this.em.createQuery(query);
-		
+
 		if (!qestado.equals("")) {
 			q.setParameter("estado", estado);
 		}
@@ -129,6 +140,10 @@ public class DealCustom {
 
 		if (!qdescuento.equals("")) {
 			q.setParameter("descuento", descuento);
+		}
+
+		if (!qcreadoPor.equals("")) {
+			q.setParameter("creadoPor", creadoPor);
 		}
 
 		return q.getResultList();

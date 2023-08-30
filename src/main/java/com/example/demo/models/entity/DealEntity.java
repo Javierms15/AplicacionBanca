@@ -35,6 +35,17 @@ public class DealEntity {
 	@Basic
 	@Column(name = "cliente")
 	private int cliente;
+	@Basic
+	@Column(name = "creado_por")
+	private int creadoPor;
+
+	public int getCreadoPor() {
+		return creadoPor;
+	}
+
+	public void setCreadoPor(int creadoPor) {
+		this.creadoPor = creadoPor;
+	}
 
 	public int getIdDeal() {
 		return idDeal;

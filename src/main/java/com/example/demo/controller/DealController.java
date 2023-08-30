@@ -16,11 +16,16 @@ import com.example.demo.models.entity.BancoEntity;
 import com.example.demo.models.entity.ClienteEntity;
 import com.example.demo.models.entity.DealEntity;
 import com.example.demo.models.entity.ParticipanteEntity;
+import com.example.demo.models.entity.UsuarioEntity;
 import com.example.demo.models.service.IBancoService;
 import com.example.demo.models.service.IClienteService;
 import com.example.demo.models.service.IDealService;
 import com.example.demo.models.service.IParticipanteService;
+import com.example.demo.models.service.IUsuarioService;
+
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
+
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -39,14 +44,19 @@ public class DealController {
 	@Autowired
 	IClienteService clienteService;
 
+	@Autowired
+	IUsuarioService usuarioService;
+
 	@GetMapping({ "", "/" })
 	public String ver(Model model) {
 		List<DealEntity> deals = dealService.findAll();
 		model.addAttribute("deals", deals);
 		DealFilter filter = new DealFilter();
+		model.addAttribute("filter", filter);
 		List<ClienteEntity> clientes = clienteService.findAll();
 		model.addAttribute("clientes", clientes);
-		model.addAttribute("filter", filter);
+		List<UsuarioEntity> usuarios = usuarioService.findAll();
+		model.addAttribute("usuarios", usuarios);
 		return "deal/deal_all";
 	}
 
@@ -59,6 +69,7 @@ public class DealController {
 		private String cantidadAbonada;
 		private String cantidadAPagar;
 		private String descuento;
+		private String creadoPor;
 
 		public String getEstado() {
 			return estado;
@@ -123,16 +134,27 @@ public class DealController {
 		public void setDescuento(String descuento) {
 			this.descuento = descuento;
 		}
+
+		public String getCreadoPor() {
+			return creadoPor;
+		}
+
+		public void setCreadoPor(String creadoPor) {
+			this.creadoPor = creadoPor;
+		}
 	}
 
 	@PostMapping({ "", "/" })
 	public String ver(DealFilter filter, Model model) {
 		List<DealEntity> deals = dealService.filter(filter.estado, filter.moneda, filter.tipo, filter.cliente,
-				filter.cantidadPrestamo, filter.cantidadAbonada, filter.cantidadAPagar, filter.descuento);
+				filter.cantidadPrestamo, filter.cantidadAbonada, filter.cantidadAPagar, filter.descuento,
+				filter.creadoPor);
+		model.addAttribute("filter", filter);
 		model.addAttribute("deals", deals);
 		List<ClienteEntity> clientes = clienteService.findAll();
 		model.addAttribute("clientes", clientes);
-		model.addAttribute("filter", filter);
+		List<UsuarioEntity> usuarios = usuarioService.findAll();
+		model.addAttribute("usuarios", usuarios);
 		return "deal/deal_all";
 	}
 
@@ -141,6 +163,7 @@ public class DealController {
 		DealEntity deal = new DealEntity();
 		deal.setEstado("PENDING");
 		deal.setCantidadAbonada(0);
+
 		model.addAttribute("deal", deal);
 		List<ClienteEntity> clientes = clienteService.findAll();
 		model.addAttribute("clientes", clientes);
@@ -183,9 +206,10 @@ public class DealController {
 	@PostMapping("/save")
 	public String save(DealEntity deal, @RequestParam(name = "banco") int id,
 			@RequestParam(name = "agente", required = false) Integer agenteId, HttpServletRequest req,
-			RedirectAttributes flash) {
+			HttpSession session, RedirectAttributes flash) {
 		ParticipanteEntity participante;
 		deal.setCantidadAPagar(deal.getCantidadPrestamo());
+		deal.setCreadoPor(((UsuarioEntity) session.getAttribute("usuario")).getIdUsuario());
 		dealService.save(deal);
 		if (((String) deal.getTipo()).equals("SOLE_LENDER")) {
 			participante = new ParticipanteEntity();
@@ -248,7 +272,7 @@ public class DealController {
 			participante.setIdDeal(deal.getIdDeal());
 			participante.setAgente((byte) 1);
 			participante.setPorcentajeParticipacion(1);
-			
+
 			boolean exist = false;
 			for (ParticipanteEntity prev : participantes) {
 				if (prev.getIdDeal() == participante.getIdDeal() && prev.getIdBanco() == participante.getIdBanco()) {

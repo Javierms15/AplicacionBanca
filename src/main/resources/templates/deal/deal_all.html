@@ -105,6 +105,18 @@
 						</div>
 					</div>
 
+					<div class="row mb-3">
+						<label class="col-sm-2 col-form-label">Creado Por:</label>
+						<div class="col-sm-10">
+							<select class="form-control" th:field="*{creadoPor}">
+								<option value="">---</option>
+								<option th:each="usuario: ${usuarios}" th:value="${usuario.idUsuario}"
+									th:text="${usuario.nombre}">
+								</option>
+							</select>
+						</div>
+					</div>
+
 					<div class="form-group row">
 						<div class="col-sm-6">
 							<input type="submit" class="btn btn-secondary" value="Filtrar" />
@@ -133,6 +145,7 @@
 						<td>Tipo</td>
 						<td>Descuento</td>
 						<td>Cliente</td>
+						<td>Creado Por</td>
 					</tr>
 				</thead>
 				<tbody>
@@ -147,7 +160,10 @@
 						<td th:text="${deal.descuento == 0 ? 'NO' : 'SI'}"></td>
 						<td th:each="cliente: ${clientes}" th:if="${deal.cliente == cliente.idCliente}"
 							th:text="${cliente.nombreLegal}"></td>
-						<td><a th:if="${deal.estado != 'CLOSED'}" th:href="@{/deal/edit/} + ${deal.idDeal}" class="btn btn-info btn-xs">Editar</a></td>
+						<td th:each="usuario: ${usuarios}" th:if="${usuario.idUsuario == deal.creadoPor}"
+							th:text="${usuario.nombre}"></td>
+						<td><a th:if="${deal.estado != 'CLOSED'}" th:href="@{/deal/edit/} + ${deal.idDeal}"
+								class="btn btn-info btn-xs">Editar</a></td>
 						<td><a th:href="@{/deal/delete/} + ${deal.idDeal}" class="btn btn-danger btn-xs">Borrar</a></td>
 					</tr>
 				</tbody>
