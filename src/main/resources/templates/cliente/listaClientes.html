@@ -9,19 +9,41 @@
 
 <header th:replace="layout/layout :: header"></header>
 
-<form th:action="@{/filtrar}" method="post">
-    <input type="text"  name="valor" id="valor">
-    <select name="filtro" id="filtro">
-        <option value="nombre">Nombre legal</option>
-        <option value="direccion">Dirección legal</option>
-        <option value="dinero">Capital</option>
-        <option value="email">Email</option>
-        <option value="banco">Banco</option>
-        <option value=""></option>
-    </select>
+<form th:action="@{/filtrar}" th:object="${filter}" method="post">
+    <div>
+        <label>Nombre legal:</label>
+        <input type="text" class="form-control" th:field="*{nombreLegal}" />
+    </div>
+    <div>
+        <label>Dirección legal:</label>
+        <input type="text" class="form-control" th:field="*{direccionLegal}" />
+    </div>
+    <div>
+        <label>Dinero:</label>
+        <input type="text" class="form-control" th:field="*{dinero}" pattern="^\d*(\.\d{1,2})?$" title="Solo se permiten números con hasta 2 decimales" />
+    </div>
+    <div>
+        <label>Email:</label>
+        <input type="text" class="form-control" th:field="*{email}" />
+    </div>
 
-    <input type="submit" value="Filtrar">
+    <div>
+        <label>Banco:</label>
+        <select  name="idBanco" id="idBanco">
+            <option value="">---</option>
+            <option th:each="banco: ${bancos}" th:value="${banco.idBanco}" th:itemid="${banco.idBanco}" th:text="${banco.nombre}"></option>
+        </select><br>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-sm-6">
+            <input type="submit" class="btn btn-secondary" value="Filtrar" />
+        </div>
+    </div>
 </form>
+
+
+
 
 
 <table>

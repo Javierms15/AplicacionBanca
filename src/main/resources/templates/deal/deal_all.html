@@ -147,7 +147,7 @@
 						<td th:text="${deal.descuento == 0 ? 'NO' : 'SI'}"></td>
 						<td th:each="cliente: ${clientes}" th:if="${deal.cliente == cliente.idCliente}"
 							th:text="${cliente.nombreLegal}"></td>
-						<td><a th:href="@{/deal/edit/} + ${deal.idDeal}" class="btn btn-info btn-xs">Editar</a></td>
+						<td><a th:if="${deal.estado != 'CLOSED'}" th:href="@{/deal/edit/} + ${deal.idDeal}" class="btn btn-info btn-xs">Editar</a></td>
 						<td><a th:href="@{/deal/delete/} + ${deal.idDeal}" class="btn btn-danger btn-xs">Borrar</a></td>
 					</tr>
 				</tbody>

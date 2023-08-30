@@ -13,8 +13,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Controller
 public class FacilityController {
@@ -32,7 +34,17 @@ public class FacilityController {
     @RequestMapping("/nuevaFacility")
     public String mostrarPantallaNuevaFacility(Model model){
         FacilityEntity facility = new FacilityEntity();
-        List<DealEntity> deals = dealService.findAll();
+
+        List<DealEntity> deals=new ArrayList<>();
+        List<DealEntity> dealsAll=dealService.findAll();
+        for(DealEntity d: dealsAll){
+            Double sumaTotalFacilities=facilityDao.obtenerSumaFacilityDeal(d.getIdDeal()) == null? 0 :  facilityDao.obtenerSumaFacilityDeal(d.getIdDeal());
+            String estado= (String) d.getEstado();
+            if(sumaTotalFacilities < d.getCantidadPrestamo() && !Objects.equals(estado, "CLOSED")){
+                deals.add(d);
+            }
+        }
+
         model.addAttribute("deals", deals);
         model.addAttribute("facility", facility);
         return "facility/facility";

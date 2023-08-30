@@ -4,6 +4,8 @@ import com.example.demo.models.dao.IBancoDao;
 import com.example.demo.models.dao.IClienteDao;
 import com.example.demo.models.entity.BancoEntity;
 import com.example.demo.models.entity.ClienteEntity;
+import com.example.demo.models.entity.FacilityEntity;
+import com.example.demo.models.service.IClienteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -19,6 +21,9 @@ public class ClienteController {
 
 	@Autowired
 	private IClienteDao clienteDao;
+
+	@Autowired
+	private IClienteService clienteService;
 
 	@Autowired
 	private IBancoDao bancoDao;
@@ -46,6 +51,8 @@ public class ClienteController {
 		model.addAttribute("clientes",clientes);
 		List<BancoEntity> bancos= (List<BancoEntity>) bancoDao.findAll();
 		model.addAttribute("bancos",bancos);
+		ClienteFilter filter = new ClienteFilter();
+		model.addAttribute("filter", filter);
 		return "cliente/listaClientes";
 	}
 
@@ -75,24 +82,63 @@ public class ClienteController {
 	}
 
 	@RequestMapping(value = "/filtrar")
-	public String filtrar(Model model, @RequestParam(value = "valor") String valor, @RequestParam(value="filtro") String filtro) {
-		List<ClienteEntity> clientes=new ArrayList<>();
-		if(filtro.equals("nombre")) {
-			clientes= (List<ClienteEntity>) clienteDao.findByNombre(valor);
-		}else if(filtro.equals("direccion")){
-			clientes= (List<ClienteEntity>) clienteDao.findByDireccion(valor);
-		}else if(filtro.equals("dinero")){
-			clientes= (List<ClienteEntity>) clienteDao.findByCapital(Double.parseDouble(valor));
-		}else if(filtro.equals("email")){
-			clientes= (List<ClienteEntity>) clienteDao.findByEmail(valor);
-		}else if(filtro.equals("banco")){
-			BancoEntity banco=bancoDao.findByNombre(valor);
-			clientes= (List<ClienteEntity>) clienteDao.findByBanco(banco.getIdBanco());
-		}else{
-			clientes= (List<ClienteEntity>) clienteDao.findAll();
-		}
+	public String filtrar(Model model, ClienteFilter filter) {
+		List<ClienteEntity> clientes = clienteService.filter(filter.nombreLegal, filter.direccionLegal, filter.dinero, filter.email,
+				filter.idBanco);
+		List<BancoEntity> bancos= (List<BancoEntity>) bancoDao.findAll();
+		model.addAttribute("bancos",bancos);
+		model.addAttribute("filter", filter);
 		model.addAttribute("clientes",clientes);
 		return "cliente/listaClientes";
 	}
 
+	class ClienteFilter {
+
+		private String nombreLegal;
+		private String direccionLegal;
+		private String dinero;
+
+		private String email;
+		private String idBanco;
+
+		public String getNombreLegal() {
+			return nombreLegal;
+		}
+
+		public void setNombreLegal(String nombreLegal) {
+			this.nombreLegal = nombreLegal;
+		}
+
+		public String getDireccionLegal() {
+			return direccionLegal;
+		}
+
+		public void setDireccionLegal(String direccionLegal) {
+			this.direccionLegal = direccionLegal;
+		}
+
+		public String getDinero() {
+			return dinero;
+		}
+
+		public void setDinero(String dinero) {
+			this.dinero = dinero;
+		}
+
+		public String getEmail() {
+			return email;
+		}
+
+		public void setEmail(String email) {
+			this.email = email;
+		}
+
+		public String getIdBanco() {
+			return idBanco;
+		}
+
+		public void setIdBanco(String idBanco) {
+			this.idBanco = idBanco;
+		}
+	}
 }

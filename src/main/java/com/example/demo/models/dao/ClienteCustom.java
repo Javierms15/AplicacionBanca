@@ -5,17 +5,18 @@ import com.example.demo.models.entity.DealEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
+@Repository
 public class ClienteCustom {
 
     @PersistenceContext
     EntityManager em;
 
-    public List<ClienteEntity> filtradoCliente(String idCliente, String nombreLegal, String direccionLegal, String dinero,
+    public List<ClienteEntity> filtradoCliente(String nombreLegal, String direccionLegal, String dinero,
                                             String email, String idBanco) {
-        String qidCliente = "";
+
         String qnombreLegal = "";
         String qdireccionLegal= "";
         String qdinero = "";
@@ -23,9 +24,7 @@ public class ClienteCustom {
         String qidBanco = "";
 
 
-        if (!idCliente.equals("")) {
-            qidCliente = " d.idCliente like :idCliente";
-        }
+
         if (!nombreLegal.equals("")) {
             qnombreLegal = " d.nombreLegal like :nombreLegal";
         }
@@ -45,17 +44,9 @@ public class ClienteCustom {
         String query = "SELECT d FROM ClienteEntity d WHERE";
 
         boolean x = false;
-        if (!idCliente.equals("")) {
-            query += qidCliente;
-            x = true;
-        }
+
 
         if (!nombreLegal.equals("")) {
-            if (x) {
-                query += " AND ";
-                x = false;
-            }
-
             query += qnombreLegal;
             x = true;
         }
@@ -102,9 +93,6 @@ public class ClienteCustom {
 
 
         Query q = this.em.createQuery(query);
-        if (!qidCliente.equals("")) {
-            q.setParameter("idCliente", idCliente);
-        }
 
         if (!qnombreLegal.equals("")) {
             q.setParameter("nombreLegal", nombreLegal);
