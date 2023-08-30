@@ -6,7 +6,7 @@
 </head>
 
 <body>
-	<form th:action="@{/deal/save}" th:object="${deal}" method="post">
+	<form th:action="@{'/deal/' + ${redirectUrl}}" th:object="${deal}" method="post">
 		<input type="hidden" th:field="*{idDeal}" />
 		<input type="hidden" th:field="*{estado}" />
 		<input type="hidden" th:field="*{cantidadPrestamo}" />
@@ -17,25 +17,46 @@
 		<input type="hidden" th:field="*{descuento}" />
 		<input type="hidden" th:field="*{cliente}" />
 		<select th:if="${deal.tipo == 'SOLE_LENDER'}" name="banco" class="form-control">
-			<option th:each="banco: ${bancos}" th:value="${banco.idBanco}" th:text="${banco.nombre}"></option>
+			<option th:each="banco: ${bancos}" th:value="${banco.idBanco}" th:text="${banco.nombre}"
+				th:selected="${agente == banco.idBanco}"></option>
 		</select>
 
 		<div th:if="${deal.tipo == 'SYNDICATED'}" th:each="banco: ${bancos}">
-			<input type="checkbox" th:id="${banco.idBanco}" name="banco" th:value="${banco.idBanco}" />
+			<input type="checkbox" class="form-control" th:id="${banco.idBanco}" name="banco"
+				th:value="${banco.idBanco}" th:checked="${#arrays.contains(bancosParticipantesId, banco.idBanco)}" />
 			<label th:for="${banco.idBanco}" th:text="${banco.nombre}"></label>
+			<input th:if="${participantes} == null" type="text" th:name="${'bancoPorcentaje' + banco.idBanco}"
+				pattern="0.\d{1,2}$" title="Solo se permiten números entre 0 y 1 (No incluidos)" />
+			<div th:unless="${participantes} == null">
+				<div th:if="${#arrays.contains(bancosParticipantesId, banco.idBanco)}">
+					<input class="form-control" th:each="participante: ${participantes}" type="text"
+						th:name="${'bancoPorcentaje' + banco.idBanco}" pattern="0.\d{1,2}$"
+						title="Solo se permiten números entre 0 y 1 (No incluidos)"
+						th:if="${participante.idBanco == banco.idBanco}"
+						th:value="${participante.porcentajeParticipacion}" />
+				</div>
+				<div th:unless="${#arrays.contains(bancosParticipantesId, banco.idBanco)}">
+					<input type="text" class="form-control" th:name="${'bancoPorcentaje' + banco.idBanco}"
+						pattern="0.\d{1,2}$" title="Solo se permiten números entre 0 y 1 (No incluidos)" />
+				</div>
+				<br />
+			</div>
+
 		</div>
 		<div th:if="${deal.tipo == 'SYNDICATED'}">
 			<label>Agente: </label>
 			<select name="agente" class="form-control">
-				<option th:each="banco: ${bancos}" th:value="${banco.idBanco}" th:text="${banco.nombre}"></option>
+				<option th:each="banco: ${bancos}" th:value="${banco.idBanco}" th:text="${banco.nombre}"
+					th:selected="${agente == banco.idBanco}"></option>
 			</select>
 		</div>
 		<div class="form-group row">
 			<div class="col-sm-6">
-				<input type="submit" value="Crear Deal" class="btn btn-secondary" />
+				<input type="submit" th:value="${buttonText}" class="btn btn-secondary" />
 			</div>
 		</div>
 	</form>
+	<a href="/deal"><button>Cancelar</button></a>
 </body>
 
 </html>

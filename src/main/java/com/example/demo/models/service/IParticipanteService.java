@@ -13,4 +13,6 @@ public interface IParticipanteService {
 	void save(ParticipanteEntity participante);
 
 	void delete(int id);
+
+	List<ParticipanteEntity> findAllByDeal(int idDeal);
 }

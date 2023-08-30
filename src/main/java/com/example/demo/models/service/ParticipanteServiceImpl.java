@@ -34,4 +34,9 @@ public class ParticipanteServiceImpl implements IParticipanteService {
 		participanteDao.deleteById(id);
 	}
 
+	@Override
+	public List<ParticipanteEntity> findAllByDeal(int idDeal) {
+		return participanteDao.findByIdDeal(idDeal);
+	}
+
 }

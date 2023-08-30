@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.util.LinkedList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -143,7 +144,6 @@ public class DealController {
 		model.addAttribute("deal", deal);
 		List<ClienteEntity> clientes = clienteService.findAll();
 		model.addAttribute("clientes", clientes);
-		model.addAttribute("buttonText", "Crear Deal");
 		return "deal/deal_form";
 	}
 
@@ -152,6 +152,31 @@ public class DealController {
 		model.addAttribute("deal", deal);
 		List<BancoEntity> bancos = bancoService.findAll();
 		model.addAttribute("bancos", bancos);
+
+		List<Integer> bancosParticipantes = new LinkedList<>();
+
+		DealEntity dealPrev = dealService.findOne(deal.getIdDeal());
+		if (dealPrev != null) {
+			List<ParticipanteEntity> participantes = participanteService.findAllByDeal(deal.getIdDeal());
+			for (ParticipanteEntity participante : participantes) {
+				bancosParticipantes.add(participante.getIdBanco());
+			}
+
+			for (ParticipanteEntity participante : participantes) {
+				if (participante.getAgente() == 1) {
+					model.addAttribute("agente", participante.getIdBanco());
+					break;
+				}
+			}
+			model.addAttribute("participantes", participantes);
+			model.addAttribute("redirectUrl", "save_edit");
+			model.addAttribute("buttonText", "Actualizar Deal");
+		} else {
+			model.addAttribute("redirectUrl", "save");
+			model.addAttribute("buttonText", "Crear Deal");
+		}
+
+		model.addAttribute("bancosParticipantesId", bancosParticipantes);
 		return "deal/deal_add_banks";
 	}
 
@@ -167,6 +192,7 @@ public class DealController {
 			participante.setIdBanco(id);
 			participante.setIdDeal(deal.getIdDeal());
 			participante.setAgente((byte) 1);
+			participante.setPorcentajeParticipacion(1);
 			participanteService.save(participante);
 		} else {
 			String[] bancoReq = req.getParameterValues("banco");
@@ -184,8 +210,128 @@ public class DealController {
 					throw new RuntimeException("BancoId no valido en DealController - save");
 				}
 				participante.setIdDeal(deal.getIdDeal());
+				String[] porcentajeParticipacionStr = req.getParameterValues("bancoPorcentaje" + bancoIdStr);
+				if (porcentajeParticipacionStr == null) {
+					// Esto no deberia ejecutarse nunca. Si se ejecuta es que hay un error en el
+					// atributo nombre de los inputs del html
+					throw new RuntimeException("Porcentaje de Participacion nulo");
+				} else {
+					try {
+						Double porcentajeParticipacion = Double.parseDouble(porcentajeParticipacionStr[0]);
+						participante.setPorcentajeParticipacion(porcentajeParticipacion);
+					} catch (NumberFormatException e) {
+						// TODO: Error
+						throw new RuntimeException("Porcentaje de Participacion con formato no válido");
+					}
+				}
+
 				participanteService.save(participante);
 			}
+		}
+		flash.addFlashAttribute("success", "Deal guardado correctamente");
+		return "redirect:/deal";
+	}
+
+	@PostMapping("/save_edit")
+	public String save_edit(DealEntity deal, @RequestParam(name = "banco") int id,
+			@RequestParam(name = "agente", required = false) Integer agenteId, HttpServletRequest req,
+			RedirectAttributes flash) {
+
+		// Es feisimo pero funciona
+
+		List<ParticipanteEntity> participantes = participanteService.findAllByDeal(deal.getIdDeal());
+		dealService.save(deal);
+		ParticipanteEntity participante;
+		if (((String) deal.getTipo()).equals("SOLE_LENDER")) {
+			participante = new ParticipanteEntity();
+			participante.setIdBanco(id);
+			participante.setIdDeal(deal.getIdDeal());
+			participante.setAgente((byte) 1);
+			participante.setPorcentajeParticipacion(1);
+			
+			boolean exist = false;
+			for (ParticipanteEntity prev : participantes) {
+				if (prev.getIdDeal() == participante.getIdDeal() && prev.getIdBanco() == participante.getIdBanco()) {
+					prev.setAgente(participante.getAgente());
+					prev.setPorcentajeParticipacion(participante.getPorcentajeParticipacion());
+					participanteService.save(prev);
+					exist = true;
+				} else {
+					participanteService.delete(prev.getIdParticipante());
+				}
+			}
+
+			if (!exist) {
+				participanteService.save(participante);
+			}
+
+		} else {
+			String[] bancoReq = req.getParameterValues("banco");
+			List<ParticipanteEntity> actual = new LinkedList<>();
+			for (String bancoIdStr : bancoReq) {
+				participante = new ParticipanteEntity();
+				try {
+					int bancoId = Integer.parseInt(bancoIdStr);
+					participante.setIdBanco(bancoId);
+					if (bancoId == agenteId) {
+						participante.setAgente((byte) 1);
+					} else {
+						participante.setAgente((byte) 0);
+					}
+				} catch (NumberFormatException e) {
+					throw new RuntimeException("BancoId no valido en DealController - save");
+				}
+				participante.setIdDeal(deal.getIdDeal());
+				String[] porcentajeParticipacionStr = req.getParameterValues("bancoPorcentaje" + bancoIdStr);
+				if (porcentajeParticipacionStr == null) {
+					// Esto no deberia ejecutarse nunca. Si se ejecuta es que hay un error en el
+					// atributo nombre de los inputs del html
+					throw new RuntimeException("Porcentaje de Participacion nulo");
+				} else {
+					try {
+						Double porcentajeParticipacion = Double.parseDouble(porcentajeParticipacionStr[0]);
+						participante.setPorcentajeParticipacion(porcentajeParticipacion);
+					} catch (NumberFormatException e) {
+						// TODO: Error
+						throw new RuntimeException("Porcentaje de Participacion con formato no válido");
+					}
+				}
+				actual.add(participante);
+			}
+
+			for (ParticipanteEntity prev : participantes) {
+				boolean exist = false;
+				for (ParticipanteEntity p : actual) {
+					if (prev.getIdDeal() == p.getIdDeal() && prev.getIdBanco() == p.getIdBanco()) {
+						prev.setAgente(p.getAgente());
+						prev.setPorcentajeParticipacion(p.getPorcentajeParticipacion());
+						participanteService.save(prev);
+						exist = true;
+						break;
+					}
+				}
+
+				if (!exist) {
+					participanteService.delete(prev.getIdParticipante());
+				} else {
+					exist = false;
+				}
+			}
+
+			for (ParticipanteEntity p : actual) {
+				boolean exist = false;
+				for (ParticipanteEntity prev : participantes) {
+					if (prev.getIdDeal() == p.getIdDeal() && prev.getIdBanco() == p.getIdBanco()) {
+						exist = true;
+						break;
+					}
+				}
+
+				if (!exist) {
+					participanteService.save(p);
+				}
+			}
+
 		}
 		flash.addFlashAttribute("success", "Deal guardado correctamente");
 		return "redirect:/deal";
