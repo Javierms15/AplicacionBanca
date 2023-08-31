@@ -17,7 +17,7 @@ public class FacilityCustom {
     EntityManager em;
 
     public List<FacilityEntity> filtradoFacility(String tipo, String estado, String cantidad,
-                                             String fechaCreacion, String fechaEfectiva, String fechaFinalizacion, String deal) {
+                                             String fechaCreacion, String fechaEfectiva, String fechaFinalizacion, String deal, String idBanco) {
 
         String qtipo = "";
         String qestado = "";
@@ -29,32 +29,56 @@ public class FacilityCustom {
 
 
         if (!tipo.equals("")) {
-            qtipo = " d.tipo like :tipo";
+            qtipo = " f.tipo like :tipo";
         }
         if (!estado.equals("")) {
-            qestado = " d.estado = :estado";
+            qestado = " f.estado = :estado";
         }
         if (!cantidad.equals("")) {
-            qcantidad = " d.cantidad = :cantidad";
+            qcantidad = " f.cantidad = :cantidad";
         }
         if (!fechaCreacion.equals("")) {
-            qfechaCreacion = " d.fechaCreacion = :fechaCreacion";
+            qfechaCreacion = " f.fechaCreacion = :fechaCreacion";
         }
         if (!fechaEfectiva.equals("")) {
-            qfechaEfectiva = " d.fechaEfectiva = :fechaEfectiva";
+            qfechaEfectiva = " f.fechaEfectiva = :fechaEfectiva";
         }
         if (!fechaFinalizacion.equals("")) {
-            qfechaFinalizacion = " d.fechaFinalizacion = :fechaFinalizacion";
+            qfechaFinalizacion = " f.fechaFinalizacion = :fechaFinalizacion";
         }
         if (!deal.equals("")) {
-            qdeal = " d.deal = :deal";
+            qdeal = " f.deal = :deal";
         }
 
-        String query = "SELECT d FROM FacilityEntity d WHERE";
+        String qidBanco = idBanco.equals("") ? " WHERE "
+                : "JOIN ClienteEntity c on c.idCliente = d.cliente and c.idBanco = :idBanco WHERE d.idDeal = f.deal";
 
-        boolean x = false;
+
+        String query = "SELECT f FROM FacilityEntity f, DealEntity d ";
+
+
+
+        if (!(tipo == "" && estado == "" && cantidad == "" && fechaCreacion == "" && fechaEfectiva == ""
+                && fechaFinalizacion == "" && deal == "")) {
+            if (!idBanco.equals("")) {
+                query += qidBanco;
+            }
+        } else {
+            if (!idBanco.equals("")) {
+                query += qidBanco;
+            } else {
+                throw new RuntimeException("No deberia ejecutarse esto");
+            }
+        }
+
+        boolean x = idBanco.equals("")? true : false;
 
         if (!tipo.equals("")) {
+
+            if (x) {
+                query += " AND ";
+                x = false;
+            }
 
             query += qtipo;
             x = true;
@@ -122,7 +146,6 @@ public class FacilityCustom {
 
         Query q = this.em.createQuery(query);
 
-
         if (!qtipo.equals("")) {
             q.setParameter("tipo", tipo);
         }
@@ -152,6 +175,10 @@ public class FacilityCustom {
 
         if (!qdeal.equals("")) {
             q.setParameter("deal", deal);
+        }
+
+        if (!idBanco.equals("")) {
+            q.setParameter("idBanco", idBanco);
         }
 
         return q.getResultList();

@@ -19,7 +19,7 @@ public class OutstandingCustom {
 	public List<OutstandingEntity> filtradoOutstanding(String cantidadRestante, String fechaEfectiva,
 			String fechaCreacion, String fechaFinalizacion, String pagoPrincipal, String pagoIntereses,
 			String tipoInteres, String tipoCobros, String periodicidad, String cantidadCobroPeriodico,
-			String facility) {
+			String facility, String idBanco) {
 		String qcantidadRestante = cantidadRestante.equals("") ? "" : " o.cantidadRestante = :cantidadRestante";
 		String qfechaEfectiva = fechaEfectiva.equals("") ? "" : " o.fechaEfectiva = :fechaEfectiva";
 		String qfechaCreacion = fechaCreacion.equals("") ? "" : " o.fechaCreacion = :fechaCreacion";
@@ -31,11 +31,33 @@ public class OutstandingCustom {
 		String qperiodicidad = periodicidad.equals("") ? "" : " o.periodicidad = :periodicidad";
 		String qcantidadCobroPeriodico = cantidadCobroPeriodico.equals("") ? "" : " o.cantidadCobroPeriodico = :cantidadCobroPeriodico";
 		String qfacility = facility.equals("") ? "" : " o.facility = :facility";
+		String qidBanco = idBanco.equals("") ? " WHERE "
+				: "JOIN ClienteEntity c on c.idCliente = d.cliente and c.idBanco = :idBanco WHERE d.idDeal = f.deal AND o.facility = f.idFacility";
 
-		String query = "SELECT o FROM OutstandingEntity o WHERE";
+		String query = "SELECT o FROM OutstandingEntity o, FacilityEntity f, DealEntity d ";
 
-		boolean x = false;
+		if (!(cantidadRestante == "" && fechaEfectiva == "" && fechaCreacion == "" && fechaFinalizacion == ""
+				&& pagoPrincipal == "" && pagoIntereses == "" && tipoInteres == "" && tipoCobros == ""
+				&& periodicidad == "" && cantidadCobroPeriodico == "" && facility == "")) {
+			if (!idBanco.equals("")) {
+				query += qidBanco;
+			}
+		} else {
+			if (!idBanco.equals("")) {
+				query += qidBanco;
+			} else {
+				throw new RuntimeException("No deberia ejecutarse esto");
+			}
+		}
+
+		boolean x = idBanco.equals("")? true : false;
+
 		if (!cantidadRestante.equals("")) {
+			if (x) {
+				query += " AND ";
+				x = false;
+			}
+
 			query += qcantidadRestante;
 			x = true;
 		}
@@ -187,6 +209,14 @@ public class OutstandingCustom {
 
 		if (!qfacility.equals("")) {
 			q.setParameter("facility", facility);
+		}
+
+		if (!qfacility.equals("")) {
+			q.setParameter("facility", facility);
+		}
+
+		if (!idBanco.equals("")) {
+			q.setParameter("idBanco", idBanco);
 		}
 
 		return q.getResultList();

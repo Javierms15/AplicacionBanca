@@ -15,7 +15,7 @@ public class ClienteCustom {
     EntityManager em;
 
     public List<ClienteEntity> filtradoCliente(String nombreLegal, String direccionLegal, String dinero,
-                                            String email, String idBanco) {
+                                            String email, String idBanco, Boolean esBanca) {
 
         String qnombreLegal = "";
         String qdireccionLegal= "";
@@ -37,7 +37,7 @@ public class ClienteCustom {
         if (!email.equals("")) {
             qemail = " d.email = :email";
         }
-        if (!idBanco.equals("")) {
+        if (!idBanco.equals("") || esBanca) {
             qidBanco = " d.idBanco = :idBanco";
         }
 
@@ -81,7 +81,7 @@ public class ClienteCustom {
             x = true;
         }
 
-        if (!idBanco.equals("")) {
+        if (!idBanco.equals("")  || esBanca) {
             if (x) {
                 query += " AND ";
                 x = false;
@@ -110,7 +110,7 @@ public class ClienteCustom {
             q.setParameter("email", email);
         }
 
-        if (!qidBanco.equals("")) {
+        if (!qidBanco.equals("")  || esBanca) {
             q.setParameter("idBanco", idBanco);
         }
 

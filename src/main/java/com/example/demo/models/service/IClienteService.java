@@ -17,6 +17,6 @@ public interface IClienteService {
 	void delete(int id);
 
 	List<ClienteEntity> filter(String nombreLegal, String direccionLegal, String dinero,
-								String email, String idBanco);
+								String email, String idBanco, Boolean esBanca);
 
 }

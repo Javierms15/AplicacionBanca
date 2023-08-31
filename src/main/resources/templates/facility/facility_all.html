@@ -44,7 +44,7 @@
             <label>Fecha de finalización:</label>
             <input type="date" class="form-control" th:field="*{fechaFinalizacion}" />
         </div>
-        <div>
+        <div th:if="${session.usuario.rol == 'ADMIN'}">
             <label>Deal:</label>
             <select  th:field="*{deal}">
                 <option value="">---</option>

@@ -50,13 +50,13 @@ public class ClienteServiceImpl implements IClienteService {
 	@Override
 	@Transactional(readOnly = true)
 	public List<ClienteEntity> filter(String nombreLegal, String direccionLegal, String dinero,
-									   String email, String idBanco) {
+									   String email, String idBanco, Boolean esBanca) {
 		if (nombreLegal == "" && direccionLegal == "" && dinero == ""  && email == ""
-				&& idBanco == "") {
+				&& idBanco == "" && !esBanca) {
 			return findAll();
 		}
 
-		return clienteCustom.filtradoCliente(nombreLegal, direccionLegal, dinero, email, idBanco);
+		return clienteCustom.filtradoCliente(nombreLegal, direccionLegal, dinero, email, idBanco, esBanca);
 	}
 
 }

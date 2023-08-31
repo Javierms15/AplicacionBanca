@@ -47,10 +47,10 @@ public class OutstandingServiceImpl implements IOutstandingService {
 	@Transactional(readOnly = true)
 	public List<OutstandingEntity> filter(String cantidadRestante, String fechaEfectiva, String fechaCreacion,
 			String fechaFinalizacion, String pagoPrincipal, String pagoIntereses, String tipoInteres, String tipoCobros,
-			String periodicidad, String cantidadCobroPeriodico, String facility) {
+			String periodicidad, String cantidadCobroPeriodico, String facility, String idBanco) {
 		if (cantidadRestante == "" && fechaEfectiva == "" && fechaCreacion == "" && fechaFinalizacion == ""
 				&& pagoPrincipal == "" && pagoIntereses == "" && tipoInteres == "" && tipoCobros == ""
-				&& periodicidad == "" && cantidadCobroPeriodico == "" && facility == "") {
+				&& periodicidad == "" && cantidadCobroPeriodico == "" && facility == "" && idBanco == "") {
 			return findAll();
 		}
 
@@ -78,7 +78,7 @@ public class OutstandingServiceImpl implements IOutstandingService {
 		}
 
 		return outstandingCustom.filtradoOutstanding(cantidadRestante, fechaEfectiva, fechaCreacion, fechaFinalizacion,
-				pagoPrincipal, pagoIntereses, tipoInteres, tipoCobros, periodicidad, cantidadCobroPeriodico, facility);
+				pagoPrincipal, pagoIntereses, tipoInteres, tipoCobros, periodicidad, cantidadCobroPeriodico, facility, idBanco);
 	}
 
 	@Override

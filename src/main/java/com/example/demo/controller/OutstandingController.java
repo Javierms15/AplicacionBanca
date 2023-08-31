@@ -3,6 +3,8 @@ package com.example.demo.controller;
 import java.util.Date;
 import java.util.List;
 
+import com.example.demo.models.entity.UsuarioEntity;
+import jakarta.servlet.http.HttpSession;
 import com.example.demo.models.dao.IOutstandingDao;
 import com.example.demo.models.entity.DealEntity;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +37,21 @@ public class OutstandingController {
 	private ITipoInteresService tipoInteresService;
 
 
-	
+
 	@GetMapping({ "", "/" })
-	public String ver(Model model) {
-		List<OutstandingEntity> outs = outstandingService.findAll();
-		model.addAttribute("outs", outs);
+	public String ver(Model model, HttpSession session) {
+
+		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
+
+		if (usuario.getRol().equals("ADMIN")) {
+			List<OutstandingEntity> outs= outstandingService.findAll();
+			model.addAttribute("outs", outs);
+		} else {
+			List<OutstandingEntity> outs = outstandingService.filter( "","","","","","","","",
+					"","","", usuario.getBanco().toString());
+			model.addAttribute("outs", outs);
+		}
+
 		OutstandingFilter filter = new OutstandingFilter();
 		model.addAttribute("filter", filter);
 		List<FacilityEntity> facilities = facilityService.findAll();
@@ -152,12 +164,20 @@ public class OutstandingController {
 	}
 
 	@PostMapping({ "", "/" })
-	public String ver(OutstandingFilter filter, Model model) {
-		List<OutstandingEntity> outs = outstandingService.filter(filter.cantidadRestante, filter.fechaEfectiva,
-				filter.fechaCreacion, filter.fechaFinalizacion, filter.pagoPrincipal, filter.pagoIntereses,
-				filter.tipoInteres, filter.tipoCobros, filter.periodicidad, filter.cantidadCobroPeriodico,
-				filter.facility);
-		model.addAttribute("outs", outs);
+	public String ver(OutstandingFilter filter, Model model, HttpSession session) {
+		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
+
+		if (usuario.getRol().equals("ADMIN")) {
+			List<OutstandingEntity> outs= outstandingService.findAll();
+			model.addAttribute("outs", outs);
+		} else {
+			List<OutstandingEntity> outs = outstandingService.filter( filter.cantidadRestante, filter.fechaEfectiva,
+					filter.fechaCreacion, filter.fechaFinalizacion, filter.pagoPrincipal, filter.pagoIntereses,
+					filter.tipoInteres, filter.tipoCobros, filter.periodicidad, filter.cantidadCobroPeriodico,
+					filter.facility, usuario.getBanco().toString());
+			model.addAttribute("outs", outs);
+		}
+
 		model.addAttribute("filter", filter);
 		List<FacilityEntity> facilities = facilityService.findAll();
 		model.addAttribute("facilities", facilities);

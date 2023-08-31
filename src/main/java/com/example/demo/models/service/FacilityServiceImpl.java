@@ -48,9 +48,9 @@ public class FacilityServiceImpl implements  IFacilityService{
     @Override
     @Transactional(readOnly = true)
     public List<FacilityEntity> filter(String tipo, String estado, String cantidad, String fechaCreacion,
-                                   String fechaEfectiva, String fechaFinalizacion, String deal) {
+                                   String fechaEfectiva, String fechaFinalizacion, String deal, String idBanco) {
         if (tipo == "" && estado == "" && cantidad == "" && fechaCreacion == "" && fechaEfectiva == ""
-                && fechaFinalizacion == "" && deal == "") {
+                && fechaFinalizacion == "" && deal == "" && idBanco == "") {
             return findAll();
         }
 
@@ -68,7 +68,7 @@ public class FacilityServiceImpl implements  IFacilityService{
         }
 
         return facilityCustom.filtradoFacility(tipo, estado, cantidad, fechaCreacion, fechaEfectiva, fechaFinalizacion,
-                deal);
+                deal, idBanco);
     }
 
 

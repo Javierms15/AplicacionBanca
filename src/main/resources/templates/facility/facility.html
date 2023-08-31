@@ -32,7 +32,7 @@
     <label for="fechaFinalizacion">Fecha finalización:</label>
     <input type="date" id="fechaFinalizacion" name="fechaFinalizacion" th:field="*{fechaFinalizacion}" required><br>
     <label for="deal">Deal:</label>
-    <select name="deal" id="deal" required th:field="*{deal}">
+    <select name="deal" id="deal" required th:field="*{deal}" >
         <option th:each="deal: ${deals}" th:value="${deal.idDeal}" th:itemid="${deal.idDeal}"
                 th:text="${deal.idDeal}"></option>
     </select><br>

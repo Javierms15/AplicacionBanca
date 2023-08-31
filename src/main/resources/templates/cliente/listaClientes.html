@@ -27,7 +27,7 @@
         <input type="text" class="form-control" th:field="*{email}" />
     </div>
 
-    <div>
+    <div th:if="${session.usuario.rol == 'ADMIN'}">
         <label>Banco:</label>
         <select  name="idBanco" id="idBanco">
             <option value="">---</option>

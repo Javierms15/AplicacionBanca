@@ -2,10 +2,9 @@ package com.example.demo.controller;
 
 import com.example.demo.models.dao.IBancoDao;
 import com.example.demo.models.dao.IClienteDao;
-import com.example.demo.models.entity.BancoEntity;
-import com.example.demo.models.entity.ClienteEntity;
-import com.example.demo.models.entity.FacilityEntity;
+import com.example.demo.models.entity.*;
 import com.example.demo.models.service.IClienteService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -46,9 +45,17 @@ public class ClienteController {
 	}
 
 	@RequestMapping("/listarClientes")
-	public String mostrarClientes(Model model){
-		List<ClienteEntity> clientes= (List<ClienteEntity>) clienteDao.findAll();
-		model.addAttribute("clientes",clientes);
+	public String mostrarClientes(Model model, HttpSession session){
+
+		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
+		if (usuario.getRol().equals("ADMIN")) {
+			List<ClienteEntity> clientes = clienteService.findAll();
+			model.addAttribute("clientes",clientes);
+		} else {
+			List<ClienteEntity> clientes = clienteService.filter("", "", "", "", usuario.getBanco().toString(), true);
+			model.addAttribute("clientes",clientes);
+		}
+
 		List<BancoEntity> bancos= (List<BancoEntity>) bancoDao.findAll();
 		model.addAttribute("bancos",bancos);
 		ClienteFilter filter = new ClienteFilter();
@@ -82,9 +89,10 @@ public class ClienteController {
 	}
 
 	@RequestMapping(value = "/filtrar")
-	public String filtrar(Model model, ClienteFilter filter) {
+	public String filtrar(Model model, ClienteFilter filter, HttpSession session) {
+		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
 		List<ClienteEntity> clientes = clienteService.filter(filter.nombreLegal, filter.direccionLegal, filter.dinero, filter.email,
-				filter.idBanco);
+				usuario.getRol() == "BANCA" ? usuario.getBanco().toString() : filter.idBanco, usuario.getRol() == "BANCA" ? true : false);
 		List<BancoEntity> bancos= (List<BancoEntity>) bancoDao.findAll();
 		model.addAttribute("bancos",bancos);
 		model.addAttribute("filter", filter);

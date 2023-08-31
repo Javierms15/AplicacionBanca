@@ -16,6 +16,6 @@ public interface IFacilityService {
     void delete(int id);
 
     List<FacilityEntity> filter(String tipo, String estado, String cantidad, String fechaCreacion,
-                            String fechaEfectiva, String fechaFinalizacion, String deal);
+                            String fechaEfectiva, String fechaFinalizacion, String deal, String idBanco);
 
 }

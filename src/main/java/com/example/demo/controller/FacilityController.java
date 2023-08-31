@@ -5,8 +5,10 @@ import com.example.demo.models.dao.IDealDao;
 import com.example.demo.models.dao.IFacilityDao;
 import com.example.demo.models.entity.DealEntity;
 import com.example.demo.models.entity.FacilityEntity;
+import com.example.demo.models.entity.UsuarioEntity;
 import com.example.demo.models.service.IDealService;
 import com.example.demo.models.service.IFacilityService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -96,9 +98,18 @@ public class FacilityController {
     }
 
     @RequestMapping("/listarFacility")
-    public String mostrarFacility(Model model){
-        List<FacilityEntity> facilitys= (List<FacilityEntity>) facilityDao.findAll();
-        model.addAttribute("facilitys",facilitys);
+    public String mostrarFacility(Model model, HttpSession session){
+
+        UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
+
+        if (usuario.getRol().equals("ADMIN")) {
+            List<FacilityEntity> facilitys= facilityService.findAll();
+            model.addAttribute("facilitys",facilitys);
+        } else {
+            List<FacilityEntity> facilitys = facilityService.filter( "", "", "", "", "", "", "", usuario.getBanco().toString());
+            model.addAttribute("facilitys",facilitys);
+        }
+
         FacilityFilter filter = new FacilityFilter();
         model.addAttribute("filter", filter);
         List<DealEntity> deals=dealService.findAll();
@@ -151,10 +162,19 @@ public class FacilityController {
     }
 
     @RequestMapping(value = "/filtrarFacility")
-    public String filtrarFacility(FacilityFilter filter, Model model) {
-        List<FacilityEntity> facilitys = facilityService.filter(filter.tipo, filter.estado, filter.cantidad, filter.fechaCreacion,
-                filter.fechaEfectiva, filter.fechaFinalizacion, filter.deal);
-        model.addAttribute("facilitys", facilitys);
+    public String filtrarFacility(FacilityFilter filter, Model model, HttpSession session) {
+
+        UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
+
+        if (usuario.getRol().equals("ADMIN")) {
+            List<FacilityEntity> facilitys= facilityService.findAll();
+            model.addAttribute("facilitys",facilitys);
+        } else {
+            List<FacilityEntity> facilitys = facilityService.filter( filter.tipo, filter.estado, filter.cantidad, filter.fechaCreacion,
+                    filter.fechaEfectiva, filter.fechaFinalizacion, filter.deal, usuario.getBanco().toString());
+            model.addAttribute("facilitys",facilitys);
+        }
+
         model.addAttribute("filter", filter);
         List<DealEntity> deals=dealService.findAll();
         model.addAttribute("deals",deals);
