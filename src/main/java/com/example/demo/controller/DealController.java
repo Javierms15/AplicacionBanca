@@ -461,7 +461,7 @@ public class DealController {
 			dealService.delete(id);
 			flash.addFlashAttribute("success", "Deal eliminado correctamente");
 		} else {
-			flash.addFlashAttribute("success", "No tiene permiso para eliminar el deal");
+			flash.addFlashAttribute("error", "No tiene permiso para eliminar el deal");
 			
 		}
 		return "redirect:/deal";
@@ -476,12 +476,12 @@ public class DealController {
 		}
 
 		if (!puedeEditar((UsuarioEntity) session.getAttribute("usuario"), deal)) {
-			flash.addFlashAttribute("success", "No tiene permiso para editar el deal");
+			flash.addFlashAttribute("error", "No tiene permiso para editar el deal");
 			return "redirect:/deal";
 		}
 
 		if (!((String) deal.getEstado()).equals("PENDING")) {
-			flash.addFlashAttribute("success", "No se puede editar el deal");
+			flash.addFlashAttribute("error", "No se puede editar el deal");
 			return "redirect:/deal";
 		}
 		
