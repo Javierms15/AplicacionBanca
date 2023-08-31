@@ -168,6 +168,8 @@
 							<a th:if="${deal.estado == 'APPROVED' && deal.aprobadoPor != usuarioId}"
 								th:href="@{/deal/close/} + ${deal.idDeal}" class="btn btn-primary btn-xs">Cerrar</a>
 						</td>
+						<td><a th:href="@{/deal/see/} + ${deal.idDeal}" class="btn btn-secondary btn-xs">Ver Info</a>
+						</td>
 						<td><a th:if="${deal.estado == 'PENDING'}" th:href="@{/deal/edit/} + ${deal.idDeal}"
 								class="btn btn-info btn-xs">Editar</a></td>
 						<td><a th:href="@{/deal/delete/} + ${deal.idDeal}" class="btn btn-danger btn-xs">Borrar</a></td>

@@ -48,7 +48,7 @@ public class DealController {
 	IUsuarioService usuarioService;
 
 	@GetMapping({ "", "/" })
-	public String ver(Model model, HttpSession session) {
+	public String ver_todos(Model model, HttpSession session) {
 		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
 		if (usuario.getRol().equals("ADMIN")) {
 			List<DealEntity> deals = dealService.findAll();
@@ -154,7 +154,7 @@ public class DealController {
 	}
 
 	@PostMapping({ "", "/" })
-	public String ver(DealFilter filter, Model model, HttpSession session) {
+	public String ver_todos(DealFilter filter, Model model, HttpSession session) {
 		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
 		String bancoUsuario = usuario.getBanco() == null ? "" : usuario.getBanco().toString();
 		List<DealEntity> deals = dealService.filter(bancoUsuario, filter.estado, filter.moneda, filter.tipo,
@@ -167,6 +167,29 @@ public class DealController {
 		List<UsuarioEntity> usuarios = usuarioService.findAll();
 		model.addAttribute("usuarios", usuarios);
 		return "deal/deal_all";
+	}
+
+	@GetMapping("/see/{id}")
+	public String ver(@PathVariable int id, Model model, RedirectAttributes flash, HttpSession session) {
+		DealEntity deal = dealService.findOne(id);
+		if (deal == null) {
+			flash.addFlashAttribute("error", "Acceso a un deal que no existe");
+			return "redirect:/deal";
+		}
+
+		if (!puedeEditar((UsuarioEntity) session.getAttribute("usuario"), deal)) {
+			flash.addFlashAttribute("error", "No tiene permiso para ver el deal");
+			return "redirect:/deal";
+		}
+
+		model.addAttribute("deal", deal);
+		List<ClienteEntity> clientes = clienteService.findAll();
+		model.addAttribute("clientes", clientes);
+		List<ParticipanteEntity> participantes = participanteService.findAllByDeal(deal.getIdDeal());
+		model.addAttribute("participantes", participantes);
+		List<BancoEntity> bancos = bancoService.findAll();
+		model.addAttribute("bancos", bancos);
+		return "deal/deal_ver";
 	}
 
 	@GetMapping("/create")
@@ -462,7 +485,7 @@ public class DealController {
 			flash.addFlashAttribute("success", "Deal eliminado correctamente");
 		} else {
 			flash.addFlashAttribute("error", "No tiene permiso para eliminar el deal");
-			
+
 		}
 		return "redirect:/deal";
 	}
@@ -484,7 +507,7 @@ public class DealController {
 			flash.addFlashAttribute("error", "No se puede editar el deal");
 			return "redirect:/deal";
 		}
-		
+
 		model.addAttribute("deal", deal);
 		List<ClienteEntity> clientes = clienteService.findAll();
 		model.addAttribute("clientes", clientes);

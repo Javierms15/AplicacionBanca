@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+	<meta charset="UTF-8" />
+</head>
+
+<body>
+
+	<header th:replace="layout/layout :: header"></header>
+
+	<div class="container py-4">
+		<div class="card bg-dark text-white">
+
+			<div class="card-header" style="font-size: xx-large">Información del deal</div>
+
+			<div class="card-body">
+
+				<form th:action="@{/deal/banks}" th:object="${deal}" method="post">
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Estado</label>
+						<div class="col-sm-6">
+							<input type="text" th:field="*{estado}" disabled />
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Creado Por</label>
+						<div class="col-sm-6">
+							<input type="text" th:field="*{creadoPor}" disabled />
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Aprobado Por</label>
+						<div class="col-sm-6">
+							<input type="text" th:field="*{aprobadoPor}" disabled />
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Cerrado Por</label>
+						<div class="col-sm-6">
+							<input type="text" th:field="*{cerradoPor}" disabled />
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Cantidad Prestamo</label>
+						<div class="col-sm-6">
+							<input type="text" th:field="*{cantidadPrestamo}" disabled />
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Cantidad Abonada</label>
+						<div class="col-sm-6">
+							<input type="text" th:field="*{cantidadAbonada}" disabled />
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Cantidad A Pagar</label>
+						<div class="col-sm-6">
+							<input type="text" th:field="*{cantidadAPagar}" disabled />
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Moneda</label>
+						<div class="col-sm-6">
+							<select class="form-control" th:field="*{moneda}" disabled>
+								<option value="EUR">Euro</option>
+								<option value="USD">Dolar estadounidense</option>
+								<option value="JPY">Yen</option>
+								<option value="GBP">Libra</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Tipo</label>
+						<div class="col-sm-6">
+							<select class="form-control" th:field="*{tipo}" disabled>
+								<option value="SOLE_LENDER">Sole lender</option>
+								<option value="SYNDICATED">Syndicated</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Descuento</label>
+						<div class="col-sm-6">
+							<select class="form-control" th:field="*{descuento}" disabled>
+								<option value="0">NO</option>
+								<option value="1">SI</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Cliente</label>
+						<div class="col-sm-6">
+							<select class="form-control" th:field="*{cliente}" disabled>
+								<option th:each="cliente: ${clientes}" th:value="${cliente.idCliente}"
+									th:text="${cliente.nombreLegal}"></option>
+							</select>
+						</div>
+					</div>
+					<label class="col-sm-2 col-form-label">Bancos Participantes</label>
+					<div class="form-group row">
+						<table>
+							<thead>
+								<tr>
+									<td>Banco</td>
+									<td>Participación</td>
+								</tr>
+							</thead>
+							<tbody>
+								<tr th:each="participante : ${participantes}">
+									<td th:each="banco: ${bancos}" th:if="${participante.idBanco == banco.idBanco}"
+										th:text="${banco.nombre}"></td>
+									<td th:text="${participante.porcentajeParticipacion * 100} + '%'"></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</form>
+
+			</div>
+
+		</div>
+	</div>
+
+	<a href="/deal" class="btn btn-warning btn-xs"><button>Volver</button></a>
+</body>
+
+</html>
