@@ -59,6 +59,7 @@ public class DealController {
 			model.addAttribute("deals", deals);
 		}
 
+		model.addAttribute("usuarioId", usuario.getIdUsuario());
 		DealFilter filter = new DealFilter();
 		model.addAttribute("filter", filter);
 		List<ClienteEntity> clientes = clienteService.findAll();
@@ -371,16 +372,114 @@ public class DealController {
 		return "redirect:/deal";
 	}
 
+	boolean puedeEditar(UsuarioEntity usuario, DealEntity deal) {
+		// Si es admin siempre puede editar
+		if (((String) usuario.getRol()).equals("ADMIN")) {
+			return true;
+		}
+
+		UsuarioEntity creadoPor = usuarioService.findOne(deal.getCreadoPor());
+		if (creadoPor == null) {
+			// TODO: Esto no deberia ocurrir
+			return false;
+		}
+
+		// Si es admin cualquiera puede editarlo
+		if (((String) creadoPor.getRol()).equals("ADMIN")) {
+			return true;
+		}
+
+		// Si no, sólo puede si es del mismo banco
+		return creadoPor.getBanco() == usuario.getBanco();
+	}
+
+	boolean puedeCerrar(UsuarioEntity usuario, DealEntity deal) {
+		if (!puedeEditar(usuario, deal)) {
+			return false;
+		}
+
+		if (!((String) deal.getEstado()).equals("APPROVED")) {
+			return false;
+		}
+
+		return deal.getAprobadoPor() != usuario.getIdUsuario();
+	}
+
+	@GetMapping("/approve/{id}")
+	public String aprobar(@PathVariable int id, RedirectAttributes flash, HttpSession session) {
+		DealEntity deal = dealService.findOne(id);
+		if (deal == null) {
+			flash.addFlashAttribute("error", "Acceso a un deal que no existe");
+			return "redirect:/deal";
+		}
+
+		if (puedeEditar((UsuarioEntity) session.getAttribute("usuario"), deal)) {
+			if (((String) deal.getEstado()).equals("PENDING")) {
+				deal.setEstado("APPROVED");
+				deal.setAprobadoPor(((UsuarioEntity) session.getAttribute("usuario")).getIdUsuario());
+				dealService.save(deal);
+				flash.addFlashAttribute("success", "Deal aprobado correctamente");
+			} else {
+				flash.addFlashAttribute("error", "No se puede aprobar el deal");
+			}
+		} else {
+			flash.addFlashAttribute("error", "No tiene permiso para aprobar el deal");
+		}
+
+		return "redirect:/deal";
+	}
+
+	@GetMapping("/close/{id}")
+	public String cerrar(@PathVariable int id, RedirectAttributes flash, HttpSession session) {
+		DealEntity deal = dealService.findOne(id);
+		if (deal == null) {
+			flash.addFlashAttribute("error", "Acceso a un deal que no existe");
+			return "redirect:/deal";
+		}
+
+		if (puedeCerrar((UsuarioEntity) session.getAttribute("usuario"), deal)) {
+			deal.setEstado("CLOSED");
+			deal.setCerradoPor(((UsuarioEntity) session.getAttribute("usuario")).getIdUsuario());
+			dealService.save(deal);
+			flash.addFlashAttribute("success", "Deal cerrado correctamente");
+		} else {
+			flash.addFlashAttribute("error", "No tiene permiso para cerrar el deal");
+		}
+
+		return "redirect:/deal";
+	}
+
 	@GetMapping("/delete/{id}")
-	public String delete(@PathVariable int id, RedirectAttributes flash) {
-		dealService.delete(id);
-		flash.addFlashAttribute("success", "Deal eliminado correctamente");
+	public String delete(@PathVariable int id, RedirectAttributes flash, HttpSession session) {
+		DealEntity deal = dealService.findOne(id);
+		if (deal == null) {
+			flash.addFlashAttribute("error", "Acceso a un deal que no existe");
+			return "redirect:/deal";
+		}
+
+		if (puedeEditar((UsuarioEntity) session.getAttribute("usuario"), deal)) {
+			dealService.delete(id);
+			flash.addFlashAttribute("success", "Deal eliminado correctamente");
+		} else {
+			flash.addFlashAttribute("success", "No tiene permiso para eliminar el deal");
+			
+		}
 		return "redirect:/deal";
 	}
 
 	@GetMapping("/edit/{id}")
-	public String edit(@PathVariable int id, Model model) {
+	public String edit(@PathVariable int id, Model model, RedirectAttributes flash, HttpSession session) {
 		DealEntity deal = dealService.findOne(id);
+		if (deal == null) {
+			flash.addFlashAttribute("error", "Acceso a un deal que no existe");
+			return "redirect:/deal";
+		}
+
+		if (!puedeEditar((UsuarioEntity) session.getAttribute("usuario"), deal)) {
+			flash.addFlashAttribute("success", "No tiene permiso para editar el deal");
+			return "redirect:/deal";
+		}
+		
 		model.addAttribute("deal", deal);
 		List<ClienteEntity> clientes = clienteService.findAll();
 		model.addAttribute("clientes", clientes);

@@ -124,7 +124,6 @@ public class DealCustom {
 			x = true;
 		}
 
-		System.out.println(query);
 		Query q = this.em.createQuery(query);
 
 		if (!qestado.equals("")) {

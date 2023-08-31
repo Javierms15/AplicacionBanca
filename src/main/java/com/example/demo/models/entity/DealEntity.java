@@ -38,6 +38,28 @@ public class DealEntity {
 	@Basic
 	@Column(name = "creado_por")
 	private int creadoPor;
+	@Basic
+	@Column(name = "aprobado_por", nullable = true)
+	private Integer aprobadoPor;
+	@Basic
+	@Column(name = "cerrado_por", nullable = true)
+	private Integer cerradoPor;
+
+	public Integer getAprobadoPor() {
+		return aprobadoPor;
+	}
+
+	public void setAprobadoPor(Integer aprobadoPor) {
+		this.aprobadoPor = aprobadoPor;
+	}
+
+	public Integer getCerradoPor() {
+		return cerradoPor;
+	}
+
+	public void setCerradoPor(Integer cerradoPor) {
+		this.cerradoPor = cerradoPor;
+	}
 
 	public int getCreadoPor() {
 		return creadoPor;

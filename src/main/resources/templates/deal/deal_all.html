@@ -162,7 +162,9 @@
 							th:text="${cliente.nombreLegal}"></td>
 						<td th:each="usuario: ${usuarios}" th:if="${usuario.idUsuario == deal.creadoPor}"
 							th:text="${usuario.nombre}"></td>
-						<td><a th:if="${deal.estado != 'CLOSED'}" th:href="@{/deal/edit/} + ${deal.idDeal}"
+						<td><a th:if="${deal.estado == 'PENDING'}" th:href="@{/deal/approve/} + ${deal.idDeal}" class="btn btn-primary btn-xs">Aprobar</a></td>
+						<td><a th:if="${deal.estado == 'APPROVED' && deal.aprobadoPor != usuarioId}" th:href="@{/deal/close/} + ${deal.idDeal}" class="btn btn-primary btn-xs">Cerrar</a></td>
+						<td><a th:if="${deal.estado == 'PENDING'}" th:href="@{/deal/edit/} + ${deal.idDeal}"
 								class="btn btn-info btn-xs">Editar</a></td>
 						<td><a th:href="@{/deal/delete/} + ${deal.idDeal}" class="btn btn-danger btn-xs">Borrar</a></td>
 					</tr>

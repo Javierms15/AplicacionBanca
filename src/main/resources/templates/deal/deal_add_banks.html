@@ -17,6 +17,8 @@
 		<input type="hidden" th:field="*{descuento}" />
 		<input type="hidden" th:field="*{cliente}" />
 		<input type="hidden" th:field="*{creadoPor}" />
+		<input type="hidden" th:field="*{aprobadoPor}" />
+		<input type="hidden" th:field="*{cerradoPor}" />
 		<select th:if="${deal.tipo == 'SOLE_LENDER'}" name="banco" class="form-control">
 			<option th:each="banco: ${bancos}" th:value="${banco.idBanco}" th:text="${banco.nombre}"
 				th:selected="${agente == banco.idBanco}"></option>
