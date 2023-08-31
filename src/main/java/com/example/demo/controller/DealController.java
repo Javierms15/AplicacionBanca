@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.sql.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,13 +17,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.demo.models.entity.BancoEntity;
 import com.example.demo.models.entity.ClienteEntity;
 import com.example.demo.models.entity.DealEntity;
+import com.example.demo.models.entity.NotificacionEntity;
 import com.example.demo.models.entity.ParticipanteEntity;
 import com.example.demo.models.entity.UsuarioEntity;
 import com.example.demo.models.service.IBancoService;
 import com.example.demo.models.service.IClienteService;
 import com.example.demo.models.service.IDealService;
+import com.example.demo.models.service.INotificacionService;
 import com.example.demo.models.service.IParticipanteService;
 import com.example.demo.models.service.IUsuarioService;
+import com.example.demo.models.service.NotificacionServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -46,6 +50,9 @@ public class DealController {
 
 	@Autowired
 	IUsuarioService usuarioService;
+
+	@Autowired
+	INotificacionService notificacionService;
 
 	@GetMapping({ "", "/" })
 	public String ver_todos(Model model, HttpSession session) {
@@ -460,11 +467,20 @@ public class DealController {
 			return "redirect:/deal";
 		}
 
-		if (puedeCerrar((UsuarioEntity) session.getAttribute("usuario"), deal)) {
+		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
+		if (puedeCerrar(usuario, deal)) {
 			deal.setEstado("CLOSED");
 			deal.setCerradoPor(((UsuarioEntity) session.getAttribute("usuario")).getIdUsuario());
 			dealService.save(deal);
 			flash.addFlashAttribute("success", "Deal cerrado correctamente");
+			NotificacionEntity notificacion = new NotificacionEntity();
+			notificacion.setEnviadoA(deal.getAprobadoPor());
+			notificacion.setEnviadoPor(usuario.getIdUsuario());
+			notificacion.setEnlace("/deal/ver/" + deal.getIdDeal());
+			notificacion.setFechaNotificacion(new Date(System.currentTimeMillis()));
+			notificacion.setTitulo("Deal cerrado");
+			notificacion.setMensaje("El usuario '" + usuario.getNombre() + "' ha cerrado el deal que habías aprobado.");
+			notificacionService.save(notificacion);
 		} else {
 			flash.addFlashAttribute("error", "No tiene permiso para cerrar el deal");
 		}

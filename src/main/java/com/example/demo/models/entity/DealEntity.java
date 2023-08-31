@@ -142,22 +142,26 @@ public class DealEntity {
 	}
 
 	@Override
-	public boolean equals(Object o) {
-		if (this == o)
+	public boolean equals(Object obj) {
+		if (this == obj)
 			return true;
-		if (o == null || getClass() != o.getClass())
+		if (obj == null)
 			return false;
-		DealEntity that = (DealEntity) o;
-		return idDeal == that.idDeal && Double.compare(that.cantidadPrestamo, cantidadPrestamo) == 0
-				&& Double.compare(that.cantidadAbonada, cantidadAbonada) == 0
-				&& Double.compare(that.cantidadAPagar, cantidadAPagar) == 0 && descuento == that.descuento
-				&& cliente == that.cliente && Objects.equals(estado, that.estado) && Objects.equals(moneda, that.moneda)
-				&& Objects.equals(tipo, that.tipo);
+		if (getClass() != obj.getClass())
+			return false;
+		DealEntity other = (DealEntity) obj;
+		return Objects.equals(aprobadoPor, other.aprobadoPor)
+				&& Double.doubleToLongBits(cantidadAPagar) == Double.doubleToLongBits(other.cantidadAPagar)
+				&& Double.doubleToLongBits(cantidadAbonada) == Double.doubleToLongBits(other.cantidadAbonada)
+				&& Double.doubleToLongBits(cantidadPrestamo) == Double.doubleToLongBits(other.cantidadPrestamo)
+				&& Objects.equals(cerradoPor, other.cerradoPor) && cliente == other.cliente
+				&& creadoPor == other.creadoPor && descuento == other.descuento && Objects.equals(estado, other.estado)
+				&& idDeal == other.idDeal && Objects.equals(moneda, other.moneda) && Objects.equals(tipo, other.tipo);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(idDeal, estado, cantidadPrestamo, cantidadAbonada, cantidadAPagar, moneda, tipo, descuento,
-				cliente);
+		return Objects.hash(aprobadoPor, cantidadAPagar, cantidadAbonada, cantidadPrestamo, cerradoPor, cliente,
+				creadoPor, descuento, estado, idDeal, moneda, tipo);
 	}
 }
