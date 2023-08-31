@@ -81,4 +81,9 @@ public class OutstandingServiceImpl implements IOutstandingService {
 				pagoPrincipal, pagoIntereses, tipoInteres, tipoCobros, periodicidad, cantidadCobroPeriodico, facility);
 	}
 
+	@Override
+	public Double obtenerSumaOutsandingFacility(int idFacility) {
+		return outstandingDao.obtenerSumaOutstandingFacility(idFacility);
+	}
+
 }

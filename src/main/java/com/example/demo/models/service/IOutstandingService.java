@@ -17,4 +17,6 @@ public interface IOutstandingService {
 	List<OutstandingEntity> filter(String cantidadRestante, String fechaEfectiva, String fechaCreacion,
 			String fechaFinalizacion, String pagoPrincipal, String pagoIntereses, String tipoInteres, String tipoCobros,
 			String periodicidad, String cantidadCobroPeriodico, String facility);
+
+	Double obtenerSumaOutsandingFacility(int idDeal);
 }

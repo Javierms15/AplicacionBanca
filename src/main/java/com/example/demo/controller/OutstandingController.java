@@ -1,7 +1,10 @@
 package com.example.demo.controller;
 
+import java.util.Date;
 import java.util.List;
 
+import com.example.demo.models.dao.IOutstandingDao;
+import com.example.demo.models.entity.DealEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -30,6 +33,8 @@ public class OutstandingController {
 
 	@Autowired
 	private ITipoInteresService tipoInteresService;
+
+
 	
 	@GetMapping({ "", "/" })
 	public String ver(Model model) {
@@ -174,10 +179,63 @@ public class OutstandingController {
 	}
 
 	@PostMapping("/save")
-	public String save(OutstandingEntity out, RedirectAttributes flash) {
-		outstandingService.save(out);
-		flash.addFlashAttribute("success", "Outstanding guardado correctamente");
-		return "redirect:/outstanding";
+	public String save(OutstandingEntity out, RedirectAttributes flash, Model model) {
+		Date fechaCreacion=out.getFechaCreacion();
+		Date fechaEfectiva=out.getFechaEfectiva();
+		Date fechaFinalizacion=out.getFechaFinalizacion();
+
+		Double sumaTotalAcumulada = outstandingService.obtenerSumaOutsandingFacility(out.getFacility()) == null? 0 : outstandingService.obtenerSumaOutsandingFacility(out.getFacility());
+		Double sumaTotalTeorica = sumaTotalAcumulada + out.getPagoPrincipal()+out.getPagoIntereses();
+		Double totalPrestamoFacility = facilityService.findOne(out.getFacility()).getCantidad();
+
+		if (fechaCreacion.compareTo(fechaEfectiva)>0 || fechaCreacion.compareTo(fechaFinalizacion) >0) {
+			model.addAttribute("error", "La fecha de creación no es válida");
+			OutstandingEntity out2 = new OutstandingEntity();
+			model.addAttribute("out", out2);
+			model.addAttribute("buttonText", "Crear Outstanding");
+			List<FacilityEntity> facilities = facilityService.findAll();
+			model.addAttribute("facilities", facilities);
+			List<TipoInteresEntity> tipoIntereses = tipoInteresService.findAll();
+			model.addAttribute("tipoIntereses", tipoIntereses);
+			return "outstanding/out_form";
+		}else if(fechaEfectiva.compareTo(fechaCreacion) <0 || fechaEfectiva.compareTo(fechaFinalizacion) > 0){
+			model.addAttribute("error", "La fecha efectiva no es válida");
+			OutstandingEntity out2 = new OutstandingEntity();
+			model.addAttribute("out", out2);
+			model.addAttribute("buttonText", "Crear Outstanding");
+			List<FacilityEntity> facilities = facilityService.findAll();
+			model.addAttribute("facilities", facilities);
+			List<TipoInteresEntity> tipoIntereses = tipoInteresService.findAll();
+			model.addAttribute("tipoIntereses", tipoIntereses);
+			return "outstanding/out_form";
+		}else if(fechaFinalizacion.compareTo(fechaCreacion)<0 || fechaFinalizacion.compareTo(fechaEfectiva)<0){
+			model.addAttribute("error", "La fecha de finalización no es válida");
+			OutstandingEntity out2 = new OutstandingEntity();
+			model.addAttribute("out", out2);
+			model.addAttribute("buttonText", "Crear Outstanding");
+			List<FacilityEntity> facilities = facilityService.findAll();
+			model.addAttribute("facilities", facilities);
+			List<TipoInteresEntity> tipoIntereses = tipoInteresService.findAll();
+			model.addAttribute("tipoIntereses", tipoIntereses);
+			return "outstanding/out_form";
+		}else {
+			if(sumaTotalTeorica <= totalPrestamoFacility) {
+				outstandingService.save(out);
+				flash.addFlashAttribute("success", "Outstanding guardado correctamente");
+				return "redirect:/outstanding";
+			}else{
+				model.addAttribute("error", "La cantidad total del outsanding no puede superar los " + (totalPrestamoFacility - sumaTotalAcumulada));
+				OutstandingEntity out2 = new OutstandingEntity();
+				model.addAttribute("out", out2);
+				model.addAttribute("buttonText", "Crear Outstanding");
+				List<FacilityEntity> facilities = facilityService.findAll();
+				model.addAttribute("facilities", facilities);
+				List<TipoInteresEntity> tipoIntereses = tipoInteresService.findAll();
+				model.addAttribute("tipoIntereses", tipoIntereses);
+				return "outstanding/out_form";
+			}
+
+		}
 	}
 
 	@GetMapping("/delete/{id}")

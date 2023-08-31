@@ -11,7 +11,7 @@
 
 <h1>Crear facility</h1>
 
-<form th:action="@{/crearFacility}" th:object="${facility}" method="post">
+<form th:action="@{/crearFacility}" th:object="${facility}"  method="post">
     <label for="tipo">Tipo</label>
     <select name="tipo" id="tipo" th:field="*{tipo}" required>
         <option value="TERM" itemid="TERM">TERM</option>
@@ -41,7 +41,7 @@
 </form>
 
 <form th:action="@{/listarClientes}">
-    <input type="submit" value="Atrás">
+    <input type="submit"  value="Atrás">
 </form>
 
 

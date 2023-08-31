@@ -3,9 +3,12 @@
 
 <head>
 	<meta charset="UTF-8" />
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
 </head>
 
 <body>
+<header th:replace="layout/layout :: header"></header>
+
 	<form th:action="@{/outstanding/save}" th:object="${out}" method="post">
 		<input type="hidden" class="form-control" th:field="*{idOutstanding}" />
 		<div class="form-group row">
@@ -16,17 +19,19 @@
 			</div>
 		</div>
 		<div class="form-group row">
-			<label class="col-sm-2 col-form-label">Fecha Efectiva</label>
-			<div class="col-sm-6">
-				<input type="date" th:field="*{fechaEfectiva}" class="form-control" required />
-			</div>
-		</div>
-		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Fecha Creacion</label>
 			<div class="col-sm-6">
 				<input type="date" th:field="*{fechaCreacion}" class="form-control" required />
 			</div>
 		</div>
+
+		<div class="form-group row">
+			<label class="col-sm-2 col-form-label">Fecha Efectiva</label>
+			<div class="col-sm-6">
+				<input type="date" th:field="*{fechaEfectiva}" class="form-control" required />
+			</div>
+		</div>
+
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Fecha finalizacion</label>
 			<div class="col-sm-6">

@@ -13,10 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Controller
 public class FacilityController {
@@ -56,6 +53,33 @@ public class FacilityController {
         Double sumaTotalAcumulada = facilityDao.obtenerSumaFacilityDeal(facility.getDeal()) == null? 0 : facilityDao.obtenerSumaFacilityDeal(facility.getDeal());
         Double sumaTotalTeorica = sumaTotalAcumulada + facility.getCantidad();
         Double totalPrestamoDeal = dealService.findOne(facility.getDeal()).getCantidadPrestamo();
+
+        Date fechaCreacion=facility.getFechaCreacion();
+        Date fechaEfectiva=facility.getFechaEfectiva();
+        Date fechaFinalizacion=facility.getFechaFinalizacion();
+
+        if (fechaCreacion.compareTo(fechaEfectiva)>0 || fechaCreacion.compareTo(fechaFinalizacion) >0) {
+            model.addAttribute("error", "La fecha de creación no es válida");
+            facility.setCantidad(0);
+            model.addAttribute("facility", facility);
+            List<DealEntity> deals = dealService.findAll();
+            model.addAttribute("deals", deals);
+            return "facility/facility";
+        }else if(fechaEfectiva.compareTo(fechaCreacion) <0 || fechaEfectiva.compareTo(fechaFinalizacion) > 0){
+            model.addAttribute("error", "La fecha efectiva no es válida");
+            facility.setCantidad(0);
+            model.addAttribute("facility", facility);
+            List<DealEntity> deals = dealService.findAll();
+            model.addAttribute("deals", deals);
+            return "facility/facility";
+        }else if(fechaFinalizacion.compareTo(fechaCreacion)<0 || fechaFinalizacion.compareTo(fechaEfectiva)<0){
+            model.addAttribute("error", "La fecha de finalización no es válida");
+            facility.setCantidad(0);
+            model.addAttribute("facility", facility);
+            List<DealEntity> deals = dealService.findAll();
+            model.addAttribute("deals", deals);
+            return "facility/facility";
+        }
 
         if(sumaTotalTeorica <= totalPrestamoDeal) {
             facilityDao.save(facility);
