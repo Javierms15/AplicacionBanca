@@ -6,6 +6,7 @@ import com.example.demo.models.dao.IDealDao;
 import com.example.demo.models.dao.IFacilityDao;
 import com.example.demo.models.entity.DealEntity;
 import com.example.demo.models.entity.FacilityEntity;
+import com.example.demo.models.entity.UsuarioEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,6 +70,11 @@ public class FacilityServiceImpl implements  IFacilityService{
 
         return facilityCustom.filtradoFacility(tipo, estado, cantidad, fechaCreacion, fechaEfectiva, fechaFinalizacion,
                 deal, idBanco);
+    }
+
+    @Override
+    public List<FacilityEntity> findByBancoUsuario(UsuarioEntity usuario) {
+        return facilityDao.findByBancoUsuario(usuario.getBanco());
     }
 
 

@@ -13,4 +13,7 @@ public interface IFacilityDao extends JpaRepository<FacilityEntity, Integer> {
 
     @Query("select sum(f.cantidad) from FacilityEntity f where f.deal = :idDeal")
     public Double obtenerSumaFacilityDeal(int idDeal);
+
+    @Query("select f from FacilityEntity f, DealEntity d JOIN ClienteEntity c on c.idCliente = d.cliente and c.idBanco = :banco WHERE d.idDeal = f.deal")
+    List<FacilityEntity> findByBancoUsuario(Integer banco);
 }

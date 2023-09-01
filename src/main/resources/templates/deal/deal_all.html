@@ -11,7 +11,9 @@
 
 	<header th:replace="layout/layout :: header"></header>
 
+	<div class="container py-4">
 	<a th:href="@{/deal/create}" class="btn btn-info btn-xs">Nuevo deal</a>
+	</div>
 
 	<div class="container py-4">
 		<div class="card bg-dark text-white">
@@ -128,7 +130,7 @@
 		</div>
 	</div>
 
-	<div class="container py-4">
+	<div class="container py-6">
 		<div class="card bg-light">
 
 			<div class="card-header" style="font-size: xx-large">Listado de Deals</div>
@@ -146,6 +148,10 @@
 						<td>Descuento</td>
 						<td>Cliente</td>
 						<td>Creado Por</td>
+						<td></td>
+						<td></td>
+						<td></td>
+						<td></td>
 					</tr>
 				</thead>
 				<tbody>

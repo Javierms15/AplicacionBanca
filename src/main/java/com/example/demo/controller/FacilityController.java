@@ -112,7 +112,7 @@ public class FacilityController {
 
         FacilityFilter filter = new FacilityFilter();
         model.addAttribute("filter", filter);
-        List<DealEntity> deals=dealService.findAll();
+        List<DealEntity> deals = dealService.findAll();
         model.addAttribute("deals",deals);
         return "facility/facility_all";
     }
@@ -131,7 +131,15 @@ public class FacilityController {
         FacilityEntity facility = facilityDao.findById(id).orElse(null);
         model.put("facility", facility);
 
-        List<DealEntity> deals=dealService.findAll();
+        List<DealEntity> deals = new ArrayList<>();
+        List<DealEntity> dealsAll=dealService.findAll();
+        for(DealEntity d: dealsAll){
+            Double sumaTotalFacilities=facilityDao.obtenerSumaFacilityDeal(d.getIdDeal()) == null? 0 :  facilityDao.obtenerSumaFacilityDeal(d.getIdDeal());
+            String estado= (String) d.getEstado();
+            if(sumaTotalFacilities < d.getCantidadPrestamo() && !Objects.equals(estado, "CLOSED")){
+                deals.add(d);
+            }
+        }
         Model.addAttribute("deals",deals);
 
         return "facility/facility_edit";

@@ -187,11 +187,11 @@ public class OutstandingController {
 	}
 
 	@GetMapping("/create")
-	public String crear(Model model) {
+	public String crear(Model model, HttpSession session) {
 		OutstandingEntity out = new OutstandingEntity();
 		model.addAttribute("out", out);
 		model.addAttribute("buttonText", "Crear Outstanding");
-		List<FacilityEntity> facilities = facilityService.findAll();
+		List<FacilityEntity> facilities = facilityService.findByBancoUsuario((UsuarioEntity) session.getAttribute("usuario"));
 		model.addAttribute("facilities", facilities);
 		List<TipoInteresEntity> tipoIntereses = tipoInteresService.findAll();
 		model.addAttribute("tipoIntereses", tipoIntereses);
@@ -266,13 +266,13 @@ public class OutstandingController {
 	}
 
 	@GetMapping("/edit/{id}")
-	public String edit(@PathVariable int id, Model model) {
+	public String edit(@PathVariable int id, Model model, HttpSession session) {
 		OutstandingEntity out = outstandingService.findOne(id);
 		model.addAttribute("out", out);
 		model.addAttribute("buttonText", "Actualizar Outstanding");
 		List<TipoInteresEntity> tipoIntereses = tipoInteresService.findAll();
 		model.addAttribute("tipoIntereses", tipoIntereses);
-		List<FacilityEntity> facilities = facilityService.findAll();
+		List<FacilityEntity> facilities = facilityService.findByBancoUsuario((UsuarioEntity) session.getAttribute("usuario"));
 		model.addAttribute("facilities", facilities);
 		return "outstanding/out_form";
 	}
