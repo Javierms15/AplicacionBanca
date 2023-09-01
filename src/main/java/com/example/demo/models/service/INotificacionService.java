@@ -13,4 +13,6 @@ public interface INotificacionService {
 	void save(NotificacionEntity notificacion);
 	
 	void delete(int id);
+	
+	List<NotificacionEntity> findByReciever(int idUsuario);
 }

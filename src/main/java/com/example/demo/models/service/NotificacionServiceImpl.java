@@ -34,4 +34,9 @@ public class NotificacionServiceImpl implements INotificacionService {
 		notificacionDao.deleteById(id);
 	}
 
+	@Override
+	public List<NotificacionEntity> findByReciever(int idUsuario) {
+		return notificacionDao.findByEnviadoA(idUsuario);
+	}
+
 }

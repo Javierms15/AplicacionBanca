@@ -9,45 +9,47 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-public class UsuarioServiceImpl implements IUsuarioService{
+public class UsuarioServiceImpl implements IUsuarioService {
 
-    @Autowired
-    private IUsuarioDao usuarioDao;
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<UsuarioEntity> findAll() {
-        return (List<UsuarioEntity>) usuarioDao.findAll();
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public UsuarioEntity findOne(int id) {
-        return usuarioDao.findById(id).orElse(null);
-    }
-
-    @Override
-    @Transactional
-    public void save(UsuarioEntity usuario) {
-        usuarioDao.save(usuario);
-    }
-
-    @Override
-    @Transactional
-    public void delete(int id) {
-        usuarioDao.deleteById(id);
-    }
-
-    public UsuarioEntity existeUsuario(String nombre, String contrasena){
-         return usuarioDao.findUsuarioEntityByNombreAndAndContrasena(nombre, contrasena);
-    }
+	@Autowired
+	private IUsuarioDao usuarioDao;
 
 	@Override
+	@Transactional(readOnly = true)
+	public List<UsuarioEntity> findAll() {
+		return (List<UsuarioEntity>) usuarioDao.findAll();
+	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public UsuarioEntity findOne(int id) {
+		return usuarioDao.findById(id).orElse(null);
+	}
+
+	@Override
+	@Transactional
+	public void save(UsuarioEntity usuario) {
+		usuarioDao.save(usuario);
+	}
+
+	@Override
+	@Transactional
+	public void delete(int id) {
+		usuarioDao.deleteById(id);
+	}
+
+	public UsuarioEntity existeUsuario(String nombre, String contrasena) {
+		return usuarioDao.findUsuarioEntityByNombreAndAndContrasena(nombre, contrasena);
+	}
+
+	@Override
+	@Transactional(readOnly = true)
 	public List<UsuarioEntity> findByBancoWithDifferentId(int idBanco, int idUsuario) {
 		return usuarioDao.findUsuarioEntityByBancoAndIdUsuarioIsNotOrBancoIsNull(idBanco, idUsuario);
 	}
 
 	@Override
+	@Transactional(readOnly = true)
 	public List<UsuarioEntity> findWithDifferentId(int idUsuario) {
 		return usuarioDao.findByIdUsuarioIsNot(idUsuario);
 	}

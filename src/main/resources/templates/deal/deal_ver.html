@@ -16,9 +16,11 @@
 			<div class="card-header" style="font-size: xx-large">Información del deal</div>
 
 			<div class="card-body">
-				<form th:if="${deal.estado == 'APPROVED'}" th:action="@{/deal/notifyClose/} + ${deal.idDeal}" method="post">
+				<form th:if="${deal.estado == 'APPROVED'}" th:action="@{/deal/notifyClose/} + ${deal.idDeal}"
+					method="post">
 					<select id="usuario" name="usuario">
-						<option th:each="usuario: ${usuarios}" th:value="${usuario.idUsuario}" th:text="${usuario.nombre}"></option>
+						<option th:each="usuario: ${usuarios}" th:value="${usuario.idUsuario}"
+							th:text="${usuario.nombre}"></option>
 					</select>
 					<input type="submit" value="Solicitar cierre de deal" class="btn btn-secondary" />
 				</form>

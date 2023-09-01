@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+	<meta charset="UTF-8" />
+</head>
+
+<body>
+	<header th:replace="layout/layout :: header"></header>
+
+	<table>
+		<thead>
+			<tr>
+				<td>Fecha Notificacion</td>
+				<td>Titulo</td>
+				<td>Mensaje</td>
+				<td>Enlace</td>
+			</tr>
+		</thead>
+		<tr th:each="notificacion : ${notificaciones}">
+			<td th:text="${notificacion.fechaNotificacion}"></td>
+			<td th:text="${notificacion.titulo}"></td>
+			<td th:text="${notificacion.mensaje}"></td>
+			<td><a th:href="${notificacion.enlace}">Ir</a></td>
+		</tr>
+	</table>
+</body>

@@ -579,7 +579,7 @@ public class DealController {
 			return "redirect:/deal";
 		}
 
-		if ((!((String)usuarioTo.getRol()).equals("ADMIN")) && (usuarioFrom.getBanco() != usuarioTo.getBanco())) {
+		if ((!((String) usuarioTo.getRol()).equals("ADMIN")) && (usuarioFrom.getBanco() != usuarioTo.getBanco())) {
 			flash.addFlashAttribute("error", "No puede enviar una notificación a ese usuario");
 			return "redirect:/deal";
 		}
