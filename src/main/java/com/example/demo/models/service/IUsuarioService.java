@@ -14,4 +14,7 @@ public interface IUsuarioService {
 
     void delete(int id);
 
+    List<UsuarioEntity> findByBancoWithDifferentId(int idBanco, int idUsuario);
+    
+    List<UsuarioEntity> findWithDifferentId(int idUsuario);
 }

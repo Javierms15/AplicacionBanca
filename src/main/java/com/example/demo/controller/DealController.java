@@ -184,9 +184,21 @@ public class DealController {
 			return "redirect:/deal";
 		}
 
-		if (!puedeEditar((UsuarioEntity) session.getAttribute("usuario"), deal)) {
+		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
+		if (!puedeEditar(usuario, deal)) {
 			flash.addFlashAttribute("error", "No tiene permiso para ver el deal");
 			return "redirect:/deal";
+		}
+
+		if (((String) deal.getEstado()).equals("APPROVED")) {
+			List<UsuarioEntity> usuarios;
+			if (((String) usuario.getRol()).equals("ADMIN")) {
+				usuarios = usuarioService.findWithDifferentId(usuario.getIdUsuario());
+			} else {
+				// TODO: Incluyo los admin tambien???
+				usuarios = usuarioService.findByBancoWithDifferentId(usuario.getBanco(), usuario.getIdUsuario());
+			}
+			model.addAttribute("usuarios", usuarios);
 		}
 
 		model.addAttribute("deal", deal);
@@ -402,7 +414,7 @@ public class DealController {
 		return "redirect:/deal";
 	}
 
-	boolean puedeEditar(UsuarioEntity usuario, DealEntity deal) {
+	private boolean puedeEditar(UsuarioEntity usuario, DealEntity deal) {
 		// Si es admin siempre puede editar
 		if (((String) usuario.getRol()).equals("ADMIN")) {
 			return true;
@@ -423,7 +435,7 @@ public class DealController {
 		return creadoPor.getBanco() == usuario.getBanco();
 	}
 
-	boolean puedeCerrar(UsuarioEntity usuario, DealEntity deal) {
+	private boolean puedeCerrar(UsuarioEntity usuario, DealEntity deal) {
 		if (!puedeEditar(usuario, deal)) {
 			return false;
 		}
@@ -459,6 +471,18 @@ public class DealController {
 		return "redirect:/deal";
 	}
 
+	private void enviarNotificacion(int enviadoPor, int enviadoA, String titulo, String mensaje, String enlace) {
+		// TODO: Comprobaciones de tamaño de mensaje
+		NotificacionEntity notificacion = new NotificacionEntity();
+		notificacion.setEnviadoPor(enviadoPor);
+		notificacion.setEnviadoA(enviadoA);
+		notificacion.setFechaNotificacion(new Date(System.currentTimeMillis()));
+		notificacion.setTitulo(titulo);
+		notificacion.setMensaje(mensaje);
+		notificacion.setEnlace(enlace);
+		notificacionService.save(notificacion);
+	}
+
 	@GetMapping("/close/{id}")
 	public String cerrar(@PathVariable int id, RedirectAttributes flash, HttpSession session) {
 		DealEntity deal = dealService.findOne(id);
@@ -473,14 +497,9 @@ public class DealController {
 			deal.setCerradoPor(((UsuarioEntity) session.getAttribute("usuario")).getIdUsuario());
 			dealService.save(deal);
 			flash.addFlashAttribute("success", "Deal cerrado correctamente");
-			NotificacionEntity notificacion = new NotificacionEntity();
-			notificacion.setEnviadoA(deal.getAprobadoPor());
-			notificacion.setEnviadoPor(usuario.getIdUsuario());
-			notificacion.setEnlace("/deal/ver/" + deal.getIdDeal());
-			notificacion.setFechaNotificacion(new Date(System.currentTimeMillis()));
-			notificacion.setTitulo("Deal cerrado");
-			notificacion.setMensaje("El usuario '" + usuario.getNombre() + "' ha cerrado el deal que habías aprobado.");
-			notificacionService.save(notificacion);
+			String mensaje = "El usuario '" + usuario.getNombre() + "' ha cerrado el deal que habías aprobado.";
+			enviarNotificacion(usuario.getIdUsuario(), deal.getAprobadoPor(), "Deal cerrado", mensaje,
+					"/deal/ver/" + deal.getIdDeal());
 		} else {
 			flash.addFlashAttribute("error", "No tiene permiso para cerrar el deal");
 		}
@@ -529,5 +548,47 @@ public class DealController {
 		model.addAttribute("clientes", clientes);
 		model.addAttribute("buttonText", "Actualizar Deal");
 		return "deal/deal_form";
+	}
+
+	@PostMapping("/notifyClose/{id}")
+	public String notificar(@PathVariable int id, @RequestParam(name = "usuario") int idUsuarioToSend,
+			RedirectAttributes flash, HttpSession session) {
+		DealEntity deal = dealService.findOne(id);
+		if (deal == null) {
+			flash.addFlashAttribute("error", "Acceso a un deal que no existe");
+			return "redirect:/deal";
+		}
+
+		UsuarioEntity usuarioFrom = (UsuarioEntity) session.getAttribute("usuario");
+
+		if (!puedeEditar(usuarioFrom, deal)) {
+			flash.addFlashAttribute("error", "No tiene permiso para editar el deal");
+			return "redirect:/deal";
+		}
+
+		UsuarioEntity usuarioTo = usuarioService.findOne(idUsuarioToSend);
+
+		if (usuarioTo == null) {
+			flash.addFlashAttribute("error", "El usuario al que quería enviar la notificación no existe");
+			return "redirect:/deal";
+		}
+
+		if (!puedeCerrar(usuarioTo, deal)) {
+			flash.addFlashAttribute("error",
+					"El usuario al que quería enviar la notificación no tiene permiso para cerrar el deal");
+			return "redirect:/deal";
+		}
+
+		if ((!((String)usuarioTo.getRol()).equals("ADMIN")) && (usuarioFrom.getBanco() != usuarioTo.getBanco())) {
+			flash.addFlashAttribute("error", "No puede enviar una notificación a ese usuario");
+			return "redirect:/deal";
+		}
+
+		String mensaje = "El usuario '" + usuarioFrom.getNombre() + "' le ha pedido que cierre un deal.";
+		enviarNotificacion(usuarioFrom.getIdUsuario(), usuarioTo.getIdUsuario(), "Peticion de cierre de deal", mensaje,
+				"/deal/see/" + deal.getIdDeal());
+
+		flash.addFlashAttribute("success", "Notificación enviada correctamente");
+		return "redirect:/deal";
 	}
 }

@@ -9,4 +9,7 @@ public interface IUsuarioDao extends CrudRepository<UsuarioEntity, Integer> {
 
     public UsuarioEntity findUsuarioEntityByNombreAndAndContrasena(String nombre, String contrasena);
 
+    public List<UsuarioEntity> findUsuarioEntityByBancoAndIdUsuarioIsNotOrBancoIsNull(int idBanco, int idUsuario);
+
+    public List<UsuarioEntity> findByIdUsuarioIsNot(int idUsuario);
 }

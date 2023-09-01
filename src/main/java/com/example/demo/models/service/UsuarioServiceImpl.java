@@ -41,4 +41,14 @@ public class UsuarioServiceImpl implements IUsuarioService{
     public UsuarioEntity existeUsuario(String nombre, String contrasena){
          return usuarioDao.findUsuarioEntityByNombreAndAndContrasena(nombre, contrasena);
     }
+
+	@Override
+	public List<UsuarioEntity> findByBancoWithDifferentId(int idBanco, int idUsuario) {
+		return usuarioDao.findUsuarioEntityByBancoAndIdUsuarioIsNotOrBancoIsNull(idBanco, idUsuario);
+	}
+
+	@Override
+	public List<UsuarioEntity> findWithDifferentId(int idUsuario) {
+		return usuarioDao.findByIdUsuarioIsNot(idUsuario);
+	}
 }
