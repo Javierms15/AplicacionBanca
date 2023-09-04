@@ -292,4 +292,33 @@ public class OutstandingController {
 		model.addAttribute("facilities", facilities);
 		return "outstanding/out_form";
 	}
+
+	@GetMapping("/pago/{id}")
+	public String irPantallaPago(@PathVariable int id, Model model){
+		OutstandingEntity out = outstandingService.findOne(id);
+		model.addAttribute("pagoPrincipal", out.getPagoPrincipal());
+		model.addAttribute("id", id);
+		return "outstanding/out_pago";
+	}
+
+	@PostMapping("/realizarPago")
+	public String realizarPago(@RequestParam(name = "idOut") int id,
+							   @RequestParam(name = "pagoPrincipal") double pagoPrincipal,
+							   @RequestParam(name = "pago") double pago,
+							   Model model){
+
+		if(pago > pagoPrincipal){
+			model.addAttribute("pagoPrincipal", pagoPrincipal);
+			model.addAttribute("id", id);
+			model.addAttribute("error", "El pago no puede superar el pago principal");
+			return "outstanding/out_pago";
+		}
+
+		OutstandingEntity out = outstandingService.findOne(id);
+		out.setPagoPrincipal(pagoPrincipal - pago);
+		outstandingService.save(out);
+
+		return "redirect:/outstanding";
+	}
+
 }

@@ -1,6 +1,7 @@
 package com.example.demo.controller;
 
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -220,14 +221,27 @@ public class DealController {
 		model.addAttribute("deal", deal);
 		List<ClienteEntity> clientes = clienteService.findAll();
 		model.addAttribute("clientes", clientes);
+
+		List<Integer> bancosParticipantes = new LinkedList<>();
+		model.addAttribute("bancosParticipantesId", bancosParticipantes);
+
+		List<BancoEntity> bancos = bancoService.findAll();
+		model.addAttribute("bancos", bancos);
+
 		return "deal/deal_form";
 	}
 
 	@PostMapping("/save")
-	public String save(DealEntity deal, @RequestParam(name = "banco") int id,
+	public String save(DealEntity deal, @RequestParam(name = "bancoSoleLender") int id,
 			@RequestParam(name = "agente", required = false) Integer agenteId, HttpServletRequest req,
-			HttpSession session, RedirectAttributes flash) {
+			HttpSession session, RedirectAttributes flash, Model model) {
 		DealEntity dealPrev = dealService.findOne(deal.getIdDeal());
+
+		//Estas dos lineas comprueban si el porcentaje de participación suma 1. Si lo suma, continua el codigo. Si no redirige de nuevo al formulario
+		String rutaRedirect = comprobarSumaPorcentajeParticipacion(deal, agenteId, req, flash, model);
+		if (rutaRedirect != null) return rutaRedirect;
+
+
 		if (dealPrev == null) {
 			ParticipanteEntity participante;
 			deal.setCantidadAPagar(deal.getCantidadPrestamo());
@@ -371,6 +385,73 @@ public class DealController {
 		}
 		flash.addFlashAttribute("success", "Deal guardado correctamente");
 		return "redirect:/deal";
+	}
+
+	private String comprobarSumaPorcentajeParticipacion(DealEntity deal, Integer agenteId, HttpServletRequest req, RedirectAttributes flash, Model model) {
+		if(((String) deal.getTipo()).equals("SYNDICATED")){
+
+			String[] bancoReq = req.getParameterValues("banco");
+			Double suma = 0.0;
+
+			List<Integer> bancosParticipantes = new LinkedList<>();
+			List<ParticipanteEntity> participantes = new ArrayList<>();
+
+			for(String bancoIdStr : bancoReq){
+				bancosParticipantes.add(Integer.parseInt(bancoIdStr));
+				String[] porcentajeParticipacionStr = req.getParameterValues("bancoPorcentaje" + bancoIdStr);
+				if(porcentajeParticipacionStr != null){
+					suma += Double.parseDouble(porcentajeParticipacionStr[0]);
+				}
+
+				ParticipanteEntity participante = new ParticipanteEntity();
+				try {
+					int bancoId = Integer.parseInt(bancoIdStr);
+					participante.setIdBanco(bancoId);
+					if (bancoId == agenteId) {
+						participante.setAgente((byte) 1);
+					} else {
+						participante.setAgente((byte) 0);
+					}
+				} catch (NumberFormatException e) {
+					throw new RuntimeException("BancoId no valido en DealController - save");
+				}
+				participante.setIdDeal(deal.getIdDeal());
+				if (porcentajeParticipacionStr == null) {
+					// Esto no deberia ejecutarse nunca. Si se ejecuta es que hay un error en el
+					// atributo nombre de los inputs del html
+					throw new RuntimeException("Porcentaje de Participacion nulo");
+				} else {
+					try {
+						Double porcentajeParticipacion = Double.parseDouble(porcentajeParticipacionStr[0]);
+						participante.setPorcentajeParticipacion(porcentajeParticipacion);
+						participantes.add(participante);
+					} catch (NumberFormatException e) {
+						// TODO: Error
+						throw new RuntimeException("Porcentaje de Participacion con formato no válido");
+					}
+				}
+			}
+
+			if(suma != 1){
+
+				model.addAttribute("deal", deal);
+				List<ClienteEntity> clientes = clienteService.findAll();
+				model.addAttribute("clientes", clientes);
+
+				model.addAttribute("bancosParticipantesId", bancosParticipantes);
+				model.addAttribute("participantes", participantes);
+
+				List<BancoEntity> bancos = bancoService.findAll();
+				model.addAttribute("bancos", bancos);
+
+				model.addAttribute("agente", agenteId);
+
+				flash.addFlashAttribute("error", "La suma del porcentaje de participación debe ser 1");
+
+				return "deal/deal_form";
+			}
+		}
+		return null;
 	}
 
 	private boolean puedeEditar(UsuarioEntity usuario, DealEntity deal) {

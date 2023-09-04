@@ -2,220 +2,218 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
-	<meta charset="UTF-8" />
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
+    <meta charset="UTF-8"/>
 </head>
 
 <body onload="cargarTipo()">
 
-	<header th:replace="layout/layout :: header"></header>
+<header th:replace="layout/layout :: header"></header>
 
-	<div class="container py-4">
-		<div class="card bg-dark text-white">
+<div class="container py-4">
+    <div class="card bg-dark text-white">
 
-			<div class="card-header" style="font-size: xx-large">Crear deal</div>
+        <div class="card-header" style="font-size: xx-large">Crear deal</div>
 
-			<div class="card-body">
+        <div class="card-body">
 
-				<form th:action="@{/deal/save}" th:object="${deal}" id="formulario" method="post">
+            <form th:action="@{/deal/save}" th:object="${deal}" id="formulario" method="post">
 
-					<input type="hidden" class="form-control" th:field="*{idDeal}" />
-					<input type="hidden" class="form-control" th:field="*{estado}" />
-					<input type="hidden" class="form-control" th:field="*{cantidadAbonada}" />
-					<input type="hidden" class="form-control" th:field="*{cantidadAPagar}" />
-					<input type="hidden" class="form-control" th:field="*{creadoPor}" />
-					<input type="hidden" class="form-control" th:field="*{aprobadoPor}" />
-					<input type="hidden" class="form-control" th:field="*{cerradoPor}" />
+                <input type="hidden" class="form-control" th:field="*{idDeal}"/>
+                <input type="hidden" class="form-control" th:field="*{estado}"/>
+                <input type="hidden" class="form-control" th:field="*{cantidadAbonada}"/>
+                <input type="hidden" class="form-control" th:field="*{cantidadAPagar}"/>
+                <input type="hidden" class="form-control" th:field="*{creadoPor}"/>
+                <input type="hidden" class="form-control" th:field="*{aprobadoPor}"/>
+                <input type="hidden" class="form-control" th:field="*{cerradoPor}"/>
 
-					<div class="form-group row">
-						<label class="col-sm-2 col-form-label">Cantidad Prestamo</label>
-						<div class="col-sm-6">
-							<input type="text" th:field="*{cantidadPrestamo}" pattern="^\d*(\.\d{1,2})?$"
-								title="Solo se permiten números con hasta 2 decimales" class="form-control" required />
-						</div>
-					</div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Cantidad Prestamo</label>
+                    <div class="col-sm-6">
+                        <input type="text" th:field="*{cantidadPrestamo}" pattern="^\d*(\.\d{1,2})?$"
+                               title="Solo se permiten números con hasta 2 decimales" class="form-control" required/>
+                    </div>
+                </div>
 
-					<div class="form-group row">
-						<label class="col-sm-2 col-form-label">Moneda</label>
-						<div class="col-sm-6">
-							<select class="form-control" th:field="*{moneda}" required>
-								<option value="EUR">Euro</option>
-								<option value="USD">Dolar estadounidense</option>
-								<option value="JPY">Yen</option>
-								<option value="GBP">Libra</option>
-							</select>
-						</div>
-					</div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Moneda</label>
+                    <div class="col-sm-6">
+                        <select class="form-control" th:field="*{moneda}" required>
+                            <option value="EUR">Euro</option>
+                            <option value="USD">Dolar estadounidense</option>
+                            <option value="JPY">Yen</option>
+                            <option value="GBP">Libra</option>
+                        </select>
+                    </div>
+                </div>
 
-					<div class="form-group row">
-						<label class="col-sm-2 col-form-label">Tipo</label>
-						<div class="col-sm-6">
-							<select class="form-control" th:field="*{tipo}" required id="tipo">
-								<option value="SOLE_LENDER">Sole lender</option>
-								<option value="SYNDICATED">Syndicated</option>
-							</select>
-						</div>
-					</div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Tipo</label>
+                    <div class="col-sm-6">
+                        <select class="form-control" th:field="*{tipo}" required id="tipo">
+                            <option value="SOLE_LENDER">Sole lender</option>
+                            <option value="SYNDICATED">Syndicated</option>
+                        </select>
+                    </div>
+                </div>
 
-					<div class="form-group row">
-						<label class="col-sm-2 col-form-label">Descuento</label>
-						<div class="col-sm-6">
-							<select class="form-control" th:field="*{descuento}" required>
-								<option value="0">NO</option>
-								<option value="1">SI</option>
-							</select>
-						</div>
-					</div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Descuento</label>
+                    <div class="col-sm-6">
+                        <select class="form-control" th:field="*{descuento}" required>
+                            <option value="0">NO</option>
+                            <option value="1">SI</option>
+                        </select>
+                    </div>
+                </div>
 
-					<div class="form-group row">
-						<label class="col-sm-2 col-form-label">Cliente</label>
-						<div class="col-sm-6">
-							<select class="form-control" th:field="*{cliente}" required>
-								<option th:each="cliente: ${clientes}"
-									th:if="${session.usuario.rol == 'ADMIN' || session.usuario.banco == cliente.idBanco}"
-									th:value="${cliente.idCliente}" th:text="${cliente.nombreLegal}"></option>
-							</select>
-						</div>
-					</div>
+                <div class="form-group row">
+                    <label class="col-sm-2 col-form-label">Cliente</label>
+                    <div class="col-sm-6">
+                        <select class="form-control" th:field="*{cliente}" required>
+                            <option th:each="cliente: ${clientes}"
+                                    th:if="${session.usuario.rol == 'ADMIN' || session.usuario.banco == cliente.idBanco}"
+                                    th:value="${cliente.idCliente}" th:text="${cliente.nombreLegal}"></option>
+                        </select>
+                    </div>
+                </div>
 
-					<div class="form-group row" id="seleccionSoleLender">
-						<label class="col-sm-2 col-form-label">BancoSoleLender</label>
-						<div class="col-sm-6">
-							<select name="banco" class="form-control">
-								<option th:each="banco: ${bancos}" th:value="${banco.idBanco}" th:text="${banco.nombre}"
-									th:selected="${agente == banco.idBanco}"></option>
-							</select>
-						</div>
-					</div>
+                <div class="form-group row" id="seleccionSoleLender">
+                    <label class="col-sm-2 col-form-label">BancoSoleLender</label>
+                    <div class="col-sm-6">
+                        <select name="bancoSoleLender" class="form-control">
+                            <option th:each="banco: ${bancos}" th:value="${banco.idBanco}" th:text="${banco.nombre}"
+                                    th:selected="${agente == banco.idBanco}"></option>
+                        </select>
+                    </div>
+                </div>
 
-					<div id="seleccionSindicado">
-						<div th:each="banco: ${bancos}" class="form-group row">
-							<div class="col-sm-2">
-								<input type="checkbox" class="form-control" name="banco" th:value="${banco.idBanco}"
-									th:id="${banco.idBanco}"
-									th:checked="${#arrays.contains(bancosParticipantesId, banco.idBanco)}" />
-							</div>
-							<label class="col-sm-2 col-form-label" th:for="${banco.idBanco}"
-								th:text="${banco.nombre}"></label>
-							<div th:unless="${participantes} == null">
-								<div th:if="${#arrays.contains(bancosParticipantesId, banco.idBanco)}">
-									<input class="form-control" th:each="participante: ${participantes}"
-										th:id="${banco.idBanco}" type="text"
-										th:if="${participante.idBanco == banco.idBanco}"
-										th:name="${'bancoPorcentaje' + banco.idBanco}" pattern="0.\d{1,2}$"
-										title="Solo se permiten números entre 0 y 1 (No incluidos)"
-										th:value="${participante.porcentajeParticipacion}" required />
-								</div>
-								<div th:unless="${#arrays.contains(bancosParticipantesId, banco.idBanco)}">
-									<input type="text" class="form-control"
-										th:name="${'bancoPorcentaje' + banco.idBanco}" th:id="${banco.idBanco}"
-										pattern="0.\d{1,2}$" title="Solo se permiten números entre 0 y 1 (No incluidos)"
-										required />
-								</div>
-								<br />
-							</div>
-						</div>
+                <div id="seleccionSindicado">
+                    <div th:each="banco: ${bancos}" class="form-group row">
+                        <div class="col-sm-2">
+                            <input type="checkbox" class="form-control" name="banco" th:value="${banco.idBanco}"
+                                   th:id="${banco.idBanco}"
+                                   th:checked="${#arrays.contains(bancosParticipantesId, banco.idBanco)}"/>
+                        </div>
+                        <label class="col-sm-2 col-form-label" th:for="${banco.idBanco}"
+                               th:text="${banco.nombre}"></label>
+                        <div th:if="${#arrays.contains(bancosParticipantesId, banco.idBanco)}">
+                            <input class="form-control" th:each="participante: ${participantes}"
+                                   th:id="${banco.idBanco}" type="text"
+                                   th:if="${participante.idBanco == banco.idBanco}"
+                                   th:name="${'bancoPorcentaje' + banco.idBanco}" pattern="0.\d{1,2}$"
+                                   title="Solo se permiten números entre 0 y 1 (No incluidos)"
+                                   th:value="${participante.porcentajeParticipacion}" required/>
+                        </div>
+                        <div th:unless="${#arrays.contains(bancosParticipantesId, banco.idBanco)}">
+                            <input type="text" class="form-control"
+                                   th:name="${'bancoPorcentaje' + banco.idBanco}" th:id="${banco.idBanco}"
+                                   pattern="0.\d{1,2}$" title="Solo se permiten números entre 0 y 1 (No incluidos)"
+                                   required/>
+                        </div>
+                        <br/>
+                    </div>
 
-						<div class="form-group row">
-							<label class="col-sm-2 col-form-label">Agente</label>
-							<div class="col-sm-6">
-								<select name="agente" class="form-control">
-									<option th:each="banco: ${bancos}" th:value="${banco.idBanco}"
-										th:text="${banco.nombre}" th:selected="${agente == banco.idBanco}"></option>
-								</select>
-							</div>
-						</div>
+                    <div class="form-group row">
+                        <label class="col-sm-2 col-form-label">Agente</label>
+                        <div class="col-sm-6">
+                            <select name="agente" class="form-control">
+                                <option th:each="banco: ${bancos}" th:value="${banco.idBanco}"
+                                        th:text="${banco.nombre}" th:selected="${agente == banco.idBanco}"></option>
+                            </select>
+                        </div>
+                    </div>
 
-					</div>
+                </div>
 
-					<div class="form-group row">
-						<div class="col-sm-6">
-							<input type="submit" th:value="${'Guardar'}" class="btn btn-secondary" />
-						</div>
-					</div>
+                <div class="form-group row">
+                    <div class="col-sm-6">
+                        <input type="submit" th:value="${'Guardar'}" class="btn btn-secondary"/>
+                    </div>
+                </div>
 
-				</form>
+            </form>
 
-			</div>
+        </div>
 
-		</div>
-	</div>
+    </div>
+</div>
 
-	<div class="container py-4">
-		<a href="/deal" class="btn btn-warning btn-xs">Volver</a>
-	</div>
+<div class="container py-4">
+    <a href="/deal" class="btn btn-warning btn-xs">Volver</a>
+</div>
 
-	<script>
-		document.addEventListener("DOMContentLoaded", function () {
-			var soleLender = document.getElementById("seleccionSoleLender");
-			var sindicado = document.getElementById("seleccionSindicado");
-			var tipo = document.getElementById("tipo");
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var soleLender = document.getElementById("seleccionSoleLender");
+        var sindicado = document.getElementById("seleccionSindicado");
+        var tipo = document.getElementById("tipo");
 
-			// Función para manejar los cambios en el select de rol
-			tipo.addEventListener("change", function () {
-				if (tipo.value === "SOLE_LENDER") {
-					soleLender.style.display = "block";
-					sindicado.style.display = "none";
-				} else {
-					soleLender.style.display = "none";
-					sindicado.style.display = "block";
-				}
-			});
-		});
+        // Función para manejar los cambios en el select de rol
+        tipo.addEventListener("change", function () {
+            if (tipo.value === "SOLE_LENDER") {
+                soleLender.style.display = "block";
+                sindicado.style.display = "none";
+            } else {
+                soleLender.style.display = "none";
+                sindicado.style.display = "block";
+            }
+        });
+    });
 
-		function cargarTipo() {
-			var soleLender = document.getElementById("seleccionSoleLender");
-			var sindicado = document.getElementById("seleccionSindicado");
-			var tipo = document.getElementById("tipo");
+    function cargarTipo() {
+        var soleLender = document.getElementById("seleccionSoleLender");
+        var sindicado = document.getElementById("seleccionSindicado");
+        var tipo = document.getElementById("tipo");
 
-			var form = document.getElementById("formulario");
-			var checkboxes = document.querySelectorAll('input[type="checkbox"]')
-			var textboxes = document.querySelectorAll('input[name^="bancoPorcentaje"]')
+        var form = document.getElementById("formulario");
+        var checkboxes = document.querySelectorAll('input[type="checkbox"]')
+        var textboxes = document.querySelectorAll('input[name^="bancoPorcentaje"]')
 
-			form.addEventListener('submit', function () {
-				var cont = 0;
-				
-				checkboxes.forEach(function (checkbox) {
-					if (checkbox.checked) {
-						cont = cont + 1;
-					}
-				})
-				
-				if (cont <= 1) {
-					alert('Debe seleccionar al menos 2 bancos!')
-					event.preventDefault()
-				}
-			})
+        form.addEventListener('submit', function () {
+            var cont = 0;
 
-			checkboxes.forEach(function (checkbox) {
-				textboxes.forEach(function (textbox) {
-					if (textbox.id == checkbox.id) {
-						if (checkbox.checked) {
-							textbox.setAttribute('required', 'required')
-						} else {
-							textbox.removeAttribute('required')
-						}
-						checkbox.addEventListener('change', function () {
-							if (checkbox.checked) {
-								textbox.setAttribute('required', 'required')
-							} else {
-								textbox.removeAttribute('required')
-							}
-						})
-					}
-				});
-			});
+            checkboxes.forEach(function (checkbox) {
+                if (checkbox.checked) {
+                    cont = cont + 1;
+                }
+            })
 
-			if (tipo.value === "SOLE_LENDER") {
-				soleLender.style.display = "block";
-				sindicado.style.display = "none";
-			} else {
-				soleLender.style.display = "none";
-				sindicado.style.display = "block";
-			}
+            if (cont <= 1) {
+                alert('Debe seleccionar al menos 2 bancos!')
+                event.preventDefault()
+            }
+        })
 
-		}
-	</script>
+        checkboxes.forEach(function (checkbox) {
+            textboxes.forEach(function (textbox) {
+                if (textbox.id == checkbox.id) {
+                    if (checkbox.checked) {
+                        textbox.setAttribute('required', 'required')
+                    } else {
+                        textbox.removeAttribute('required')
+                    }
+                    checkbox.addEventListener('change', function () {
+                        if (checkbox.checked) {
+                            textbox.setAttribute('required', 'required')
+                        } else {
+                            textbox.removeAttribute('required')
+                        }
+                    })
+                }
+            });
+        });
+
+        if (tipo.value === "SOLE_LENDER") {
+            soleLender.style.display = "block";
+            sindicado.style.display = "none";
+        } else {
+            soleLender.style.display = "none";
+            sindicado.style.display = "block";
+        }
+
+    }
+</script>
 </body>
 
 </html>
