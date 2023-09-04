@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -10,10 +11,7 @@ import com.example.demo.models.entity.DealEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import com.example.demo.models.entity.FacilityEntity;
 import com.example.demo.models.entity.OutstandingEntity;
@@ -191,11 +189,28 @@ public class OutstandingController {
 		OutstandingEntity out = new OutstandingEntity();
 		model.addAttribute("out", out);
 		model.addAttribute("buttonText", "Crear Outstanding");
-		List<FacilityEntity> facilities = facilityService.findByBancoUsuario((UsuarioEntity) session.getAttribute("usuario"));
+		UsuarioEntity usuario=(UsuarioEntity) session.getAttribute("usuario");
+		List<FacilityEntity> facilities =new ArrayList<>();
+		if(usuario.getBanco()!=null) {
+			facilities = facilityService.findByBancoUsuario(usuario);
+		}else{
+			facilities = facilityService.findAll();
+		}
 		model.addAttribute("facilities", facilities);
 		List<TipoInteresEntity> tipoIntereses = tipoInteresService.findAll();
 		model.addAttribute("tipoIntereses", tipoIntereses);
 		return "outstanding/out_form";
+	}
+
+	@ResponseBody
+	@GetMapping("/create/dinero/{id}")
+	public double obtenerDineroFacilitySelect(@PathVariable int id){
+		FacilityEntity facility=facilityService.findOne(id);
+		Double sumaTotalAcumulada = outstandingService.obtenerSumaOutsandingFacility(id) == null? 0 : outstandingService.obtenerSumaOutsandingFacility(id);
+		Double totalPrestamoFacility = facilityService.findOne(id).getCantidad();
+		double dinero=totalPrestamoFacility - sumaTotalAcumulada;
+
+		return dinero;
 	}
 
 	@PostMapping("/save")
@@ -240,6 +255,7 @@ public class OutstandingController {
 			return "outstanding/out_form";
 		}else {
 			if(sumaTotalTeorica <= totalPrestamoFacility) {
+				out.setCantidadRestante(totalPrestamoFacility - sumaTotalAcumulada);
 				outstandingService.save(out);
 				flash.addFlashAttribute("success", "Outstanding guardado correctamente");
 				return "redirect:/outstanding";

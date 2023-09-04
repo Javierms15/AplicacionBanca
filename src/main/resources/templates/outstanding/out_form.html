@@ -6,8 +6,8 @@
 	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
 </head>
 
-<body>
-<header th:replace="layout/layout :: header"></header>
+<body onload="calculoIdFacility()">
+<header th:replace="layout/layout :: header" ></header>
 
 	<form th:action="@{/outstanding/save}" th:object="${out}" method="post">
 		<input type="hidden" class="form-control" th:field="*{idOutstanding}" />
@@ -15,7 +15,7 @@
 			<label class="col-sm-2 col-form-label">Cantidad Restante</label>
 			<div class="col-sm-6">
 				<input type="text" th:field="*{cantidadRestante}" class="form-control" pattern="^\d*(\.\d{1,2})?$"
-					title="Solo se permiten números con hasta 2 decimales" required />
+					title="Solo se permiten números con hasta 2 decimales" id="cantidadRestante" required/>
 			</div>
 		</div>
 		<div class="form-group row">
@@ -91,7 +91,7 @@
 		<div class="form-group row">
 			<label class="col-sm-2 col-form-label">Facility</label>
 			<div class="col-sm-6">
-				<select class="form-control" th:field="*{facility}" required>
+				<select class="form-control" th:field="*{facility}" id="facility" required>
 					<option th:each="facility: ${facilities}" th:value="${facility.idFacility}"
 						th:text="${facility.idFacility}">
 					</option>
@@ -107,6 +107,24 @@
 
 	</form>
 	<a href="/outstanding"><button>Volver</button></a>
+
+<script>
+	function cargarDineroFacility(){
+		var facility = document.getElementById("facility");
+		fetch('http://localhost:8080/outstanding/create/dinero/'+facility.value).then(response=>response.json()).then(dinero=>{
+			var texto=document.getElementById("cantidadRestante")
+			texto.value=dinero
+		})
+
+	}
+	function calculoIdFacility(){
+		cargarDineroFacility()
+		var select=document.getElementById("facility");
+		select.addEventListener('change',cargarDineroFacility)
+	}
+
+</script>
+
 </body>
 
 </html>
