@@ -17,6 +17,7 @@ public class ManejoErroresController {
         return modelAndView;
     }
 
+    /*
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ModelAndView handleDatabaseConnectionError() {
@@ -24,6 +25,6 @@ public class ManejoErroresController {
         modelAndView.addObject("errorMessage", "Error de conexión a la base de datos al inicio de la aplicación. Inténtalo de nuevo más tarde.");
         return modelAndView;
     }
-
+*/
 
 }
