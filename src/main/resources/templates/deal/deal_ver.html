@@ -23,6 +23,8 @@
 							th:text="${usuario.nombre}"></option>
 					</select>
 					<input type="submit" value="Solicitar cierre de deal" class="btn btn-secondary" />
+					<a th:if="${deal.estado == 'APPROVED' && deal.aprobadoPor != usuarioId}"
+								th:href="@{/deal/close/} + ${deal.idDeal}" class="btn btn-primary btn-xs">Cerrar Deal</a>
 				</form>
 				<form th:action="@{/deal/banks}" th:object="${deal}" method="post">
 					<div class="form-group row">
