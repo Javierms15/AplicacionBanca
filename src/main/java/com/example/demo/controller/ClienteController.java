@@ -36,8 +36,29 @@ public class ClienteController {
 		return "cliente/cliente";
 	}
 
+	private boolean puedeEditar(UsuarioEntity usuario, ClienteEntity cliente) {
+		if (((String) usuario.getRol()).equals("ADMIN")) {
+			return true;
+		}
+
+		return cliente.getIdBanco() == usuario.getBanco();
+	}
+
 	@PostMapping("/crearCliente")
-	public String crearCliente(Model model, ClienteEntity cliente, RedirectAttributes flash) {
+	public String crearCliente(Model model, ClienteEntity cliente, RedirectAttributes flash, HttpSession session) {
+
+		if (cliente == null) {
+			flash.addFlashAttribute("error", "Ha intentado crear un cliente nulo");
+			return "redirect:/listarClientes";
+		}
+
+		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
+
+		if (!puedeEditar(usuario, cliente)) {
+			flash.addFlashAttribute("error", "No tiene permiso para crear ese cliente");
+			return "redirect:/listarClientes";
+		}
+
 		clienteDao.save(cliente);
 		flash.addFlashAttribute("success", "Cliente " + cliente.getNombreLegal() + " creado correctamente");
 
@@ -64,17 +85,43 @@ public class ClienteController {
 	}
 
 	@RequestMapping("eliminarCliente/{id}")
-	public String eliminar(@PathVariable(value = "id") int id, RedirectAttributes flash) {
+	public String eliminar(@PathVariable(value = "id") int id, RedirectAttributes flash, HttpSession session) {
 		ClienteEntity cliente = clienteDao.findById(id).orElse(null);
+
+		if (cliente == null) {
+			flash.addFlashAttribute("error", "Ha intentado eliminar un cliente que no existe");
+			return "redirect:/listarClientes";
+		}
+
+		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
+
+		if (!puedeEditar(usuario, cliente)) {
+			flash.addFlashAttribute("error", "No tiene permiso para eliminar ese cliente");
+			return "redirect:/listarClientes";
+		}
+
 		clienteDao.delete(cliente);
 		flash.addFlashAttribute("success", "Cliente eliminado correctamente");
 		return "redirect:/listarClientes";
 	}
 
 	@RequestMapping("editarCliente/{id}")
-	public String editarCliente(@PathVariable(value = "id") int id, Map<String, Object> model, Model Model) {
-
+	public String editarCliente(@PathVariable(value = "id") int id, Map<String, Object> model, Model Model,
+			RedirectAttributes flash, HttpSession session) {
 		ClienteEntity cliente = clienteDao.findById(id).orElse(null);
+
+		if (cliente == null) {
+			flash.addFlashAttribute("error", "Ha intentado editar un cliente que no existe");
+			return "redirect:/listarClientes";
+		}
+
+		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
+
+		if (!puedeEditar(usuario, cliente)) {
+			flash.addFlashAttribute("error", "No tiene permiso para editar ese cliente");
+			return "redirect:/listarClientes";
+		}
+
 		model.put("cliente", cliente);
 		List<BancoEntity> bancos = (List<BancoEntity>) bancoDao.findAll();
 		Model.addAttribute("bancos", bancos);
@@ -82,9 +129,22 @@ public class ClienteController {
 	}
 
 	@RequestMapping(value = "/editarClienteSave", method = RequestMethod.POST)
-	public String editarClienteSave(ClienteEntity cliente, RedirectAttributes flash) {
+	public String editarClienteSave(ClienteEntity cliente, RedirectAttributes flash, HttpSession session) {
+
+		if (cliente == null) {
+			flash.addFlashAttribute("error", "Ha intentado editar un cliente nulo");
+			return "redirect:/listarClientes";
+		}
+
+		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
+
+		if (!puedeEditar(usuario, cliente)) {
+			flash.addFlashAttribute("error", "No tiene permiso para editar ese cliente");
+			return "redirect:/listarClientes";
+		}
+
 		clienteDao.save(cliente);
-		flash.addFlashAttribute("success", "Cliente " + cliente.getNombreLegal() + " creado correctamente");
+		flash.addFlashAttribute("success", "Cliente " + cliente.getNombreLegal() + " editado correctamente");
 		return "redirect:/listarClientes";
 	}
 
