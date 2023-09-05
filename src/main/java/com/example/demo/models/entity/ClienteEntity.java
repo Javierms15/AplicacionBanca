@@ -9,7 +9,13 @@ import java.util.Objects;
 @Entity
 @Table(name = "cliente", schema = "sql7641808", catalog = "")
 public class ClienteEntity {
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Override
+	public String toString() {
+		return "ClienteEntity [idCliente=" + idCliente + ", nombreLegal=" + nombreLegal + ", direccionLegal="
+				+ direccionLegal + ", dinero=" + dinero + ", email=" + email + ", idBanco=" + idBanco + "]";
+	}
+
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "id_cliente")
     private int idCliente;

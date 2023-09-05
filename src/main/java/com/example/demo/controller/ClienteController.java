@@ -28,16 +28,16 @@ public class ClienteController {
 	private IBancoDao bancoDao;
 
 	@RequestMapping("/nuevoCliente")
-	public String mostrarPantallaNuevoCliente(Model model){
-		ClienteEntity cliente=new ClienteEntity();
-		List<BancoEntity> bancos= (List<BancoEntity>) bancoDao.findAll();
-		model.addAttribute("bancos",bancos);
-		model.addAttribute("cliente",cliente);
-		return"cliente/cliente";
+	public String mostrarPantallaNuevoCliente(Model model) {
+		ClienteEntity cliente = new ClienteEntity();
+		List<BancoEntity> bancos = (List<BancoEntity>) bancoDao.findAll();
+		model.addAttribute("bancos", bancos);
+		model.addAttribute("cliente", cliente);
+		return "cliente/cliente";
 	}
 
 	@PostMapping("/crearCliente")
-	public String crearCliente(Model model, ClienteEntity cliente, RedirectAttributes flash){
+	public String crearCliente(Model model, ClienteEntity cliente, RedirectAttributes flash) {
 		clienteDao.save(cliente);
 		flash.addFlashAttribute("success", "Cliente " + cliente.getNombreLegal() + " creado correctamente");
 
@@ -45,19 +45,19 @@ public class ClienteController {
 	}
 
 	@RequestMapping("/listarClientes")
-	public String mostrarClientes(Model model, HttpSession session){
+	public String mostrarClientes(Model model, HttpSession session) {
 
 		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
 		if (usuario.getRol().equals("ADMIN")) {
 			List<ClienteEntity> clientes = clienteService.findAll();
-			model.addAttribute("clientes",clientes);
+			model.addAttribute("clientes", clientes);
 		} else {
 			List<ClienteEntity> clientes = clienteService.filter("", "", "", "", usuario.getBanco().toString(), true);
-			model.addAttribute("clientes",clientes);
+			model.addAttribute("clientes", clientes);
 		}
 
-		List<BancoEntity> bancos= (List<BancoEntity>) bancoDao.findAll();
-		model.addAttribute("bancos",bancos);
+		List<BancoEntity> bancos = (List<BancoEntity>) bancoDao.findAll();
+		model.addAttribute("bancos", bancos);
 		ClienteFilter filter = new ClienteFilter();
 		model.addAttribute("filter", filter);
 		return "cliente/listaClientes";
@@ -65,7 +65,7 @@ public class ClienteController {
 
 	@RequestMapping("eliminarCliente/{id}")
 	public String eliminar(@PathVariable(value = "id") int id, RedirectAttributes flash) {
-		ClienteEntity cliente=clienteDao.findById(id).orElse(null);
+		ClienteEntity cliente = clienteDao.findById(id).orElse(null);
 		clienteDao.delete(cliente);
 		flash.addFlashAttribute("success", "Cliente eliminado correctamente");
 		return "redirect:/listarClientes";
@@ -76,8 +76,8 @@ public class ClienteController {
 
 		ClienteEntity cliente = clienteDao.findById(id).orElse(null);
 		model.put("cliente", cliente);
-		List<BancoEntity> bancos= (List<BancoEntity>) bancoDao.findAll();
-		Model.addAttribute("bancos",bancos);
+		List<BancoEntity> bancos = (List<BancoEntity>) bancoDao.findAll();
+		Model.addAttribute("bancos", bancos);
 		return "cliente/editarCliente";
 	}
 
@@ -91,16 +91,17 @@ public class ClienteController {
 	@RequestMapping(value = "/filtrar")
 	public String filtrar(Model model, ClienteFilter filter, HttpSession session) {
 		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
-		List<ClienteEntity> clientes = clienteService.filter(filter.nombreLegal, filter.direccionLegal, filter.dinero, filter.email,
-				usuario.getRol() == "BANCA" ? usuario.getBanco().toString() : filter.idBanco, usuario.getRol() == "BANCA" ? true : false);
-		List<BancoEntity> bancos= (List<BancoEntity>) bancoDao.findAll();
-		model.addAttribute("bancos",bancos);
+		List<ClienteEntity> clientes = clienteService.filter(filter.nombreLegal, filter.direccionLegal, filter.dinero,
+				filter.email, usuario.getRol() == "BANCA" ? usuario.getBanco().toString() : filter.idBanco,
+				usuario.getRol() == "BANCA" ? true : false);
+		List<BancoEntity> bancos = (List<BancoEntity>) bancoDao.findAll();
+		model.addAttribute("bancos", bancos);
 		model.addAttribute("filter", filter);
-		model.addAttribute("clientes",clientes);
+		model.addAttribute("clientes", clientes);
 		return "cliente/listaClientes";
 	}
 
-	class ClienteFilter {
+	public class ClienteFilter {
 
 		private String nombreLegal;
 		private String direccionLegal;
