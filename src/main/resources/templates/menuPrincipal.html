@@ -55,22 +55,22 @@
 
 
 
-	<div class="row p-5" th:if="${session.usuario.rol == 'ADMIN'}">
+	<div class="row p-5">
 		<div class="col-sm-6">
+			<div class="card">
+				<div class="card-body">
+					<h5 class="card-title">Gestión De Notificaciones</h5>
+					<p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+					<a th:href="@{/notificacion}" class="btn btn-primary">Notificaciones</a>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6" th:if="${session.usuario.rol == 'ADMIN'}">
 			<div class="card">
 				<div class="card-body">
 					<h5 class="card-title">Gestión De Usuarios</h5>
 					<p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
 					<a th:href="@{/usuario}" class="btn btn-primary">Usuarios</a>
-				</div>
-			</div>
-		</div>
-		<div class="col-sm-6">
-			<div class="card">
-				<div class="card-body">
-					<h5 class="card-title">Gestion de Notificaciones</h5>
-					<p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-					<a th:href="@{/notificacion}" class="btn btn-primary">Notificaciones</a>
 				</div>
 			</div>
 		</div>

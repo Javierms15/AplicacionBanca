@@ -30,6 +30,8 @@
 					<td th:text="${notificacion.titulo}"></td>
 					<td th:text="${notificacion.mensaje}"></td>
 					<td><a th:href="${notificacion.enlace}" class="btn btn-info btn-xs">Ver</a></td>
+					<td><a th:href="@{notificacion/delete/} + ${notificacion.idNotificacion}"
+							class="btn btn-danger btn-xs">Borrar</a></td>
 				</tr>
 			</table>
 </body>
