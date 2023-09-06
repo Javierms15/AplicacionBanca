@@ -77,7 +77,7 @@ public class DealController {
 		return "deal/deal_all";
 	}
 
-	class DealFilter {
+	public class DealFilter {
 		private String estado;
 		private String moneda;
 		private String tipo;
@@ -158,6 +158,19 @@ public class DealController {
 
 		public void setCreadoPor(String creadoPor) {
 			this.creadoPor = creadoPor;
+		}
+
+		@Override
+		public String toString() {
+			return "estado=" + estado + '&' +
+					"moneda=" + moneda + '&' +
+					"tipo=" + tipo + '&' +
+					"cliente=" + cliente + '&' +
+					"cantidadPrestamo=" + cantidadPrestamo + '&' +
+					"cantidadAbonada=" + cantidadAbonada + '&' +
+					"cantidadAPagar=" + cantidadAPagar + '&' +
+					"descuento=" + descuento + '&' +
+					"creadoPor=" + creadoPor;
 		}
 	}
 
