@@ -1,49 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
-    <meta charset="UTF-8">
-    <title>Facility</title>
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+	<meta charset="UTF-8">
+	<title>Facility</title>
 </head>
+
 <body>
 
-<header th:replace="layout/layout :: header"></header>
+	<header th:replace="~{layout/layout :: header}"></header>
 
-<h1>Crear facility</h1>
+	<div class="container py-4">
+		<div class="card bg-dark text-white">
 
-<form th:action="@{/crearFacility}" th:object="${facility}"  method="post">
-    <label for="tipo">Tipo</label>
-    <select name="tipo" id="tipo" th:field="*{tipo}" required>
-        <option value="TERM" itemid="TERM">TERM</option>
-        <option value="REVOLVER" itemid="REVOLVER">REVOLVER</option>
-    </select><br>
-    <label for="estado">Estado:</label>
-    <select name="estado" id="estado" th:field="*{estado}" required>
-        <option value="PENDING" itemid="PENDING">PENDING</option>
-        <option value="APPROVED" itemid="APPROVED">APPROVED</option>
-        <option value="CLOSED" itemid="CLOSED">CLOSED</option>
-    </select><br>
-    <label for="cantidad">Cantidad:</label>
-    <input type="number" id="cantidad" name="cantidad" th:field="*{cantidad}" required><br>
-    <label for="fechaCreacion">Fecha creación:</label>
-    <input type="date" id="fechaCreacion" name="fechaCreacion" th:field="*{fechaCreacion}" required><br>
-    <label for="fechaEfectiva">Fecha efectiva:</label>
-    <input type="date" id="fechaEfectiva" name="fechaEfectiva" th:field="*{fechaEfectiva}" required><br>
-    <label for="fechaFinalizacion">Fecha finalización:</label>
-    <input type="date" id="fechaFinalizacion" name="fechaFinalizacion" th:field="*{fechaFinalizacion}" required><br>
-    <label for="deal">Deal:</label>
-    <select name="deal" id="deal" required th:field="*{deal}" >
-        <option th:each="deal: ${deals}" th:value="${deal.idDeal}" th:itemid="${deal.idDeal}"
-                th:text="${deal.idDeal}"></option>
-    </select><br>
+			<div class="card-header" style="font-size: xx-large">Crear facility</div>
 
-    <input type="submit" value="Crear">
-</form>
+			<div class="card-body">
 
-<form th:action="@{/listarFacility}">
-    <input type="submit"  value="Atrás">
-</form>
+				<form th:action="@{/crearFacility}" th:object="${facility}" method="post">
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label" for="tipo">Tipo</label>
+						<div class="col-sm-6">
+							<select name="tipo" id="tipo" th:field="*{tipo}" class="form-control" required>
+								<option value="TERM" itemid="TERM">TERM</option>
+								<option value="REVOLVER" itemid="REVOLVER">REVOLVER</option>
+							</select>
+						</div>
+					</div>
 
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label" for="estado">Estado:</label>
+						<div class="col-sm-6">
+							<select name="estado" id="estado" th:field="*{estado}" class="form-control" required>
+								<option value="PENDING" itemid="PENDING">PENDING</option>
+								<option value="APPROVED" itemid="APPROVED">APPROVED</option>
+								<option value="CLOSED" itemid="CLOSED">CLOSED</option>
+							</select>
+						</div>
+					</div>
+
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label" for="cantidad">Cantidad:</label>
+						<div class="col-sm-6">
+							<input type="number" id="cantidad" name="cantidad" th:field="*{cantidad}"
+								class="form-control" required>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label" for="fechaCreacion">Fecha creación:</label>
+						<div class="col-sm-6">
+							<input type="date" id="fechaCreacion" name="fechaCreacion" th:field="*{fechaCreacion}"
+								class="form-control" required>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label" for="fechaEfectiva">Fecha efectiva:</label>
+						<div class="col-sm-6">
+							<input type="date" id="fechaEfectiva" name="fechaEfectiva" th:field="*{fechaEfectiva}"
+								class="form-control" required>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label" for="fechaFinalizacion">Fecha finalización:</label>
+						<div class="col-sm-6">
+							<input type="date" id="fechaFinalizacion" name="fechaFinalizacion"
+								th:field="*{fechaFinalizacion}" class="form-control" required>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label" for="deal">Deal:</label>
+						<div class="col-sm-6">
+							<select name="deal" id="deal" required th:field="*{deal}" class="form-control">
+								<option th:each="deal: ${deals}" th:value="${deal.idDeal}" th:itemid="${deal.idDeal}"
+									th:text="${deal.idDeal}"></option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<div class="col-sm-6">
+							<input type="submit" value="Crear" class="btn btn-secondary" />
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+
+	<div class="container py-4">
+		<a href="/listarFacility" class="btn btn-warning btn-xs">Atrás</a>
+	</div>
 
 </body>
+
 </html>

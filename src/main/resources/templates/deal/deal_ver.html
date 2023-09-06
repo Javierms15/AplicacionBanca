@@ -4,11 +4,12 @@
 <head>
 	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
 	<meta charset="UTF-8" />
+	<title>Info Deal</title>
 </head>
 
 <body>
 
-	<header th:replace="layout/layout :: header"></header>
+	<header th:replace="~{layout/layout :: header}"></header>
 
 	<div class="container py-4">
 		<div class="card bg-dark text-white">
@@ -24,7 +25,7 @@
 					</select>
 					<input type="submit" value="Solicitar cierre de deal" class="btn btn-secondary" />
 					<a th:if="${deal.estado == 'APPROVED' && deal.aprobadoPor != usuarioId}"
-								th:href="@{/deal/close/} + ${deal.idDeal}" class="btn btn-primary btn-xs">Cerrar Deal</a>
+						th:href="@{/deal/close/} + ${deal.idDeal}" class="btn btn-primary btn-xs">Cerrar Deal</a>
 				</form>
 				<form th:action="@{/deal/banks}" th:object="${deal}" method="post">
 					<div class="form-group row">
@@ -109,23 +110,25 @@
 							</select>
 						</div>
 					</div>
-					<label class="col-sm-2 col-form-label">Bancos Participantes</label>
-					<div class="form-group row">
-						<table>
-							<thead>
-								<tr>
-									<td>Banco</td>
-									<td>Participación</td>
-								</tr>
-							</thead>
-							<tbody>
-								<tr th:each="participante : ${participantes}">
-									<td th:each="banco: ${bancos}" th:if="${participante.idBanco == banco.idBanco}"
-										th:text="${banco.nombre}"></td>
-									<td th:text="${participante.porcentajeParticipacion * 100} + '%'"></td>
-								</tr>
-							</tbody>
-						</table>
+					<div class="container py-6">
+						<label class="col-sm-2 col-form-label">Participantes</label>
+						<div class="form-group row">
+							<table class="table table-striped table-bordered">
+								<thead class="thead-inverse">
+									<tr>
+										<td>Banco</td>
+										<td>Participación</td>
+									</tr>
+								</thead>
+								<tbody>
+									<tr th:each="participante : ${participantes}">
+										<td th:each="banco: ${bancos}" th:if="${participante.idBanco == banco.idBanco}"
+											th:text="${banco.nombre}"></td>
+										<td th:text="${participante.porcentajeParticipacion * 100} + '%'"></td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
 					</div>
 				</form>
 
@@ -134,7 +137,9 @@
 		</div>
 	</div>
 
-	<a href="/deal" class="btn btn-warning btn-xs"><button>Volver</button></a>
+	<div class="container py-4">
+		<a href="/deal" class="btn btn-warning btn-xs">Volver</a>
+	</div>
 </body>
 
 </html>

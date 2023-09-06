@@ -1,127 +1,135 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
-    <title>Menu Usuarios</title>
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+	<meta charset="UTF-8" />
+	<title>Menu Usuarios</title>
 </head>
+
 <body>
 
-<header th:replace="layout/layout :: header"></header>
+	<header th:replace="~{layout/layout :: header}"></header>
 
-<div class="container py-4">
-    <div class="card bg-dark text-white">
+	<div class="container py-4">
+		<div class="card bg-dark text-white">
 
-        <div class="card-header" style="font-size: xx-large">Registre un usuario</div>
+			<div class="card-header" style="font-size: xx-large">Registre un usuario</div>
 
-        <div class="card-body">
+			<div class="card-body">
 
-            <form th:action="@{/usuario/crearUsuario}" th:object="${usuario}" method="post">
+				<form th:action="@{/usuario/crearUsuario}" th:object="${usuario}" method="post">
 
-                <div class="row mb-3">
-                    <label for="nombre" class="col-sm-2 col-form-label">Nombre</label>
-                    <div class="col-sm-10">
-                        <input type="text" name="nombre" id="nombre" required class="form-control">
-                    </div>
-                </div>
+					<div class="row mb-3">
+						<label for="nombre" class="col-sm-2 col-form-label">Nombre</label>
+						<div class="col-sm-10">
+							<input type="text" name="nombre" id="nombre" required class="form-control">
+						</div>
+					</div>
 
-                <div class="row mb-3">
-                    <label for="contrasena" class="col-sm-2 col-form-label">Contraseña</label>
-                    <div class="col-sm-10">
-                        <input type="text" name="contrasena" id="contrasena" required class="form-control">
-                    </div>
-                </div>
+					<div class="row mb-3">
+						<label for="contrasena" class="col-sm-2 col-form-label">Contraseña</label>
+						<div class="col-sm-10">
+							<input type="text" name="contrasena" id="contrasena" required class="form-control">
+						</div>
+					</div>
 
-                <div class="row mb-3">
-                    <label for="rol" class="col-sm-2 col-form-label">Rol</label>
-                    <div class="col-sm-10">
-                        <select name="rol" id="rol" required class="form-control">
-                            <option value="ADMIN" selected="true">Administrador</option>
-                            <option value="BANCA">Banca</option>
-                        </select>
-                    </div>
-                </div>
+					<div class="row mb-3">
+						<label for="rol" class="col-sm-2 col-form-label">Rol</label>
+						<div class="col-sm-10">
+							<select name="rol" id="rol" required class="form-control">
+								<option value="ADMIN" selected="true">Administrador</option>
+								<option value="BANCA">Banca</option>
+							</select>
+						</div>
+					</div>
 
-                <div class="row mb-3">
-                    <label for="rol" class="col-sm-2 col-form-label">Banco</label>
-                    <div class="col-sm-10">
-                        <select name="banco" id="banco" class="form-control" disabled>
-                            <option th:value="${null}" th:text="${'No pertenece a ningun banco'}" selected="true"></option>
-                            <option th:each="banco: ${bancos}" th:value="${banco.idBanco}" th:text="${banco.nombre}"></option>
-                        </select>
-                    </div>
-                </div>
+					<div class="row mb-3">
+						<label for="rol" class="col-sm-2 col-form-label">Banco</label>
+						<div class="col-sm-10">
+							<select name="banco" id="banco" class="form-control" disabled>
+								<option th:value="${null}" th:text="${'No pertenece a ningun banco'}" selected="true">
+								</option>
+								<option th:each="banco: ${bancos}" th:value="${banco.idBanco}"
+									th:text="${banco.nombre}"></option>
+							</select>
+						</div>
+					</div>
 
-                <input type="submit" class="btn btn-primary" value="Crear Usuario">
-            </form>
+					<input type="submit" class="btn btn-primary" value="Crear Usuario">
+				</form>
 
-        </div>
+			</div>
 
-    </div>
-</div>
+		</div>
+	</div>
 
-<div class="container py-4">
-    <div class="card bg-light">
+	<div class="container py-4">
+		<div class="card bg-light">
 
-        <div class="card-header" style="font-size: xx-large">Listado de Usuarios</div>
-
-
-            <table class="table table-striped table-bordered">
-                <thead class="thead-inverse">
-                <tr>
-                    <td>Id</td>
-                    <td>Nombre</td>
-                    <td>Contraseña</td>
-                    <td>Rol</td>
-                    <td>Banco</td>
-                    <td></td>
-                    <td></td>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="usuario: ${usuarios}">
-                    <td th:text="${usuario.idUsuario}"></td>
-                    <td th:text="${usuario.nombre}"></td>
-                    <td th:text="${usuario.contrasena}"></td>
-                    <td th:text="${usuario.rol}"></td>
-                    <td th:if="${usuario.banco == null}"></td>
-                    <td th:else th:each="banco : ${bancos}" th:if="${banco.idBanco == usuario.banco}" th:utext="${banco.nombre}"></td>
-                    <td style="text-align: center"><a th:href="@{usuario/formEditar/} + ${usuario.idUsuario}" th:text="Editar" class="btn btn-info btn-xs"></a></td>
-                    <td style="text-align: center"><a th:href="@{usuario/eliminar/} + ${usuario.idUsuario}" th:text="Eliminar" class="btn btn-danger btn-xs"></a></td>
-                </tr>
-                </tbody>
-            </table>
+			<div class="card-header" style="font-size: xx-large">Listado de Usuarios</div>
 
 
-    </div>
-</div>
+			<table class="table table-striped table-bordered">
+				<thead class="thead-inverse">
+					<tr>
+						<td>Id</td>
+						<td>Nombre</td>
+						<td>Contraseña</td>
+						<td>Rol</td>
+						<td>Banco</td>
+						<td></td>
+						<td></td>
+					</tr>
+				</thead>
+				<tbody>
+					<tr th:each="usuario: ${usuarios}">
+						<td th:text="${usuario.idUsuario}"></td>
+						<td th:text="${usuario.nombre}"></td>
+						<td th:text="${usuario.contrasena}"></td>
+						<td th:text="${usuario.rol}"></td>
+						<td th:if="${usuario.banco == null}"></td>
+						<td th:else th:each="banco : ${bancos}" th:if="${banco.idBanco == usuario.banco}"
+							th:utext="${banco.nombre}"></td>
+						<td style="text-align: center"><a th:href="@{usuario/formEditar/} + ${usuario.idUsuario}"
+								th:text="Editar" class="btn btn-info btn-xs"></a></td>
+						<td style="text-align: center"><a th:href="@{usuario/eliminar/} + ${usuario.idUsuario}"
+								th:text="Eliminar" class="btn btn-danger btn-xs"></a></td>
+					</tr>
+				</tbody>
+			</table>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var rolSelect = document.getElementById("rol");
-        var bancoSelect = document.getElementById("banco");
+		</div>
+	</div>
 
-        // Función para manejar los cambios en el select de rol
-        rolSelect.addEventListener("change", function () {
-            if (rolSelect.value === "ADMIN") {
-                var optionNoPertenece = document.createElement("option");
-                optionNoPertenece.value = "";
-                optionNoPertenece.text = "No pertenece a ningún banco";
-                bancoSelect.appendChild(optionNoPertenece);
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			var rolSelect = document.getElementById("rol");
+			var bancoSelect = document.getElementById("banco");
 
-                bancoSelect.value = ""; // Establecer el valor en blanco
-                bancoSelect.setAttribute("disabled", "disabled"); // Deshabilitar el select
+			// Función para manejar los cambios en el select de rol
+			rolSelect.addEventListener("change", function () {
+				if (rolSelect.value === "ADMIN") {
+					var optionNoPertenece = document.createElement("option");
+					optionNoPertenece.value = "";
+					optionNoPertenece.text = "No pertenece a ningún banco";
+					bancoSelect.appendChild(optionNoPertenece);
 
-            } else {
-                bancoSelect.removeAttribute("disabled"); // Habilitar el select
-                // Eliminar la opción "No pertenece a ningún banco" si estaba presente
-                var optionNoPertenece = bancoSelect.querySelector("option[value='']");
-                if (optionNoPertenece) {
-                    bancoSelect.removeChild(optionNoPertenece);
-                }
-            }
-        });
-    });
-</script>
+					bancoSelect.value = ""; // Establecer el valor en blanco
+					bancoSelect.setAttribute("disabled", "disabled"); // Deshabilitar el select
+
+				} else {
+					bancoSelect.removeAttribute("disabled"); // Habilitar el select
+					// Eliminar la opción "No pertenece a ningún banco" si estaba presente
+					var optionNoPertenece = bancoSelect.querySelector("option[value='']");
+					if (optionNoPertenece) {
+						bancoSelect.removeChild(optionNoPertenece);
+					}
+				}
+			});
+		});
+	</script>
 
 </body>
+
 </html>

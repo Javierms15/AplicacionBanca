@@ -1,33 +1,80 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
-    <title>Cliente</title>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+	<title>Cliente</title>
 </head>
+
 <body>
-    <h1>Crear cliente</h1>
 
-    <form th:action="@{/crearCliente}" th:object="${cliente}" method="post">
-        <label for="nombreLegal">Nombre legal:</label>
-        <input type="text" id="nombreLegal" name="nombreLegal" required><br>
-        <label for="direccionLegal">Dirección legal:</label>
-        <input type="text" id="direccionLegal" name="direccionLegal" required><br>
-        <label for="dinero">Capital:</label>
-        <input type="number" id="dinero" name="dinero" required><br>
-        <label for="email">Email:</label>
-        <input type="email" id="email" name="email" required><br>
-        <label for="idBanco">Banco:</label>
-        <select  name="idBanco" id="idBanco" required>
-            <option th:each="banco: ${bancos}" th:if="${session.usuario.rol == 'ADMIN' || session.usuario.banco == banco.idBanco}" th:value="${banco.idBanco}" th:itemid="${banco.idBanco}" th:text="${banco.nombre}"></option>
-        </select><br>
-        <input type="submit" value="Crear">
-    </form>
+	<header th:replace="~{layout/layout :: header}"></header>
 
-    <form th:action="@{/listarClientes}">
-        <input type="submit" value="Atrás">
-    </form>
+	<div class="container py-4">
+		<div class="card bg-dark text-white">
 
+			<div class="card-header" style="font-size: xx-large">Crear cliente</div>
+
+			<div class="card-body">
+
+				<form th:action="@{/crearCliente}" th:object="${cliente}" method="post">
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label" for="nombreLegal">Nombre legal:</label>
+						<div class="col-sm-6">
+							<input type="text" id="nombreLegal" name="nombreLegal" class="form-control" required>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label" for="direccionLegal">Dirección legal:</label>
+						<div class="col-sm-6">
+							<input type="text" id="direccionLegal" name="direccionLegal" class="form-control" required>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label" for="dinero">Capital:</label>
+						<div class="col-sm-6">
+							<input type="number" id="dinero" name="dinero" class="form-control" required>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label" for="email">Email:</label>
+						<div class="col-sm-6">
+							<input type="email" id="email" name="email" class="form-control" required>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label" for="idBanco">Banco:</label>
+						<div class="col-sm-6">
+							<select name="idBanco" id="idBanco" class="form-control" required>
+								<option th:each="banco: ${bancos}"
+									th:if="${session.usuario.rol == 'ADMIN' || session.usuario.banco == banco.idBanco}"
+									th:value="${banco.idBanco}" th:itemid="${banco.idBanco}" th:text="${banco.nombre}">
+								</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<div class="col-sm-6">
+							<input type="submit" value="Crear" class="btn btn-secondary" />
+						</div>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+
+	<div class="container py-4">
+		<a href="/listarClientes" class="btn btn-warning btn-xs">Atrás</a>
+	</div>
 
 </body>
+
 </html>

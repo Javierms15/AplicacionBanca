@@ -2,131 +2,159 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
 	<meta charset="UTF-8" />
-	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
+	<title>Formulario Outstanding</title>
 </head>
 
 <body onload="calculoIdFacility()">
-<header th:replace="layout/layout :: header" ></header>
 
-	<form th:action="@{/outstanding/save}" th:object="${out}" method="post">
-		<input type="hidden" class="form-control" th:field="*{idOutstanding}" />
-		<input type="hidden" class="form-control" id="cantidadRestante" th:field="*{cantidadRestante}" />
-		<div class="form-group row">
-			<label class="col-sm-2 col-form-label">Cantidad Restante</label>
-			<div class="col-sm-6">
-				<input type="text" class="form-control" pattern="^\d*(\.\d{1,2})?$"
-					title="Solo se permiten números con hasta 2 decimales" id="cantidadRestante2" required disabled/>
-			</div>
-		</div>
-		<div class="form-group row">
-			<label class="col-sm-2 col-form-label">Fecha Creacion</label>
-			<div class="col-sm-6">
-				<input type="date" th:field="*{fechaCreacion}" class="form-control" required />
-			</div>
-		</div>
+	<header th:replace="~{layout/layout :: header}"></header>
 
-		<div class="form-group row">
-			<label class="col-sm-2 col-form-label">Fecha Efectiva</label>
-			<div class="col-sm-6">
-				<input type="date" th:field="*{fechaEfectiva}" class="form-control" required />
-			</div>
-		</div>
+	<div class="container py-4">
+		<div class="card bg-dark text-white">
 
-		<div class="form-group row">
-			<label class="col-sm-2 col-form-label">Fecha finalizacion</label>
-			<div class="col-sm-6">
-				<input type="date" th:field="*{fechaFinalizacion}" class="form-control" required />
-			</div>
-		</div>
-		<div class="form-group row">
-			<label class="col-sm-2 col-form-label">Pago Principal</label>
-			<div class="col-sm-6">
-				<input type="text" th:field="*{pagoPrincipal}" class="form-control" pattern="^\d*(\.\d{1,2})?$"
-					title="Solo se permiten números con hasta 2 decimales" required />
-			</div>
-		</div>
-		<div class="form-group row">
-			<label class="col-sm-2 col-form-label">Pago Intereses</label>
-			<div class="col-sm-6">
-				<input type="text" th:field="*{pagoIntereses}" class="form-control" pattern="^\d*(\.\d{1,2})?$"
-					title="Solo se permiten números con hasta 2 decimales" required />
-			</div>
-		</div>
-		<div class="form-group row">
-			<label class="col-sm-2 col-form-label">Tipo Interes</label>
-			<div class="col-sm-6">
-				<select class="form-control" th:field="*{tipoInteres}" required>
-					<option th:each="tipoInteres: ${tipoIntereses}" th:value="${tipoInteres.idTipoInteres}"
-						th:text="${tipoInteres.nombre}">
-					</option>
-				</select>
-			</div>
-		</div>
-		<div class="form-group row">
-			<label class="col-sm-2 col-form-label">Tipo Cobros</label>
-			<div class="col-sm-6">
-				<select class="form-control" th:field="*{tipoCobros}" required>
-					<option value="MANUAL">Manual</option>
-					<option value="AUTOMATICO">Automatico</option>
-				</select>
-			</div>
-		</div>
-		<div class="form-group row">
-			<label class="col-sm-2 col-form-label">Periodicidad</label>
-			<div class="col-sm-6">
-				<select class="form-control" th:field="*{periodicidad}" required>
-					<option value="SEMANAL">Semanal</option>
-					<option value="MENSUAL">Mensual</option>
-					<option value="TRIMESTRAL">Trimestral</option>
-				</select>
-			</div>
-		</div>
-		<div class="form-group row">
-			<label class="col-sm-2 col-form-label">Cantidad Cobro Periodico</label>
-			<div class="col-sm-6">
-				<input type="text" th:field="*{cantidadCobroPeriodico}" class="form-control" pattern="^\d*(\.\d{1,2})?$"
-					title="Solo se permiten números con hasta 2 decimales" required />
-			</div>
-		</div>
-		<div class="form-group row">
-			<label class="col-sm-2 col-form-label">Facility</label>
-			<div class="col-sm-6">
-				<select class="form-control" th:field="*{facility}" id="facility" required>
-					<option th:each="facility: ${facilities}" th:value="${facility.idFacility}"
-						th:text="${facility.idFacility}">
-					</option>
-				</select>
-			</div>
-		</div>
+			<div class="card-header" style="font-size: xx-large">Crear outstanding</div>
 
-		<div class="form-group row">
-			<div class="col-sm-6">
-				<input type="submit" th:value="${buttonText}" class="btn btn-secondary" />
+			<div class="card-body">
+
+				<form th:action="@{/outstanding/save}" th:object="${out}" method="post">
+					<input type="hidden" class="form-control" th:field="*{idOutstanding}" />
+					<input type="hidden" class="form-control" id="cantidadRestante" th:field="*{cantidadRestante}" />
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Cantidad Restante</label>
+						<div class="col-sm-6">
+							<input type="text" class="form-control" pattern="^\d*(\.\d{1,2})?$"
+								title="Solo se permiten números con hasta 2 decimales" id="cantidadRestante2" required
+								disabled />
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Fecha Creacion</label>
+						<div class="col-sm-6">
+							<input type="date" th:field="*{fechaCreacion}" class="form-control" required />
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Fecha Efectiva</label>
+						<div class="col-sm-6">
+							<input type="date" th:field="*{fechaEfectiva}" class="form-control" required />
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Fecha finalizacion</label>
+						<div class="col-sm-6">
+							<input type="date" th:field="*{fechaFinalizacion}" class="form-control" required />
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Pago Principal</label>
+						<div class="col-sm-6">
+							<input type="text" th:field="*{pagoPrincipal}" class="form-control"
+								pattern="^\d*(\.\d{1,2})?$" title="Solo se permiten números con hasta 2 decimales"
+								required />
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Pago Intereses</label>
+						<div class="col-sm-6">
+							<input type="text" th:field="*{pagoIntereses}" class="form-control"
+								pattern="^\d*(\.\d{1,2})?$" title="Solo se permiten números con hasta 2 decimales"
+								required />
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Tipo Interes</label>
+						<div class="col-sm-6">
+							<select class="form-control" th:field="*{tipoInteres}" required>
+								<option th:each="tipoInteres: ${tipoIntereses}" th:value="${tipoInteres.idTipoInteres}"
+									th:text="${tipoInteres.nombre}">
+								</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Tipo Cobros</label>
+						<div class="col-sm-6">
+							<select class="form-control" th:field="*{tipoCobros}" required>
+								<option value="MANUAL">Manual</option>
+								<option value="AUTOMATICO">Automatico</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Periodicidad</label>
+						<div class="col-sm-6">
+							<select class="form-control" th:field="*{periodicidad}" required>
+								<option value="SEMANAL">Semanal</option>
+								<option value="MENSUAL">Mensual</option>
+								<option value="TRIMESTRAL">Trimestral</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Cantidad Cobro Periodico</label>
+						<div class="col-sm-6">
+							<input type="text" th:field="*{cantidadCobroPeriodico}" class="form-control"
+								pattern="^\d*(\.\d{1,2})?$" title="Solo se permiten números con hasta 2 decimales"
+								required />
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Facility</label>
+						<div class="col-sm-6">
+							<select class="form-control" th:field="*{facility}" id="facility" required>
+								<option th:each="facility: ${facilities}" th:value="${facility.idFacility}"
+									th:text="${facility.idFacility}">
+								</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<div class="col-sm-6">
+							<input type="submit" th:value="${buttonText}" class="btn btn-secondary" />
+						</div>
+					</div>
+
+				</form>
+
 			</div>
 		</div>
+	</div>
 
-	</form>
-	<a href="/outstanding"><button>Volver</button></a>
+	<div class="container py-4">
+		<a href="/outstanding" class="btn btn-warning btn-xs">Volver</a>
+	</div>
 
-<script>
-	function cargarDineroFacility(){
-		var facility = document.getElementById("facility");
-		fetch('http://localhost:8080/outstanding/create/dinero/'+facility.value).then(response=>response.json()).then(dinero=>{
-			var textoPrincipal=document.getElementById("cantidadRestante")
-			var textoSecundario=document.getElementById("cantidadRestante2")
-			textoPrincipal.value=dinero
-			textoSecundario.value=dinero
-		})
+	<script>
+		function cargarDineroFacility() {
+			var facility = document.getElementById("facility");
+			fetch('http://localhost:8080/outstanding/create/dinero/' + facility.value).then(response => response.json()).then(dinero => {
+				var textoPrincipal = document.getElementById("cantidadRestante")
+				var textoSecundario = document.getElementById("cantidadRestante2")
+				textoPrincipal.value = dinero
+				textoSecundario.value = dinero
+			})
 
-	}
-	function calculoIdFacility(){
-		cargarDineroFacility()
-		var select=document.getElementById("facility");
-		select.addEventListener('change',cargarDineroFacility)
-	}
+		}
+		function calculoIdFacility() {
+			cargarDineroFacility()
+			var select = document.getElementById("facility");
+			select.addEventListener('change', cargarDineroFacility)
+		}
 
-</script>
+	</script>
 
 </body>
 

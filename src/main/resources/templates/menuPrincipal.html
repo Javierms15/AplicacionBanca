@@ -1,79 +1,82 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
-    <meta charset="UTF-8">
-    <title>Menu Principal</title>
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+	<meta charset="UTF-8">
+	<title>Menu Principal</title>
 </head>
+
 <body>
 
-<header th:replace="layout/layout :: header"></header>
+	<header th:replace="~{layout/layout :: header}"></header>
 
-<div class="row p-5">
-    <div class="col-sm-6">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Crear Cliente</h5>
-                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                <a th:href="@{/listarClientes}" class="btn btn-primary">Crear Cliente</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Crear Deal</h5>
-                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                <a th:href="@{/deal}" class="btn btn-primary">Crear Deal</a>
-            </div>
-        </div>
-    </div>
-</div>
+	<div class="row p-5">
+		<div class="col-sm-6">
+			<div class="card">
+				<div class="card-body">
+					<h5 class="card-title">Crear Cliente</h5>
+					<p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+					<a th:href="@{/listarClientes}" class="btn btn-primary">Crear Cliente</a>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<div class="card">
+				<div class="card-body">
+					<h5 class="card-title">Crear Deal</h5>
+					<p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+					<a th:href="@{/deal}" class="btn btn-primary">Crear Deal</a>
+				</div>
+			</div>
+		</div>
+	</div>
 
-<div class="row p-5">
-    <div class="col-sm-6">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Crear Facility</h5>
-                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                <a th:href="@{/listarFacility}" class="btn btn-primary">Crear Facility</a>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm-6">
-        <div class="card">
-            <div class="card-body">
-                <h5 class="card-title">Crear Outstanding</h5>
-                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                <a th:href="@{/outstanding}" class="btn btn-primary">Crear Outstanding</a>
-            </div>
-        </div>
-    </div>
-</div>
+	<div class="row p-5">
+		<div class="col-sm-6">
+			<div class="card">
+				<div class="card-body">
+					<h5 class="card-title">Crear Facility</h5>
+					<p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+					<a th:href="@{/listarFacility}" class="btn btn-primary">Crear Facility</a>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<div class="card">
+				<div class="card-body">
+					<h5 class="card-title">Crear Outstanding</h5>
+					<p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+					<a th:href="@{/outstanding}" class="btn btn-primary">Crear Outstanding</a>
+				</div>
+			</div>
+		</div>
+	</div>
 
 
 
-    <div class="row p-5" th:if="${session.usuario.rol == 'ADMIN'}">
-        <div class="col-sm-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Gestión De Usuarios</h5>
-                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                    <a th:href="@{/usuario}" class="btn btn-primary">Usuarios</a>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6">
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">Gestion de Notificaciones</h5>
-                    <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-                    <a th:href="@{/notificacion}" class="btn btn-primary">Notificaciones</a>
-                </div>
-            </div>
-        </div>
-    </div>
+	<div class="row p-5" th:if="${session.usuario.rol == 'ADMIN'}">
+		<div class="col-sm-6">
+			<div class="card">
+				<div class="card-body">
+					<h5 class="card-title">Gestión De Usuarios</h5>
+					<p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+					<a th:href="@{/usuario}" class="btn btn-primary">Usuarios</a>
+				</div>
+			</div>
+		</div>
+		<div class="col-sm-6">
+			<div class="card">
+				<div class="card-body">
+					<h5 class="card-title">Gestion de Notificaciones</h5>
+					<p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+					<a th:href="@{/notificacion}" class="btn btn-primary">Notificaciones</a>
+				</div>
+			</div>
+		</div>
+	</div>
 
 
 </body>
+
 </html>

@@ -1,97 +1,107 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
-    <title>Editar usuario</title>
+	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+	<meta charset="UTF-8" />
+	<title>Editar usuario</title>
 </head>
+
 <body>
 
-<header th:replace="layout/layout :: header"></header>
+	<header th:replace="~{layout/layout :: header}"></header>
 
-<div class="container py-4">
-    <div class="card bg-dark text-white">
+	<div class="container py-4">
+		<div class="card bg-dark text-white">
 
-        <div class="card-header" style="font-size: xx-large">Editar Usuario</div>
+			<div class="card-header" style="font-size: xx-large">Editar Usuario</div>
 
-        <div class="card-body">
+			<div class="card-body">
 
-            <form th:action="@{/usuario/editarUsuario}" th:object="${usuario}" method="post">
+				<form th:action="@{/usuario/editarUsuario}" th:object="${usuario}" method="post">
 
+					<div class="row mb-3">
+						<label for="contrasena" class="col-sm-2 col-form-label">Nombre</label>
+						<div class="col-sm-10">
+							<input type="text" th:field="*{nombre}" name="nombre" id="nombre" required
+								class="form-control">
+						</div>
+					</div>
 
-                <div class="row mb-3">
-                    <label for="contrasena" class="col-sm-2 col-form-label">Nombre</label>
-                    <div class="col-sm-10">
-                        <input type="text" th:field="*{nombre}" name="nombre" id="nombre" required class="form-control">
-                    </div>
-                </div>
+					<div class="row mb-3">
+						<label for="contrasena" class="col-sm-2 col-form-label">Contraseña</label>
+						<div class="col-sm-10">
+							<input type="text" th:field="*{contrasena}" name="contrasena" id="contrasena" required
+								class="form-control">
+						</div>
+					</div>
 
-                <div class="row mb-3">
-                    <label for="contrasena" class="col-sm-2 col-form-label">Contraseña</label>
-                    <div class="col-sm-10">
-                        <input type="text" th:field="*{contrasena}" name="contrasena" id="contrasena" required
-                               class="form-control">
-                    </div>
-                </div>
+					<div class="row mb-3">
+						<label for="rol" class="col-sm-2 col-form-label">Rol</label>
+						<div class="col-sm-10">
+							<select name="rol" th:field="*{rol}" id="rol" required class="form-control">
+								<option value="ADMIN">Administrador</option>
+								<option value="BANCA">Banca</option>
+							</select>
+						</div>
+					</div>
 
-                <div class="row mb-3">
-                    <label for="rol" class="col-sm-2 col-form-label">Rol</label>
-                    <div class="col-sm-10">
-                        <select name="rol" th:field="*{rol}" id="rol" required class="form-control">
-                            <option value="ADMIN">Administrador</option>
-                            <option value="BANCA">Banca</option>
-                        </select>
-                    </div>
-                </div>
+					<div class="row mb-3">
+						<label for="rol" class="col-sm-2 col-form-label">Banco</label>
+						<div class="col-sm-10">
+							<select name="banco" id="banco" th:field="*{banco}" class="form-control"
+								th:disabled="*{rol == 'ADMIN'}">
+								<option th:if="*{rol == 'ADMIN'}" th:value="${null}"
+									th:text="${'No pertenece a ningun banco'}"></option>
+								<option th:each="banco: ${bancos}" th:value="${banco.idBanco}"
+									th:text="${banco.nombre}"></option>
+							</select>
+						</div>
+					</div>
 
-                <div class="row mb-3">
-                    <label for="rol" class="col-sm-2 col-form-label">Banco</label>
-                    <div class="col-sm-10">
-                        <select name="banco" id="banco" th:field="*{banco}" class="form-control" th:disabled="*{rol == 'ADMIN'}">
-                            <option th:if="*{rol == 'ADMIN'}" th:value="${null}" th:text="${'No pertenece a ningun banco'}"></option>
-                            <option th:each="banco: ${bancos}" th:value="${banco.idBanco}"
-                                    th:text="${banco.nombre}"></option>
-                        </select>
-                    </div>
-                </div>
+					<input type="hidden" th:field="*{idUsuario}" name="idUsuario" id="idUsuario">
 
-                <input type="hidden" th:field="*{idUsuario}" name="idUsuario" id="idUsuario">
+					<input type="submit" class="btn btn-primary" value="Editar Usuario">
+				</form>
 
-                <input type="submit" class="btn btn-primary" value="Editar Usuario">
-            </form>
+			</div>
 
-        </div>
+		</div>
+	</div>
 
-    </div>
-</div>
+	<div class="container py-4">
+		<a href="/usuario" class="btn btn-warning btn-xs">Volver</a>
+	</div>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var rolSelect = document.getElementById("rol");
-        var bancoSelect = document.getElementById("banco");
+	<script>
+		document.addEventListener("DOMContentLoaded", function () {
+			var rolSelect = document.getElementById("rol");
+			var bancoSelect = document.getElementById("banco");
 
-        // Función para manejar los cambios en el select de rol
-        rolSelect.addEventListener("change", function () {
-            if (rolSelect.value === "ADMIN") {
-                var optionNoPertenece = document.createElement("option");
-                optionNoPertenece.value = "";
-                optionNoPertenece.text = "No pertenece a ningún banco";
-                bancoSelect.appendChild(optionNoPertenece);
+			// Función para manejar los cambios en el select de rol
+			rolSelect.addEventListener("change", function () {
+				if (rolSelect.value === "ADMIN") {
+					var optionNoPertenece = document.createElement("option");
+					optionNoPertenece.value = "";
+					optionNoPertenece.text = "No pertenece a ningún banco";
+					bancoSelect.appendChild(optionNoPertenece);
 
-                bancoSelect.value = ""; // Establecer el valor en blanco
-                bancoSelect.setAttribute("disabled", "disabled"); // Deshabilitar el select
+					bancoSelect.value = ""; // Establecer el valor en blanco
+					bancoSelect.setAttribute("disabled", "disabled"); // Deshabilitar el select
 
-            } else {
-                bancoSelect.removeAttribute("disabled"); // Habilitar el select
-                // Eliminar la opción "No pertenece a ningún banco" si estaba presente
-                var optionNoPertenece = bancoSelect.querySelector("option[value='']");
-                if (optionNoPertenece) {
-                    bancoSelect.removeChild(optionNoPertenece);
-                }
-            }
-        });
-    });
-</script>
+				} else {
+					bancoSelect.removeAttribute("disabled"); // Habilitar el select
+					// Eliminar la opción "No pertenece a ningún banco" si estaba presente
+					var optionNoPertenece = bancoSelect.querySelector("option[value='']");
+					if (optionNoPertenece) {
+						bancoSelect.removeChild(optionNoPertenece);
+					}
+				}
+			});
+		});
+	</script>
 
 
 </body>
+
 </html>

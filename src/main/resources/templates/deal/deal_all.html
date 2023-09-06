@@ -3,16 +3,16 @@
 
 <head>
 	<link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
-	<title>Menu Deal</title>
 	<meta charset="UTF-8" />
+	<title>Menu Deals</title>
 </head>
 
 <body>
 
-	<header th:replace="layout/layout :: header"></header>
+	<header th:replace="~{layout/layout :: header}"></header>
 
 	<div class="container py-4">
-	<a th:href="@{/deal/create}" class="btn btn-info btn-xs">Nuevo deal</a>
+		<a th:href="@{/deal/create}" class="btn btn-info btn-xs">Nuevo deal</a>
 	</div>
 
 	<div class="container py-4">
