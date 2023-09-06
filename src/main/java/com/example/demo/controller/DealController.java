@@ -209,7 +209,6 @@ public class DealController {
 			if (((String) usuario.getRol()).equals("ADMIN")) {
 				usuarios = usuarioService.findWithDifferentId(usuario.getIdUsuario());
 			} else {
-				// TODO: Incluyo los admin tambien???
 				usuarios = usuarioService.findByBancoWithDifferentId(usuario.getBanco(), usuario.getIdUsuario());
 			}
 			model.addAttribute("usuarios", usuarios);
@@ -250,10 +249,11 @@ public class DealController {
 			HttpSession session, RedirectAttributes flash, Model model) {
 		DealEntity dealPrev = dealService.findOne(deal.getIdDeal());
 
-		//Estas dos lineas comprueban si el porcentaje de participación suma 1. Si lo suma, continua el codigo. Si no redirige de nuevo al formulario
+		// Estas dos lineas comprueban si el porcentaje de participación suma 1. Si lo
+		// suma, continua el codigo. Si no redirige de nuevo al formulario
 		String rutaRedirect = comprobarSumaPorcentajeParticipacion(deal, agenteId, req, flash, model);
-		if (rutaRedirect != null) return rutaRedirect;
-
+		if (rutaRedirect != null)
+			return rutaRedirect;
 
 		if (dealPrev == null) {
 			ParticipanteEntity participante;
@@ -355,7 +355,8 @@ public class DealController {
 							Double porcentajeParticipacion = Double.parseDouble(porcentajeParticipacionStr[0]);
 							participante.setPorcentajeParticipacion(porcentajeParticipacion);
 						} catch (NumberFormatException e) {
-							throw new RuntimeException("Porcentaje de Participacion con formato no válido:" + porcentajeParticipacionStr[0]);
+							throw new RuntimeException("Porcentaje de Participacion con formato no válido:"
+									+ porcentajeParticipacionStr[0]);
 						}
 					}
 					actual.add(participante);
@@ -400,8 +401,9 @@ public class DealController {
 		return "redirect:/deal";
 	}
 
-	private String comprobarSumaPorcentajeParticipacion(DealEntity deal, Integer agenteId, HttpServletRequest req, RedirectAttributes flash, Model model) {
-		if(((String) deal.getTipo()).equals("SYNDICATED")){
+	private String comprobarSumaPorcentajeParticipacion(DealEntity deal, Integer agenteId, HttpServletRequest req,
+			RedirectAttributes flash, Model model) {
+		if (((String) deal.getTipo()).equals("SYNDICATED")) {
 
 			String[] bancoReq = req.getParameterValues("banco");
 			Double suma = 0.0;
@@ -409,10 +411,10 @@ public class DealController {
 			List<Integer> bancosParticipantes = new LinkedList<>();
 			List<ParticipanteEntity> participantes = new ArrayList<>();
 
-			for(String bancoIdStr : bancoReq){
+			for (String bancoIdStr : bancoReq) {
 				bancosParticipantes.add(Integer.parseInt(bancoIdStr));
 				String[] porcentajeParticipacionStr = req.getParameterValues("bancoPorcentaje" + bancoIdStr);
-				if(porcentajeParticipacionStr != null){
+				if (porcentajeParticipacionStr != null) {
 					suma += Double.parseDouble(porcentajeParticipacionStr[0]);
 				}
 
@@ -445,7 +447,7 @@ public class DealController {
 				}
 			}
 
-			if(suma != 1){
+			if (suma != 1) {
 
 				model.addAttribute("deal", deal);
 				List<ClienteEntity> clientes = clienteService.findAll();
