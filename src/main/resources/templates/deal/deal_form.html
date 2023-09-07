@@ -171,6 +171,10 @@
 			var textboxes = document.querySelectorAll('input[name^="bancoPorcentaje"]')
 
 			form.addEventListener('submit', function () {
+				if (tipo.value != 'SYNDICATED') {
+					return
+				}
+				
 				var cont = 0;
 
 				checkboxes.forEach(function (checkbox) {
