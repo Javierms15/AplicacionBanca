@@ -27,7 +27,6 @@ import com.example.demo.models.service.IDealService;
 import com.example.demo.models.service.INotificacionService;
 import com.example.demo.models.service.IParticipanteService;
 import com.example.demo.models.service.IUsuarioService;
-import com.example.demo.models.service.NotificacionServiceImpl;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -162,15 +161,10 @@ public class DealController {
 
 		@Override
 		public String toString() {
-			return "estado=" + estado + '&' +
-					"moneda=" + moneda + '&' +
-					"tipo=" + tipo + '&' +
-					"cliente=" + cliente + '&' +
-					"cantidadPrestamo=" + cantidadPrestamo + '&' +
-					"cantidadAbonada=" + cantidadAbonada + '&' +
-					"cantidadAPagar=" + cantidadAPagar + '&' +
-					"descuento=" + descuento + '&' +
-					"creadoPor=" + creadoPor;
+			return "estado=" + estado + '&' + "moneda=" + moneda + '&' + "tipo=" + tipo + '&' + "cliente=" + cliente
+					+ '&' + "cantidadPrestamo=" + cantidadPrestamo + '&' + "cantidadAbonada=" + cantidadAbonada + '&'
+					+ "cantidadAPagar=" + cantidadAPagar + '&' + "descuento=" + descuento + '&' + "creadoPor="
+					+ creadoPor;
 		}
 	}
 
@@ -231,6 +225,8 @@ public class DealController {
 		deal.setCantidadAbonada(0);
 
 		model.addAttribute("deal", deal);
+		// TODO: Obtener solo los clientes que son del mismo banco que el usuario (a
+		// menos que sea admin)
 		List<ClienteEntity> clientes = clienteService.findAll();
 		model.addAttribute("clientes", clientes);
 
@@ -251,9 +247,11 @@ public class DealController {
 
 		// Estas dos lineas comprueban si el porcentaje de participación suma 1. Si lo
 		// suma, continua el codigo. Si no redirige de nuevo al formulario
-		String rutaRedirect = comprobarSumaPorcentajeParticipacion(deal, agenteId, req, flash, model);
-		if (rutaRedirect != null)
-			return rutaRedirect;
+		String[] rutaRedirect = comprobarSumaPorcentajeParticipacion(deal, agenteId, req, model);
+		if (rutaRedirect != null) {
+			model.addAttribute(rutaRedirect[1], rutaRedirect[2]);
+			return rutaRedirect[0];
+		}
 
 		if (dealPrev == null) {
 			ParticipanteEntity participante;
@@ -401,8 +399,8 @@ public class DealController {
 		return "redirect:/deal";
 	}
 
-	private String comprobarSumaPorcentajeParticipacion(DealEntity deal, Integer agenteId, HttpServletRequest req,
-			RedirectAttributes flash, Model model) {
+	private String[] comprobarSumaPorcentajeParticipacion(DealEntity deal, Integer agenteId, HttpServletRequest req,
+			Model model) {
 		if (((String) deal.getTipo()).equals("SYNDICATED")) {
 
 			String[] bancoReq = req.getParameterValues("banco");
@@ -412,11 +410,25 @@ public class DealController {
 			List<ParticipanteEntity> participantes = new ArrayList<>();
 
 			for (String bancoIdStr : bancoReq) {
-				bancosParticipantes.add(Integer.parseInt(bancoIdStr));
 				String[] porcentajeParticipacionStr = req.getParameterValues("bancoPorcentaje" + bancoIdStr);
 				if (porcentajeParticipacionStr != null) {
-					suma += Double.parseDouble(porcentajeParticipacionStr[0]);
+					try {
+						suma += Double.parseDouble(porcentajeParticipacionStr[0]);
+					} catch (NumberFormatException e) {
+						// TODO: Error
+						throw new RuntimeException("Porcentaje de Participacion con formato no válido");
+					}
+
 				}
+			}
+
+			if (suma == 1 && bancoReq.length >= 2) {
+				return null;
+			}
+
+			for (String bancoIdStr : bancoReq) {
+				bancosParticipantes.add(Integer.parseInt(bancoIdStr));
+				String[] porcentajeParticipacionStr = req.getParameterValues("bancoPorcentaje" + bancoIdStr);
 
 				ParticipanteEntity participante = new ParticipanteEntity();
 				try {
@@ -428,7 +440,8 @@ public class DealController {
 						participante.setAgente((byte) 0);
 					}
 				} catch (NumberFormatException e) {
-					throw new RuntimeException("BancoId no valido en DealController - save");
+					throw new RuntimeException(
+							"BancoId no valido en DealController - comprobarSumaPorcentajeParticipacion");
 				}
 				participante.setIdDeal(deal.getIdDeal());
 				if (porcentajeParticipacionStr == null) {
@@ -436,15 +449,26 @@ public class DealController {
 					// atributo nombre de los inputs del html
 					throw new RuntimeException("Porcentaje de Participacion nulo");
 				} else {
-					try {
-						Double porcentajeParticipacion = Double.parseDouble(porcentajeParticipacionStr[0]);
-						participante.setPorcentajeParticipacion(porcentajeParticipacion);
-						participantes.add(participante);
-					} catch (NumberFormatException e) {
-						// TODO: Error
-						throw new RuntimeException("Porcentaje de Participacion con formato no válido");
-					}
+					Double porcentajeParticipacion = Double.parseDouble(porcentajeParticipacionStr[0]);
+					participante.setPorcentajeParticipacion(porcentajeParticipacion);
+					participantes.add(participante);
 				}
+			}
+
+			if (deal.getTipo().equals("SYNDICATED") && participantes.size() < 2) {
+				model.addAttribute("deal", deal);
+				List<ClienteEntity> clientes = clienteService.findAll();
+				model.addAttribute("clientes", clientes);
+
+				model.addAttribute("bancosParticipantesId", bancosParticipantes);
+				model.addAttribute("participantes", participantes);
+
+				List<BancoEntity> bancos = bancoService.findAll();
+				model.addAttribute("bancos", bancos);
+
+				model.addAttribute("agente", agenteId);
+
+				return new String[] { "deal/deal_form", "error", "Debe elegir al menos 2 participantes en el deal" };
 			}
 
 			if (suma != 1) {
@@ -460,10 +484,8 @@ public class DealController {
 				model.addAttribute("bancos", bancos);
 
 				model.addAttribute("agente", agenteId);
-
-				flash.addFlashAttribute("error", "La suma del porcentaje de participación debe ser 1");
-
-				return "deal/deal_form";
+				
+				return new String[] { "deal/deal_form", "error", "La suma del porcentaje de participación debe ser 1" };
 			}
 		}
 		return null;
