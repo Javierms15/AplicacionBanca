@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,10 +65,12 @@ public class InicioSesionControllerTest {
 
 		MockHttpSession session = new MockHttpSession();
 		MockHttpServletResponse response = mvc
-				.perform(post("/iniciarSesion").session(session).contentType(MediaType.APPLICATION_FORM_URLENCODED)
-						.content(
-								"nombre=" + usuarioExiste.getNombre() + "&contrasena=" + usuarioExiste.getContrasena()))
-				.andReturn().getResponse();
+				.perform(
+						post("/iniciarSesion").session(session).contentType(MediaType.APPLICATION_FORM_URLENCODED)
+								.content("nombre=" + usuarioExiste.getNombre() + "&contrasena="
+										+ usuarioExiste.getContrasena()))
+				.andExpect(flash().attribute("success", "Bienvenido " + usuarioExiste.getNombre())).andReturn()
+				.getResponse();
 
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
 		assertThat(response.getHeader("Location")).isEqualTo("/");
@@ -89,9 +92,11 @@ public class InicioSesionControllerTest {
 				.thenReturn(null);
 
 		MockHttpSession session = new MockHttpSession();
-		MockHttpServletResponse response = mvc.perform(
-				post("/iniciarSesion").session(session).contentType(MediaType.APPLICATION_FORM_URLENCODED).content(
-						"nombre=" + usuarioNoExiste.getNombre() + "&contrasena=" + usuarioNoExiste.getContrasena()))
+		MockHttpServletResponse response = mvc
+				.perform(post("/iniciarSesion").session(session).contentType(MediaType.APPLICATION_FORM_URLENCODED)
+						.content("nombre=" + usuarioNoExiste.getNombre() + "&contrasena="
+								+ usuarioNoExiste.getContrasena()))
+				.andExpect(flash().attribute("error", "Usuario o contraseña incorrectos, vuelva a intentarlo"))
 				.andReturn().getResponse();
 
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
