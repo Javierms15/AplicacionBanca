@@ -209,5 +209,11 @@ public class ClienteController {
 		public void setIdBanco(String idBanco) {
 			this.idBanco = idBanco;
 		}
+
+		@Override
+		public String toString() {
+			return "nombreLegal=" + nombreLegal + "&direccionLegal=" + direccionLegal + "&dinero=" + dinero + "&email="
+					+ email + "&idBanco=" + idBanco;
+		}
 	}
 }

@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,7 +22,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.util.SerializationUtils;
 
 import com.example.demo.controller.ClienteController;
 import com.example.demo.controller.ClienteController.ClienteFilter;
@@ -40,6 +40,8 @@ public class ClienteControllerTest {
 
 	private List<BancoEntity> allBancos;
 	private List<ClienteEntity> allClientes;
+	private UsuarioEntity usuarioAdmin;
+	private UsuarioEntity usuarioBancoSantander;
 
 	@Mock
 	private IClienteDao clienteDao;
@@ -96,6 +98,11 @@ public class ClienteControllerTest {
 	public void setup() {
 		allBancos = bancosAll();
 		allClientes = clientesAll();
+		usuarioAdmin = new UsuarioEntity();
+		usuarioAdmin.setRol("ADMIN");
+		usuarioBancoSantander = new UsuarioEntity();
+		usuarioBancoSantander.setRol("BANCA");
+		usuarioBancoSantander.setBanco(allBancos.get(0).getIdBanco());
 		mvc = MockMvcBuilders.standaloneSetup(clienteController).build();
 	}
 
@@ -110,18 +117,17 @@ public class ClienteControllerTest {
 	}
 
 	@Test
-	public void creaClienteCorrectamente() throws Exception {
+	public void creaClienteCorrectamenteSiendoAdmin() throws Exception {
 		ClienteEntity cliente = crearCliente(1, "Pepe Pepito", "mi casa", "a@a.com", 1000, 1);
 
 		when(clienteDao.save(any(ClienteEntity.class))).thenReturn(cliente);
 		when(clienteDao.findById(cliente.getIdCliente())).thenReturn(Optional.of(cliente));
 
-		UsuarioEntity usuario=new UsuarioEntity();
-		usuario.setRol("ADMIN");
-
 		MockHttpServletResponse response = mvc
-				.perform(post("/crearCliente").contentType(MediaType.APPLICATION_FORM_URLENCODED).sessionAttr("usuario", usuario)
-						.content(SerializationUtils.serialize(cliente.toString())))
+				.perform(post("/crearCliente").content(cliente.toString())
+						.contentType(MediaType.APPLICATION_FORM_URLENCODED).sessionAttr("usuario", usuarioAdmin))
+				.andExpect(
+						flash().attribute("success", "Cliente " + cliente.getNombreLegal() + " creado correctamente"))
 				.andReturn().getResponse();
 
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
@@ -133,11 +139,43 @@ public class ClienteControllerTest {
 	}
 
 	@Test
-	public void redireccionCorrectaListarClientesSiendoAdmin() throws Exception {
-		UsuarioEntity usuario = new UsuarioEntity();
-		usuario.setRol("ADMIN");
+	public void creaClienteCorrectamenteSinSerAdmin() throws Exception {
+		ClienteEntity cliente = crearCliente(1, "Pepe Pepito", "mi casa", "a@a.com", 1000, 1);
 
-		MockHttpServletResponse response = mvc.perform(get("/listarClientes").sessionAttr("usuario", usuario))
+		when(clienteDao.save(any(ClienteEntity.class))).thenReturn(cliente);
+		when(clienteDao.findById(cliente.getIdCliente())).thenReturn(Optional.of(cliente));
+
+		MockHttpServletResponse response = mvc.perform(post("/crearCliente").content(cliente.toString())
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED).sessionAttr("usuario", usuarioBancoSantander))
+				.andExpect(
+						flash().attribute("success", "Cliente " + cliente.getNombreLegal() + " creado correctamente"))
+				.andReturn().getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarClientes");
+
+		ClienteEntity result = clienteService.findOne(cliente.getIdCliente());
+		assertThat(result).isNotNull();
+		assertThat(result.getIdCliente()).isEqualTo(cliente.getIdCliente());
+	}
+
+	@Test
+	public void creaClienteSinTenerPermiso() throws Exception {
+		ClienteEntity cliente = crearCliente(1, "Pepe Pepito", "mi casa", "a@a.com", 1000,
+				allBancos.get(1).getIdBanco());
+
+		MockHttpServletResponse response = mvc.perform(post("/crearCliente").content(cliente.toString())
+				.contentType(MediaType.APPLICATION_FORM_URLENCODED).sessionAttr("usuario", usuarioBancoSantander))
+				.andExpect(flash().attribute("error", "No tiene permiso para crear ese cliente")).andReturn()
+				.getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarClientes");
+	}
+
+	@Test
+	public void redireccionCorrectaListarClientesSiendoAdmin() throws Exception {
+		MockHttpServletResponse response = mvc.perform(get("/listarClientes").sessionAttr("usuario", usuarioAdmin))
 				.andReturn().getResponse();
 
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -146,42 +184,115 @@ public class ClienteControllerTest {
 
 	@Test
 	public void redireccionCorrectaListarClientesSinSerAdmin() throws Exception {
-		UsuarioEntity usuario = new UsuarioEntity();
-		usuario.setRol("BANCA");
-		usuario.setBanco(1);
-
-		MockHttpServletResponse response = mvc.perform(get("/listarClientes").sessionAttr("usuario", usuario))
-				.andReturn().getResponse();
+		MockHttpServletResponse response = mvc
+				.perform(get("/listarClientes").sessionAttr("usuario", usuarioBancoSantander)).andReturn()
+				.getResponse();
 
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 		assertThat(response.getForwardedUrl()).isEqualTo("cliente/listaClientes");
 	}
 
 	@Test
-	public void eliminaClienteCorrectamente() throws Exception {
-		// TODO: Si usase service en vez de dao en el controlador creo que se podria
-		// hacer mejor
-		// TODO: Deberia controlar si el id es de un cliente valido o no
+	public void eliminaClienteIdIncorrecto() throws Exception {
+		int clienteId = 0;
+		when(clienteDao.findById(clienteId)).thenReturn(Optional.ofNullable(null));
 
-		MockHttpServletResponse response = mvc.perform(get("/eliminarCliente/" + allClientes.get(0).getIdCliente()))
-				.andReturn().getResponse();
+		MockHttpServletResponse response = mvc.perform(get("/eliminarCliente/" + clienteId))
+				.andExpect(flash().attribute("error", "Ha intentado eliminar un cliente que no existe")).andReturn()
+				.getResponse();
 
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
 		assertThat(response.getHeader("Location")).isEqualTo("/listarClientes");
 	}
 
-	/*
+	@Test
+	public void eliminaClienteSinPermiso() throws Exception {
+		ClienteEntity cliente = crearCliente(1, "Pepe Pepito", "mi casa", "a@a.com", 1000, 2);
+
+		when(clienteDao.findById(cliente.getIdCliente())).thenReturn(Optional.of(cliente));
+
+		MockHttpServletResponse response = mvc
+				.perform(
+						get("/eliminarCliente/" + cliente.getIdCliente()).sessionAttr("usuario", usuarioBancoSantander))
+				.andExpect(flash().attribute("error", "No tiene permiso para eliminar ese cliente")).andReturn()
+				.getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarClientes");
+	}
+
+	@Test
+	public void eliminaClienteCorrectamente() throws Exception {
+		// TODO: Si usase service en vez de dao en el controlador creo que se podria
+		// hacer mejor
+		ClienteEntity cliente = allClientes.get(0);
+
+		when(clienteDao.findById(cliente.getIdCliente())).thenReturn(Optional.of(cliente));
+
+		MockHttpServletResponse response = mvc
+				.perform(get("/eliminarCliente/" + cliente.getIdCliente()).sessionAttr("usuario", usuarioAdmin))
+				.andExpect(flash().attribute("success", "Cliente eliminado correctamente")).andReturn().getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarClientes");
+	}
+
+	@Test
+	public void redireccionEditarClienteIdIncorrecto() throws Exception {
+		int clienteId = 0;
+		when(clienteDao.findById(clienteId)).thenReturn(Optional.ofNullable(null));
+
+		MockHttpServletResponse response = mvc.perform(get("/editarCliente/" + clienteId))
+				.andExpect(flash().attribute("error", "Ha intentado editar un cliente que no existe")).andReturn()
+				.getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarClientes");
+	}
+
+	@Test
+	public void redireccionEditarClienteSinPermiso() throws Exception {
+		ClienteEntity cliente = allClientes.get(1);
+
+		when(clienteDao.findById(cliente.getIdCliente())).thenReturn(Optional.ofNullable(cliente));
+
+		MockHttpServletResponse response = mvc
+				.perform(get("/editarCliente/" + cliente.getIdCliente()).sessionAttr("usuario", usuarioBancoSantander))
+				.andExpect(flash().attribute("error", "No tiene permiso para editar ese cliente")).andReturn()
+				.getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarClientes");
+	}
+
 	@Test
 	public void redireccionCorrectaEditarCliente() throws Exception {
-		// TODO: Deberia controlar si el id es de un cliente valido o no
+		ClienteEntity cliente = allClientes.get(0);
 
-		MockHttpServletResponse response = mvc.perform(get("/editarCliente/" + allClientes.get(0).getIdCliente()))
+		when(clienteDao.findById(cliente.getIdCliente())).thenReturn(Optional.of(cliente));
+
+		MockHttpServletResponse response = mvc
+				.perform(get("/editarCliente/" + cliente.getIdCliente()).sessionAttr("usuario", usuarioAdmin))
 				.andReturn().getResponse();
 
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 		assertThat(response.getForwardedUrl()).isEqualTo("cliente/editarCliente");
 	}
-*/
+
+	@Test
+	public void guardarClienteEditadoSinPermiso() throws Exception {
+		ClienteEntity cliente = crearCliente(1, "Pepe Pepito", "mi casa", "a@a.com", 1000, 2);
+
+		MockHttpServletResponse response = mvc
+				.perform(post("/editarClienteSave").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+						.sessionAttr("usuario", usuarioBancoSantander).content(cliente.toString()))
+				.andExpect(flash().attribute("error", "No tiene permiso para editar ese cliente")).andReturn()
+				.getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarClientes");
+	}
+
 	@Test
 	public void guardarClienteEditadoCorrectamente() throws Exception {
 		ClienteEntity cliente = crearCliente(1, "Pepe Pepito", "mi casa", "a@a.com", 1000, 1);
@@ -189,12 +300,11 @@ public class ClienteControllerTest {
 		when(clienteDao.save(any(ClienteEntity.class))).thenReturn(cliente);
 		when(clienteDao.findById(cliente.getIdCliente())).thenReturn(Optional.of(cliente));
 
-		UsuarioEntity usuario=new UsuarioEntity();
-		usuario.setRol("ADMIN");
-
 		MockHttpServletResponse response = mvc
-				.perform(post("/editarClienteSave").contentType(MediaType.APPLICATION_FORM_URLENCODED).sessionAttr("usuario", usuario)
-						.content(SerializationUtils.serialize(cliente.toString())))
+				.perform(post("/editarClienteSave").contentType(MediaType.APPLICATION_FORM_URLENCODED)
+						.sessionAttr("usuario", usuarioAdmin).content(cliente.toString()))
+				.andExpect(
+						flash().attribute("success", "Cliente " + cliente.getNombreLegal() + " editado correctamente"))
 				.andReturn().getResponse();
 
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
@@ -207,9 +317,6 @@ public class ClienteControllerTest {
 
 	@Test
 	public void redireccionCorrectaFiltrarSinFiltroSiendoAdmin() throws Exception {
-		UsuarioEntity usuario = new UsuarioEntity();
-		usuario.setRol("ADMIN");
-
 		ClienteFilter filter = clienteController.new ClienteFilter();
 		filter.setDinero("");
 		filter.setDireccionLegal("");
@@ -218,8 +325,8 @@ public class ClienteControllerTest {
 		filter.setNombreLegal("");
 
 		MockHttpServletResponse response = mvc
-				.perform(post("/filtrar").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-						.content(SerializationUtils.serialize(filter.toString())).sessionAttr("usuario", usuario))
+				.perform(post("/filtrar").contentType(MediaType.APPLICATION_FORM_URLENCODED).content(filter.toString())
+						.sessionAttr("usuario", usuarioAdmin))
 				.andReturn().getResponse();
 
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -228,9 +335,6 @@ public class ClienteControllerTest {
 
 	@Test
 	public void redireccionCorrectaFiltrarConFiltroSiendoAdmin() throws Exception {
-		UsuarioEntity usuario = new UsuarioEntity();
-		usuario.setRol("ADMIN");
-
 		ClienteFilter filter = clienteController.new ClienteFilter();
 		filter.setDinero("1000");
 		filter.setDireccionLegal("direccion 1");
@@ -239,8 +343,8 @@ public class ClienteControllerTest {
 		filter.setNombreLegal("Pepe");
 
 		MockHttpServletResponse response = mvc
-				.perform(post("/filtrar").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-						.content(SerializationUtils.serialize(filter.toString())).sessionAttr("usuario", usuario))
+				.perform(post("/filtrar").contentType(MediaType.APPLICATION_FORM_URLENCODED).content(filter.toString())
+						.sessionAttr("usuario", usuarioAdmin))
 				.andReturn().getResponse();
 
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -249,10 +353,6 @@ public class ClienteControllerTest {
 
 	@Test
 	public void redireccionCorrectaFiltrarSinFiltroSinSerAdmin() throws Exception {
-		UsuarioEntity usuario = new UsuarioEntity();
-		usuario.setRol("BANCA");
-		usuario.setBanco(1);
-
 		ClienteFilter filter = clienteController.new ClienteFilter();
 		filter.setDinero("");
 		filter.setDireccionLegal("");
@@ -261,8 +361,8 @@ public class ClienteControllerTest {
 		filter.setNombreLegal("");
 
 		MockHttpServletResponse response = mvc
-				.perform(post("/filtrar").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-						.content(SerializationUtils.serialize(filter.toString())).sessionAttr("usuario", usuario))
+				.perform(post("/filtrar").contentType(MediaType.APPLICATION_FORM_URLENCODED).content(filter.toString())
+						.sessionAttr("usuario", usuarioBancoSantander))
 				.andReturn().getResponse();
 
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
@@ -271,10 +371,6 @@ public class ClienteControllerTest {
 
 	@Test
 	public void redireccionCorrectaFiltrarConFiltroSinSerAdmin() throws Exception {
-		UsuarioEntity usuario = new UsuarioEntity();
-		usuario.setRol("BANCA");
-		usuario.setBanco(1);
-
 		ClienteFilter filter = clienteController.new ClienteFilter();
 		filter.setDinero("2000");
 		filter.setDireccionLegal("direccion 2");
@@ -283,8 +379,8 @@ public class ClienteControllerTest {
 		filter.setNombreLegal("Arthur");
 
 		MockHttpServletResponse response = mvc
-				.perform(post("/filtrar").contentType(MediaType.APPLICATION_FORM_URLENCODED)
-						.content(SerializationUtils.serialize(filter.toString())).sessionAttr("usuario", usuario))
+				.perform(post("/filtrar").contentType(MediaType.APPLICATION_FORM_URLENCODED).content(filter.toString())
+						.sessionAttr("usuario", usuarioBancoSantander))
 				.andReturn().getResponse();
 
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
