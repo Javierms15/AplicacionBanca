@@ -110,4 +110,16 @@ public class FacilityEntity {
     public int hashCode() {
         return Objects.hash(idFacility, tipo, estado, cantidad, fechaCreacion, fechaEfectiva, fechaFinalizacion, deal);
     }
+
+    @Override
+    public String toString() {
+        return "idFacility=" + idFacility +
+                "&tipo=" + tipo +
+                "&estado=" + estado +
+                "&cantidad=" + cantidad +
+                "&fechaCreacion=" + fechaCreacion +
+                "&fechaEfectiva=" + fechaEfectiva +
+                "&fechaFinalizacion=" + fechaFinalizacion +
+                "&deal=" + deal;
+    }
 }

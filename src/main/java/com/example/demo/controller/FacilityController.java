@@ -31,15 +31,15 @@ public class FacilityController {
 
 
     @RequestMapping("/nuevaFacility")
-    public String mostrarPantallaNuevaFacility(Model model){
+    public String mostrarPantallaNuevaFacility(Model model) {
         FacilityEntity facility = new FacilityEntity();
 
-        List<DealEntity> deals=new ArrayList<>();
-        List<DealEntity> dealsAll=dealService.findAll();
-        for(DealEntity d: dealsAll){
-            Double sumaTotalFacilities=facilityDao.obtenerSumaFacilityDeal(d.getIdDeal()) == null? 0 :  facilityDao.obtenerSumaFacilityDeal(d.getIdDeal());
-            String estado= (String) d.getEstado();
-            if(sumaTotalFacilities < d.getCantidadPrestamo() && !Objects.equals(estado, "CLOSED")){
+        List<DealEntity> deals = new ArrayList<>();
+        List<DealEntity> dealsAll = dealService.findAll();
+        for (DealEntity d : dealsAll) {
+            Double sumaTotalFacilities = facilityDao.obtenerSumaFacilityDeal(d.getIdDeal()) == null ? 0 : facilityDao.obtenerSumaFacilityDeal(d.getIdDeal());
+            String estado = (String) d.getEstado();
+            if (sumaTotalFacilities < d.getCantidadPrestamo() && !Objects.equals(estado, "CLOSED")) {
                 deals.add(d);
             }
         }
@@ -50,44 +50,38 @@ public class FacilityController {
     }
 
     @PostMapping("/crearFacility")
-    public String crearFacility(Model model, FacilityEntity facility, RedirectAttributes flash){
+    public String crearFacility(Model model, FacilityEntity facility, RedirectAttributes flash) {
 
-        Double sumaTotalAcumulada = facilityDao.obtenerSumaFacilityDeal(facility.getDeal()) == null? 0 : facilityDao.obtenerSumaFacilityDeal(facility.getDeal());
+        Double sumaTotalAcumulada = facilityDao.obtenerSumaFacilityDeal(facility.getDeal()) == null ? 0 : facilityDao.obtenerSumaFacilityDeal(facility.getDeal());
         Double sumaTotalTeorica = sumaTotalAcumulada + facility.getCantidad();
         Double totalPrestamoDeal = dealService.findOne(facility.getDeal()).getCantidadPrestamo();
 
-        Date fechaCreacion=facility.getFechaCreacion();
-        Date fechaEfectiva=facility.getFechaEfectiva();
-        Date fechaFinalizacion=facility.getFechaFinalizacion();
+        Date fechaCreacion = facility.getFechaCreacion();
+        Date fechaEfectiva = facility.getFechaEfectiva();
+        Date fechaFinalizacion = facility.getFechaFinalizacion();
 
-        if (fechaCreacion.compareTo(fechaEfectiva)>0 || fechaCreacion.compareTo(fechaFinalizacion) >0) {
+        if (fechaCreacion.compareTo(fechaEfectiva) > 0) {
             model.addAttribute("error", "La fecha de creación no es válida");
             facility.setCantidad(0);
             model.addAttribute("facility", facility);
             List<DealEntity> deals = dealService.findAll();
             model.addAttribute("deals", deals);
             return "facility/facility";
-        }else if(fechaEfectiva.compareTo(fechaCreacion) <0 || fechaEfectiva.compareTo(fechaFinalizacion) > 0){
+        } else if (fechaEfectiva.compareTo(fechaFinalizacion) > 0) {
             model.addAttribute("error", "La fecha efectiva no es válida");
             facility.setCantidad(0);
             model.addAttribute("facility", facility);
             List<DealEntity> deals = dealService.findAll();
             model.addAttribute("deals", deals);
             return "facility/facility";
-        }else if(fechaFinalizacion.compareTo(fechaCreacion)<0 || fechaFinalizacion.compareTo(fechaEfectiva)<0){
-            model.addAttribute("error", "La fecha de finalización no es válida");
-            facility.setCantidad(0);
-            model.addAttribute("facility", facility);
-            List<DealEntity> deals = dealService.findAll();
-            model.addAttribute("deals", deals);
-            return "facility/facility";
+
         }
 
-        if(sumaTotalTeorica <= totalPrestamoDeal) {
+        if (sumaTotalTeorica <= totalPrestamoDeal) {
             facilityDao.save(facility);
             flash.addFlashAttribute("success", "Facility creada correctamente");
             return "redirect:/listarFacility";
-        }else{
+        } else {
             model.addAttribute("error", "La cantidad total de la facility no puede superar los " + (totalPrestamoDeal - sumaTotalAcumulada));
             facility.setCantidad(0);
             model.addAttribute("facility", facility);
@@ -98,49 +92,49 @@ public class FacilityController {
     }
 
     @RequestMapping("/listarFacility")
-    public String mostrarFacility(Model model, HttpSession session){
+    public String mostrarFacility(Model model, HttpSession session) {
 
         UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
 
         if (usuario.getRol().equals("ADMIN")) {
-            List<FacilityEntity> facilitys= facilityService.findAll();
-            model.addAttribute("facilitys",facilitys);
+            List<FacilityEntity> facilitys = facilityService.findAll();
+            model.addAttribute("facilitys", facilitys);
         } else {
-            List<FacilityEntity> facilitys = facilityService.filter( "", "", "", "", "", "", "", usuario.getBanco().toString());
-            model.addAttribute("facilitys",facilitys);
+            List<FacilityEntity> facilitys = facilityService.filter("", "", "", "", "", "", "", usuario.getBanco().toString());
+            model.addAttribute("facilitys", facilitys);
         }
 
         FacilityFilter filter = new FacilityFilter();
         model.addAttribute("filter", filter);
         List<DealEntity> deals = dealService.findAll();
-        model.addAttribute("deals",deals);
+        model.addAttribute("deals", deals);
         return "facility/facility_all";
     }
 
     @RequestMapping("eliminarFacility/{id}")
-    public String eliminar(@PathVariable(value = "id") int id,  RedirectAttributes flash) {
-        FacilityEntity facility=facilityDao.findById(id).orElse(null);
+    public String eliminar(@PathVariable(value = "id") int id, RedirectAttributes flash) {
+        FacilityEntity facility = facilityDao.findById(id).orElse(null);
         facilityDao.delete(facility);
         flash.addFlashAttribute("success", "Facility eliminada correctamente");
         return "redirect:/listarFacility";
     }
 
     @RequestMapping("editarFacility/{id}")
-    public String editarFacility(@PathVariable(value = "id") int id, Map<String, Object> model,Model Model) {
+    public String editarFacility(@PathVariable(value = "id") int id, Map<String, Object> model, Model Model) {
 
         FacilityEntity facility = facilityDao.findById(id).orElse(null);
         model.put("facility", facility);
 
         List<DealEntity> deals = new ArrayList<>();
-        List<DealEntity> dealsAll=dealService.findAll();
-        for(DealEntity d: dealsAll){
-            Double sumaTotalFacilities=facilityDao.obtenerSumaFacilityDeal(d.getIdDeal()) == null? 0 :  facilityDao.obtenerSumaFacilityDeal(d.getIdDeal());
-            String estado= (String) d.getEstado();
-            if(sumaTotalFacilities < d.getCantidadPrestamo() && !Objects.equals(estado, "CLOSED")){
+        List<DealEntity> dealsAll = dealService.findAll();
+        for (DealEntity d : dealsAll) {
+            Double sumaTotalFacilities = facilityDao.obtenerSumaFacilityDeal(d.getIdDeal()) == null ? 0 : facilityDao.obtenerSumaFacilityDeal(d.getIdDeal());
+            String estado = (String) d.getEstado();
+            if (sumaTotalFacilities < d.getCantidadPrestamo() && !Objects.equals(estado, "CLOSED")) {
                 deals.add(d);
             }
         }
-        Model.addAttribute("deals",deals);
+        Model.addAttribute("deals", deals);
 
         return "facility/facility_edit";
     }
@@ -149,17 +143,16 @@ public class FacilityController {
     public String editarFacilitySave(FacilityEntity facility, RedirectAttributes flash, Model model) {
 
 
-
-        Double sumaTotalAcumulada = facilityDao.obtenerSumaFacilityDeal(facility.getDeal()) == null? 0 : facilityDao.obtenerSumaFacilityDeal(facility.getDeal());
-        sumaTotalAcumulada-= facilityDao.findById(facility.getIdFacility()).orElse(null).getCantidad();
+        Double sumaTotalAcumulada = facilityDao.obtenerSumaFacilityDeal(facility.getDeal()) == null ? 0 : facilityDao.obtenerSumaFacilityDeal(facility.getDeal());
+        sumaTotalAcumulada -= facilityDao.findById(facility.getIdFacility()).orElse(null).getCantidad();
         Double sumaTotalTeorica = sumaTotalAcumulada + facility.getCantidad();
         Double totalPrestamoDeal = dealService.findOne(facility.getDeal()).getCantidadPrestamo();
 
-        if(sumaTotalTeorica <= totalPrestamoDeal) {
+        if (sumaTotalTeorica <= totalPrestamoDeal) {
             facilityDao.save(facility);
             flash.addFlashAttribute("success", "Facility creada correctamente");
             return "redirect:/listarFacility";
-        }else{
+        } else {
             model.addAttribute("error", "La cantidad total de la facility no puede superar los " + (totalPrestamoDeal - sumaTotalAcumulada));
             facility.setCantidad(0);
             model.addAttribute("facility", facility);
@@ -175,22 +168,22 @@ public class FacilityController {
         UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
 
         if (usuario.getRol().equals("ADMIN")) {
-            List<FacilityEntity> facilitys= facilityService.findAll();
-            model.addAttribute("facilitys",facilitys);
+            List<FacilityEntity> facilitys = facilityService.findAll();
+            model.addAttribute("facilitys", facilitys);
         } else {
-            List<FacilityEntity> facilitys = facilityService.filter( filter.tipo, filter.estado, filter.cantidad, filter.fechaCreacion,
+            List<FacilityEntity> facilitys = facilityService.filter(filter.tipo, filter.estado, filter.cantidad, filter.fechaCreacion,
                     filter.fechaEfectiva, filter.fechaFinalizacion, filter.deal, usuario.getBanco().toString());
-            model.addAttribute("facilitys",facilitys);
+            model.addAttribute("facilitys", facilitys);
         }
 
         model.addAttribute("filter", filter);
-        List<DealEntity> deals=dealService.findAll();
-        model.addAttribute("deals",deals);
+        List<DealEntity> deals = dealService.findAll();
+        model.addAttribute("deals", deals);
 
         return "facility/facility_all";
     }
 
-    class FacilityFilter{
+    class FacilityFilter {
 
         private String tipo;
         private String estado;
@@ -200,7 +193,6 @@ public class FacilityController {
         private String fechaEfectiva;
         private String fechaFinalizacion;
         private String deal;
-
 
 
         public String getTipo() {
@@ -259,9 +251,6 @@ public class FacilityController {
             this.deal = deal;
         }
     }
-
-
-
 
 
 }
