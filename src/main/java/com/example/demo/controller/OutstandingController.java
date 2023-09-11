@@ -294,7 +294,7 @@ public class OutstandingController {
 			return "outstanding/out_form";
 		} else {
 			if (sumaTotalTeorica <= totalPrestamoFacility) {
-				out.setCantidadRestante(totalPrestamoFacility - sumaTotalAcumulada);
+				out.setCantidadRestante(out.getPagoPrincipal() + out.getPagoIntereses());
 				outstandingService.save(out);
 				flash.addFlashAttribute("success", "Outstanding guardado correctamente");
 				return "redirect:/outstanding";
@@ -404,14 +404,14 @@ public class OutstandingController {
 			return "redirect:/outstanding";
 		}
 
-		model.addAttribute("pagoPrincipal", out.getPagoPrincipal());
+		model.addAttribute("cantidadRestante", out.getCantidadRestante());
 		model.addAttribute("id", id);
 		return "outstanding/out_pago";
 	}
 
 	@PostMapping("/realizarPago")
 	public String realizarPago(@RequestParam(name = "idOut") int id,
-			@RequestParam(name = "pagoPrincipal") double pagoPrincipal, @RequestParam(name = "pago") double pago,
+			@RequestParam(name = "cantidadRestante") double cantidadRestante, @RequestParam(name = "pago") double pago,
 			Model model, RedirectAttributes flash, HttpSession session) {
 		OutstandingEntity out = outstandingService.findOne(id);
 		if (out == null) {
@@ -425,14 +425,14 @@ public class OutstandingController {
 			return "redirect:/outstanding";
 		}
 
-		if (pago > pagoPrincipal) {
-			model.addAttribute("pagoPrincipal", pagoPrincipal);
+		if (pago > cantidadRestante) {
+			model.addAttribute("cantidadRestante", cantidadRestante);
 			model.addAttribute("id", id);
 			model.addAttribute("error", "El pago no puede superar el pago principal");
 			return "outstanding/out_pago";
 		}
 
-		out.setPagoPrincipal(pagoPrincipal - pago);
+		out.setCantidadRestante(cantidadRestante - pago);
 		outstandingService.save(out);
 
 		return "redirect:/outstanding";

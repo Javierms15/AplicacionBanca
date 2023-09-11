@@ -20,14 +20,70 @@
 
 				<form th:action="@{/outstanding/save}" th:object="${out}" method="post">
 					<input type="hidden" class="form-control" th:field="*{idOutstanding}" />
-					<input type="hidden" class="form-control" id="cantidadRestante" th:field="*{cantidadRestante}" />
+
 
 					<div class="form-group row">
-						<label class="col-sm-2 col-form-label">Cantidad Restante</label>
+						<label class="col-sm-2 col-form-label">Facility</label>
+						<div class="col-sm-6">
+							<select class="form-control" th:field="*{facility}" id="facility" required>
+								<option th:each="facility: ${facilities}" th:value="${facility.idFacility}"
+										th:text="${facility.idFacility}">
+								</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Cantidad disponible en la facility</label>
+						<div class="col-sm-6">
+							<input type="text"  class="form-control" id="cantidadDisponible"
+								   required readonly/>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Introducir cantidad a pagar</label>
 						<div class="col-sm-6">
 							<input type="text" class="form-control" pattern="^\d*(\.\d{1,2})?$"
-								title="Solo se permiten números con hasta 2 decimales" id="cantidadRestante2" required
-								disabled />
+								title="Solo se permiten números con hasta 2 decimales" id="cantidadPagar" required/>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Tipo Interes</label>
+						<div class="col-sm-6">
+							<select class="form-control" th:field="*{tipoInteres}" required id="tipoInteres" >
+								<option th:each="tipoInteres: ${tipoIntereses}" th:value="${tipoInteres.idTipoInteres}"
+										th:text="${tipoInteres.nombre}">
+								</option>
+							</select>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Pago Principal</label>
+						<div class="col-sm-6">
+							<input type="text" th:field="*{pagoPrincipal}" class="form-control"
+								   pattern="^\d*(\.\d{1,2})?$" title="Solo se permiten números con hasta 2 decimales"
+								   required readonly/>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Pago Intereses</label>
+						<div class="col-sm-6">
+							<input type="text" th:field="*{pagoIntereses}" class="form-control" id="pagoInteres"
+								   pattern="^\d*(\.\d{1,2})?$" title="Solo se permiten números con hasta 2 decimales"
+								   required readonly/>
+						</div>
+					</div>
+
+					<div class="form-group row">
+						<label class="col-sm-2 col-form-label">Cantidad Total</label>
+						<div class="col-sm-6">
+							<input type="text" th:field="*{cantidadRestante}" class="form-control" id="cantidadRestante"
+								   pattern="^\d*(\.\d{1,2})?$" title="Solo se permiten números con hasta 2 decimales"
+								   required readonly/>
 						</div>
 					</div>
 
@@ -53,35 +109,6 @@
 					</div>
 
 					<div class="form-group row">
-						<label class="col-sm-2 col-form-label">Pago Principal</label>
-						<div class="col-sm-6">
-							<input type="text" th:field="*{pagoPrincipal}" class="form-control"
-								pattern="^\d*(\.\d{1,2})?$" title="Solo se permiten números con hasta 2 decimales"
-								required />
-						</div>
-					</div>
-
-					<div class="form-group row">
-						<label class="col-sm-2 col-form-label">Pago Intereses</label>
-						<div class="col-sm-6">
-							<input type="text" th:field="*{pagoIntereses}" class="form-control"
-								pattern="^\d*(\.\d{1,2})?$" title="Solo se permiten números con hasta 2 decimales"
-								required />
-						</div>
-					</div>
-
-					<div class="form-group row">
-						<label class="col-sm-2 col-form-label">Tipo Interes</label>
-						<div class="col-sm-6">
-							<select class="form-control" th:field="*{tipoInteres}" required>
-								<option th:each="tipoInteres: ${tipoIntereses}" th:value="${tipoInteres.idTipoInteres}"
-									th:text="${tipoInteres.nombre}">
-								</option>
-							</select>
-						</div>
-					</div>
-
-					<div class="form-group row">
 						<label class="col-sm-2 col-form-label">Tipo Cobros</label>
 						<div class="col-sm-6">
 							<select class="form-control" th:field="*{tipoCobros}" required>
@@ -90,6 +117,7 @@
 							</select>
 						</div>
 					</div>
+
 					<div class="form-group row">
 						<label class="col-sm-2 col-form-label">Periodicidad</label>
 						<div class="col-sm-6">
@@ -111,17 +139,6 @@
 					</div>
 
 					<div class="form-group row">
-						<label class="col-sm-2 col-form-label">Facility</label>
-						<div class="col-sm-6">
-							<select class="form-control" th:field="*{facility}" id="facility" required>
-								<option th:each="facility: ${facilities}" th:value="${facility.idFacility}"
-									th:text="${facility.idFacility}">
-								</option>
-							</select>
-						</div>
-					</div>
-
-					<div class="form-group row">
 						<div class="col-sm-6">
 							<input type="submit" th:value="${buttonText}" class="btn btn-secondary" />
 						</div>
@@ -137,14 +154,12 @@
 		<a href="/outstanding" class="btn btn-warning btn-xs">Volver</a>
 	</div>
 
-	<script>
+	<script th:inline="javascript">
 		function cargarDineroFacility() {
 			var facility = document.getElementById("facility");
 			fetch('http://localhost:8080/outstanding/create/dinero/' + facility.value).then(response => response.json()).then(dinero => {
-				var textoPrincipal = document.getElementById("cantidadRestante")
-				var textoSecundario = document.getElementById("cantidadRestante2")
+				var textoPrincipal = document.getElementById("cantidadDisponible")
 				textoPrincipal.value = dinero
-				textoSecundario.value = dinero
 			})
 
 		}
@@ -152,6 +167,36 @@
 			cargarDineroFacility()
 			var select = document.getElementById("facility");
 			select.addEventListener('change', cargarDineroFacility)
+		}
+
+		document.addEventListener("DOMContentLoaded", function () {
+			var cantidadPagar = document.getElementById("cantidadPagar");
+			var select = document.getElementById("tipoInteres");
+			cantidadPagar.addEventListener('input', calculoTotalOutstanding)
+			select.addEventListener('change', calculoTotalOutstanding)
+		});
+
+		function calculoTotalOutstanding(){
+			var cantidadPagar = document.getElementById("cantidadPagar").value;
+			var tipoInteres = document.getElementById("tipoInteres").value;
+			var pagoPrincipal = document.getElementById("pagoPrincipal");
+			var pagoInteres = document.getElementById("pagoInteres");
+			var cantidadRestante = document.getElementById("cantidadRestante");
+
+			var listaIntereses = [[${tipoIntereses}]];
+
+			var interesEncontrado = null;
+			for (var i = 0; i < listaIntereses.length; i++) {
+				if (listaIntereses[i].idTipoInteres == tipoInteres) {
+					interesEncontrado = listaIntereses[i];
+					break; // Termina el bucle cuando se encuentra el interés
+				}
+			}
+
+
+			pagoPrincipal.value = cantidadPagar;
+			pagoInteres.value = parseFloat(cantidadPagar) * interesEncontrado.valor;
+			cantidadRestante.value = parseFloat(cantidadPagar) +  parseFloat(pagoInteres.value);
 		}
 
 	</script>
