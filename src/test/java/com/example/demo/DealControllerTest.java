@@ -74,8 +74,8 @@ public class DealControllerTest {
 		mvc = MockMvcBuilders.standaloneSetup(dealController).build();
 	}
 
-	private DealEntity crearDeal(int idDeal, Object estado, double cantidadPrestamo, double cantidadAbonada,
-			double cantidadAPagar, Object moneda, Object tipo, byte descuento, int cliente, int creadoPor,
+	private DealEntity crearDeal(int idDeal, String estado, double cantidadPrestamo, double cantidadAbonada,
+			double cantidadAPagar, String moneda, String tipo, byte descuento, int cliente, int creadoPor,
 			Integer aprobadoPor, Integer cerradoPor) {
 		DealEntity deal = new DealEntity();
 		deal.setIdDeal(idDeal);

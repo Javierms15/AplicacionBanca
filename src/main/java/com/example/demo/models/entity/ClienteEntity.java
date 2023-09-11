@@ -1,8 +1,6 @@
 package com.example.demo.models.entity;
 
-import com.example.demo.models.dao.IBancoDao;
 import jakarta.persistence.*;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Objects;
 

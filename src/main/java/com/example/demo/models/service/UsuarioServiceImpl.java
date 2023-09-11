@@ -38,6 +38,8 @@ public class UsuarioServiceImpl implements IUsuarioService {
 		usuarioDao.deleteById(id);
 	}
 
+	@Override
+	@Transactional(readOnly = true)
 	public UsuarioEntity existeUsuario(String nombre, String contrasena) {
 		return usuarioDao.findUsuarioEntityByNombreAndAndContrasena(nombre, contrasena);
 	}

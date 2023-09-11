@@ -14,10 +14,10 @@ public class FacilityEntity {
     private int idFacility;
     @Basic
     @Column(name = "tipo")
-    private Object tipo;
+    private String tipo;
     @Basic
     @Column(name = "estado")
-    private Object estado;
+    private String estado;
     @Basic
     @Column(name = "cantidad")
     private double cantidad;
@@ -42,19 +42,19 @@ public class FacilityEntity {
         this.idFacility = idFacility;
     }
 
-    public Object getTipo() {
+    public String getTipo() {
         return tipo;
     }
 
-    public void setTipo(Object tipo) {
+    public void setTipo(String tipo) {
         this.tipo = tipo;
     }
 
-    public Object getEstado() {
+    public String getEstado() {
         return estado;
     }
 
-    public void setEstado(Object estado) {
+    public void setEstado(String estado) {
         this.estado = estado;
     }
 

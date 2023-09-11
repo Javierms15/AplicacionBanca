@@ -19,7 +19,7 @@ public class UsuarioEntity {
 	private String contrasena;
 	@Basic
 	@Column(name = "rol")
-	private Object rol;
+	private String rol;
 	@Basic
 	@Column(name = "banco")
 	private Integer banco;
@@ -48,11 +48,11 @@ public class UsuarioEntity {
 		this.contrasena = contrasena;
 	}
 
-	public Object getRol() {
+	public String getRol() {
 		return rol;
 	}
 
-	public void setRol(Object rol) {
+	public void setRol(String rol) {
 		this.rol = rol;
 	}
 

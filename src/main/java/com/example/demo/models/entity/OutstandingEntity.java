@@ -35,10 +35,10 @@ public class OutstandingEntity {
 	private int tipoInteres;
 	@Basic
 	@Column(name = "tipo_cobros")
-	private Object tipoCobros;
+	private String tipoCobros;
 	@Basic
 	@Column(name = "periodicidad")
-	private Object periodicidad;
+	private String periodicidad;
 	@Basic
 	@Column(name = "cantidad_cobro_periodico")
 	private double cantidadCobroPeriodico;
@@ -110,19 +110,19 @@ public class OutstandingEntity {
 		this.tipoInteres = tipoInteres;
 	}
 
-	public Object getTipoCobros() {
+	public String getTipoCobros() {
 		return tipoCobros;
 	}
 
-	public void setTipoCobros(Object tipoCobros) {
+	public void setTipoCobros(String tipoCobros) {
 		this.tipoCobros = tipoCobros;
 	}
 
-	public Object getPeriodicidad() {
+	public String getPeriodicidad() {
 		return periodicidad;
 	}
 
-	public void setPeriodicidad(Object periodicidad) {
+	public void setPeriodicidad(String periodicidad) {
 		this.periodicidad = periodicidad;
 	}
 

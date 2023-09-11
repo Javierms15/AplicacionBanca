@@ -22,7 +22,7 @@ public class TransaccionEntity {
     private int idBanco;
     @Basic
     @Column(name = "tipo_transaccion")
-    private Object tipoTransaccion;
+    private String tipoTransaccion;
     @Basic
     @Column(name = "outstanding")
     private int outstanding;
@@ -59,11 +59,11 @@ public class TransaccionEntity {
         this.idBanco = idBanco;
     }
 
-    public Object getTipoTransaccion() {
+    public String getTipoTransaccion() {
         return tipoTransaccion;
     }
 
-    public void setTipoTransaccion(Object tipoTransaccion) {
+    public void setTipoTransaccion(String tipoTransaccion) {
         this.tipoTransaccion = tipoTransaccion;
     }
 

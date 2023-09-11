@@ -13,7 +13,7 @@ public class DealEntity {
 	private int idDeal;
 	@Basic
 	@Column(name = "estado")
-	private Object estado;
+	private String estado;
 	@Basic
 	@Column(name = "cantidad_prestamo")
 	private double cantidadPrestamo;
@@ -25,10 +25,10 @@ public class DealEntity {
 	private double cantidadAPagar;
 	@Basic
 	@Column(name = "moneda")
-	private Object moneda;
+	private String moneda;
 	@Basic
 	@Column(name = "tipo")
-	private Object tipo;
+	private String tipo;
 	@Basic
 	@Column(name = "descuento")
 	private byte descuento;
@@ -77,11 +77,11 @@ public class DealEntity {
 		this.idDeal = idDeal;
 	}
 
-	public Object getEstado() {
+	public String getEstado() {
 		return estado;
 	}
 
-	public void setEstado(Object estado) {
+	public void setEstado(String estado) {
 		this.estado = estado;
 	}
 
@@ -109,19 +109,19 @@ public class DealEntity {
 		this.cantidadAPagar = cantidadAPagar;
 	}
 
-	public Object getMoneda() {
+	public String getMoneda() {
 		return moneda;
 	}
 
-	public void setMoneda(Object moneda) {
+	public void setMoneda(String moneda) {
 		this.moneda = moneda;
 	}
 
-	public Object getTipo() {
+	public String getTipo() {
 		return tipo;
 	}
 
-	public void setTipo(Object tipo) {
+	public void setTipo(String tipo) {
 		this.tipo = tipo;
 	}
 

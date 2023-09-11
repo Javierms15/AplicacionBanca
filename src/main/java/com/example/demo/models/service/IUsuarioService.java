@@ -17,4 +17,6 @@ public interface IUsuarioService {
 	List<UsuarioEntity> findByBancoWithDifferentId(int idBanco, int idUsuario);
     
     List<UsuarioEntity> findWithDifferentId(int idUsuario);
+    
+    public UsuarioEntity existeUsuario(String nombre, String contrasena);
 }

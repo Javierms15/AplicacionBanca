@@ -8,28 +8,28 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class BancoServiceImpl implements IBancoService{
+public class BancoServiceImpl implements IBancoService {
 
-    @Autowired
-    private IBancoDao bancoDao;
+	@Autowired
+	private IBancoDao bancoDao;
 
-    @Override
-    public List<BancoEntity> findAll() {
-        return (List<BancoEntity>) bancoDao.findAll();
-    }
+	@Override
+	public List<BancoEntity> findAll() {
+		return (List<BancoEntity>) bancoDao.findAll();
+	}
 
-    @Override
-    public BancoEntity findOne(int id) {
-        return null;
-    }
+	@Override
+	public BancoEntity findOne(int id) {
+		return bancoDao.findById(id).orElse(null);
+	}
 
-    @Override
-    public void save(BancoEntity banco) {
+	@Override
+	public void save(BancoEntity banco) {
+		bancoDao.save(banco);
+	}
 
-    }
+	@Override
+	public void delete(int id) {
 
-    @Override
-    public void delete(int id) {
-
-    }
+	}
 }
