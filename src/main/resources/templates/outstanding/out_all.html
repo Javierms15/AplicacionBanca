@@ -173,14 +173,15 @@
 						<td th:text="${out.periodicidad}"></td>
 						<td th:text="${out.cantidadCobroPeriodico}"></td>
 						<td th:text="${out.facility}"></td>
-						<td th:if="${out.tipoCobros == 'MANUAL' && out.pagoPrincipal != 0}"><a
-								th:href="@{/outstanding/pago/} + ${out.idOutstanding}"
-								class="btn btn-secondary btn-xs">Realizar
-								Pago</a></td>
+
 						<td><a th:href="@{/outstanding/edit/} + ${out.idOutstanding}"
 								class="btn btn-info btn-xs">Editar</a></td>
 						<td><a th:href="@{/outstanding/delete/} + ${out.idOutstanding}"
 								class="btn btn-danger btn-xs">Borrar</a></td>
+						<td th:if="${out.tipoCobros == 'MANUAL' && out.pagoPrincipal != 0}"><a
+								th:href="@{/outstanding/pago/} + ${out.idOutstanding}"
+								class="btn btn-secondary btn-xs">Realizar
+							Pago</a></td>
 					</tr>
 				</tbody>
 			</table>
