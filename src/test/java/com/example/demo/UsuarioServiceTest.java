@@ -2,6 +2,7 @@ package com.example.demo;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -27,8 +28,14 @@ public class UsuarioServiceTest {
 	@Autowired
 	private IUsuarioService usuarioService;
 
+	private List<UsuarioEntity> usuarios;
+
 	@BeforeEach
 	public void setup() {
+		if (usuarios != null && usuarios.size() != 0) {
+			return;
+		}
+
 		UsuarioEntity usuario = new UsuarioEntity();
 		usuario.setNombre("admin");
 		usuario.setContrasena("admin");
@@ -36,6 +43,7 @@ public class UsuarioServiceTest {
 		usuarioService.save(usuario);
 
 		UsuarioEntity usuario2 = new UsuarioEntity();
+		usuario2.setIdUsuario(2);
 		usuario2.setNombre("a");
 		usuario2.setContrasena("a");
 		usuario2.setRol("BANCA");
@@ -43,11 +51,17 @@ public class UsuarioServiceTest {
 		usuarioService.save(usuario2);
 
 		UsuarioEntity usuario3 = new UsuarioEntity();
+		usuario3.setIdUsuario(3);
 		usuario3.setNombre("b");
 		usuario3.setContrasena("b");
 		usuario3.setRol("BANCA");
 		usuario3.setBanco(2);
 		usuarioService.save(usuario3);
+
+		usuarios = new ArrayList<>();
+		usuarios.add(usuarioService.findByName("admin"));
+		usuarios.add(usuarioService.findByName("a"));
+		usuarios.add(usuarioService.findByName("b"));
 	}
 
 	@Test
@@ -60,22 +74,47 @@ public class UsuarioServiceTest {
 	@Test
 	@Transactional
 	public void encuentraUnoIdIncorrecto() {
-		UsuarioEntity usuario = usuarioService.findOne(4);
+		UsuarioEntity usuario = usuarioService.findOne(100);
 		assertThat(usuario).isNull();
 	}
 
 	@Test
 	@Transactional
 	public void encuentraUnoIdCorrecto() {
-		UsuarioEntity usuario = usuarioService.findOne(1);
-		assertThat(usuario).isNotNull();
+		UsuarioEntity expectedUsuario = usuarios.get(0);
+		UsuarioEntity obtainedUsuario = usuarioService.findOne(expectedUsuario.getIdUsuario());
+		assertThat(obtainedUsuario).isNotNull();
+		assertThat(obtainedUsuario.getIdUsuario()).isEqualTo(expectedUsuario.getIdUsuario());
+		assertThat(obtainedUsuario.getNombre()).isEqualTo(expectedUsuario.getNombre());
+		assertThat(obtainedUsuario.getContrasena()).isEqualTo(expectedUsuario.getContrasena());
+		assertThat(obtainedUsuario.getRol()).isEqualTo(expectedUsuario.getRol());
 	}
 
 	@Test
 	@Transactional
-	public void encuentraPorNombreYContraseña() {
-		UsuarioEntity usuario = usuarioService.existeUsuario("admin", "admin");
-		assertThat(usuario).isNotNull();
+	public void encuentraPorNombreIncorrecto() {
+		UsuarioEntity usuario = usuarioService.existeUsuario("admon", "admin");
+		assertThat(usuario).isNull();
+	}
+
+	@Test
+	@Transactional
+	public void encuentraPorContraseñaIncorrecta() {
+		UsuarioEntity usuario = usuarioService.existeUsuario("admin", "admon");
+		assertThat(usuario).isNull();
+	}
+
+	@Test
+	@Transactional
+	public void encuentraPorNombreYContraseñaCorrectamente() {
+		UsuarioEntity expectedUsuario = usuarios.get(0);
+		UsuarioEntity obtainedUsuario = usuarioService.existeUsuario(expectedUsuario.getNombre(),
+				expectedUsuario.getContrasena());
+		assertThat(obtainedUsuario).isNotNull();
+		assertThat(obtainedUsuario.getIdUsuario()).isEqualTo(expectedUsuario.getIdUsuario());
+		assertThat(obtainedUsuario.getNombre()).isEqualTo(expectedUsuario.getNombre());
+		assertThat(obtainedUsuario.getContrasena()).isEqualTo(expectedUsuario.getContrasena());
+		assertThat(obtainedUsuario.getRol()).isEqualTo(expectedUsuario.getRol());
 	}
 
 	@Test
@@ -91,4 +130,22 @@ public class UsuarioServiceTest {
 		assertThat(usuario2).isNotNull();
 	}
 
+	@Test
+	@Transactional
+	public void eliminaUsuarioIdIncorrecto() {
+		usuarioService.delete(100);
+		List<UsuarioEntity> usuarios = usuarioService.findAll();
+		assertThat(usuarios.size()).isEqualTo(3);
+	}
+
+	@Test
+	@Transactional
+	public void eliminaUsuarioCorrectamente() {
+		int indice = usuarios.get(1).getIdUsuario();
+		usuarioService.delete(indice);
+		List<UsuarioEntity> usuariosAll = usuarioService.findAll();
+		assertThat(usuariosAll.size()).isEqualTo(2);
+		UsuarioEntity usuario = usuarioService.findOne(indice);
+		assertThat(usuario).isNull();
+	}
 }

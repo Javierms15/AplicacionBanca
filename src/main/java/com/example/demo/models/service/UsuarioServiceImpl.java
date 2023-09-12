@@ -55,4 +55,10 @@ public class UsuarioServiceImpl implements IUsuarioService {
 	public List<UsuarioEntity> findWithDifferentId(int idUsuario) {
 		return usuarioDao.findByIdUsuarioIsNot(idUsuario);
 	}
+
+	@Override
+	@Transactional(readOnly = true)
+	public UsuarioEntity findByName(String nombre) {
+		return usuarioDao.findByNombre(nombre);
+	}
 }

@@ -73,6 +73,7 @@ public class FacilityServiceImpl implements  IFacilityService{
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<FacilityEntity> findByBancoUsuario(UsuarioEntity usuario) {
         return facilityDao.findByBancoUsuario(usuario.getBanco());
     }

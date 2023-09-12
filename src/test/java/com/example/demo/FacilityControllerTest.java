@@ -21,11 +21,8 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -37,6 +34,7 @@ public class FacilityControllerTest {
 
 	private UsuarioEntity usuarioAdmin;
 	private UsuarioEntity usuarioBancoSantander;
+	private UsuarioEntity usuarioBancoCaixa;
 	private List<BancoEntity> allBancos;
 
 	private List<FacilityEntity> allFacilities;
@@ -107,6 +105,9 @@ public class FacilityControllerTest {
 		usuarioBancoSantander = new UsuarioEntity();
 		usuarioBancoSantander.setRol("BANCA");
 		usuarioBancoSantander.setBanco(allBancos.get(0).getIdBanco());
+		usuarioBancoCaixa = new UsuarioEntity();
+		usuarioBancoCaixa.setRol("BANCA");
+		usuarioBancoCaixa.setBanco(allBancos.get(2).getIdBanco());
 		mvc = MockMvcBuilders.standaloneSetup(facilityController).build();
 	}
 
@@ -130,14 +131,35 @@ public class FacilityControllerTest {
 	}
 
 	@Test
+	public void creaFacilitySinPermiso() throws Exception {
+		FacilityEntity facility = crearFacility(1, "TERM", "PENDING", 10, new Date(2023, 9, 22), new Date(2023, 9, 21),
+				new Date(2023, 9, 22), 2);
+		DealEntity deal = crearDeal(facility.getDeal(), "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3,
+				null, null);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
+		when(dealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(false);
+
+		MockHttpServletResponse response = mvc
+				.perform(post("/crearFacility").sessionAttr("usuario", usuarioBancoSantander)
+						.content(facility.toString()).contentType(MediaType.APPLICATION_FORM_URLENCODED))
+				.andExpect(flash().attribute("error", "No tiene permiso para crear esa facility")).andReturn()
+				.getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarFacility");
+
+	}
+
+	@Test
 	public void creaFacilityMalFechaCreacion() throws Exception {
 		FacilityEntity facility = crearFacility(1, "TERM", "PENDING", 10, new Date(2023, 9, 22), new Date(2023, 9, 21),
 				new Date(2023, 9, 22), 2);
 		DealEntity deal = crearDeal(1, "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3, null, null);
-		when(dealService.findOne(2)).thenReturn(deal);
+		when(dealService.puedeEditar(usuarioAdmin, deal)).thenReturn(true);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
 
 		MockHttpServletResponse response = mvc
-				.perform(post("/crearFacility").content(facility.toString())
+				.perform(post("/crearFacility").sessionAttr("usuario", usuarioAdmin).content(facility.toString())
 						.contentType(MediaType.APPLICATION_FORM_URLENCODED))
 				.andExpect(model().attribute("error", "La fecha de creación no es válida")).andReturn().getResponse();
 
@@ -150,11 +172,13 @@ public class FacilityControllerTest {
 	public void creaFacilityMalFechaFinalizacion() throws Exception {
 		FacilityEntity facility = crearFacility(1, "TERM", "PENDING", 10, new Date(2023, 9, 22), new Date(2023, 9, 22),
 				new Date(2023, 9, 20), 2);
-		DealEntity deal = crearDeal(1, "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3, null, null);
-		when(dealService.findOne(2)).thenReturn(deal);
+		DealEntity deal = crearDeal(facility.getDeal(), "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3,
+				null, null);
+		when(dealService.puedeEditar(usuarioAdmin, deal)).thenReturn(true);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
 
 		MockHttpServletResponse response = mvc
-				.perform(post("/crearFacility").content(facility.toString())
+				.perform(post("/crearFacility").sessionAttr("usuario", usuarioAdmin).content(facility.toString())
 						.contentType(MediaType.APPLICATION_FORM_URLENCODED))
 				.andExpect(model().attribute("error", "La fecha efectiva no es válida")).andReturn().getResponse();
 
@@ -167,16 +191,199 @@ public class FacilityControllerTest {
 	public void creaFacilityMalFechaEfectiva() throws Exception {
 		FacilityEntity facility = crearFacility(1, "TERM", "PENDING", 10, new Date(2023, 9, 22), new Date(2023, 9, 21),
 				new Date(2023, 9, 22), 2);
-		DealEntity deal = crearDeal(1, "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3, null, null);
-		when(dealService.findOne(2)).thenReturn(deal);
+		DealEntity deal = crearDeal(facility.getDeal(), "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3,
+				null, null);
+		when(dealService.puedeEditar(usuarioAdmin, deal)).thenReturn(true);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
 
 		MockHttpServletResponse response = mvc
-				.perform(post("/crearFacility").content(facility.toString())
+				.perform(post("/crearFacility").sessionAttr("usuario", usuarioAdmin).content(facility.toString())
 						.contentType(MediaType.APPLICATION_FORM_URLENCODED))
 				.andExpect(model().attribute("error", "La fecha de creación no es válida")).andReturn().getResponse();
 
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
 		assertThat(response.getForwardedUrl()).isEqualTo("facility/facility");
+
+	}
+
+	@Test
+	public void creaFacilitySuperiorDineroTotalDeal() throws Exception {
+		FacilityEntity facility = crearFacility(1, "TERM", "PENDING", 10, new Date(2023, 9, 20), new Date(2023, 9, 21),
+				new Date(2023, 9, 22), 2);
+		DealEntity deal = crearDeal(facility.getDeal(), "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3,
+				null, null);
+		when(dealService.puedeEditar(usuarioAdmin, deal)).thenReturn(true);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
+		when(facilityDao.obtenerSumaFacilityDeal(facility.getDeal())).thenReturn(2000.0);
+
+		Double sumaTotalAcumulada = facilityDao.obtenerSumaFacilityDeal(facility.getDeal()) == null ? 0
+				: facilityDao.obtenerSumaFacilityDeal(facility.getDeal());
+		Double totalPrestamoDeal = dealService.findOne(facility.getDeal()).getCantidadPrestamo();
+
+		MockHttpServletResponse response = mvc
+				.perform(post("/crearFacility").sessionAttr("usuario", usuarioAdmin).content(facility.toString())
+						.contentType(MediaType.APPLICATION_FORM_URLENCODED))
+				.andExpect(model().attribute("error", "La cantidad total de la facility no puede superar los "
+						+ (totalPrestamoDeal - sumaTotalAcumulada)))
+				.andReturn().getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+		assertThat(response.getForwardedUrl()).isEqualTo("facility/facility");
+
+	}
+
+	@Test
+	public void creaFacilityCorrectamente() throws Exception {
+		FacilityEntity facility = crearFacility(1, "TERM", "PENDING", 10, new Date(2023, 9, 20), new Date(2023, 9, 21),
+				new Date(2023, 9, 22), 2);
+		DealEntity deal = crearDeal(facility.getDeal(), "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3,
+				null, null);
+		when(dealService.puedeEditar(usuarioAdmin, deal)).thenReturn(true);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
+		when(facilityDao.obtenerSumaFacilityDeal(facility.getDeal())).thenReturn(80.0);
+
+		MockHttpServletResponse response = mvc
+				.perform(post("/crearFacility").sessionAttr("usuario", usuarioAdmin).content(facility.toString())
+						.contentType(MediaType.APPLICATION_FORM_URLENCODED))
+				.andExpect(flash().attribute("success", "Facility creada correctamente")).andReturn().getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarFacility");
+
+	}
+
+	@Test
+	public void editarFacilitySinPermiso() throws Exception {
+		FacilityEntity facility = crearFacility(1, "TERM", "PENDING", 10, new Date(2023, 9, 22), new Date(2023, 9, 21),
+				new Date(2023, 9, 22), 2);
+		DealEntity deal = crearDeal(facility.getDeal(), "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3,
+				null, null);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
+		when(dealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(false);
+
+		MockHttpServletResponse response = mvc
+				.perform(post("/editarFacilitySave").sessionAttr("usuario", usuarioBancoSantander)
+						.content(facility.toString()).contentType(MediaType.APPLICATION_FORM_URLENCODED))
+				.andExpect(flash().attribute("error", "No tiene permiso para editar esa facility")).andReturn()
+				.getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarFacility");
+
+	}
+
+	@Test
+	public void editarFacilityMalFechaCreacion() throws Exception {
+		FacilityEntity facility = crearFacility(1, "TERM", "PENDING", 10, new Date(2023, 9, 22), new Date(2023, 9, 21),
+				new Date(2023, 9, 22), 2);
+		DealEntity deal = crearDeal(1, "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3, null, null);
+		when(iFacilityService.findOne(facility.getIdFacility())).thenReturn(facility);
+		when(dealService.puedeEditar(usuarioAdmin, deal)).thenReturn(true);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
+
+		MockHttpServletResponse response = mvc
+				.perform(post("/editarFacilitySave").sessionAttr("usuario", usuarioAdmin).content(facility.toString())
+						.contentType(MediaType.APPLICATION_FORM_URLENCODED))
+				.andExpect(model().attribute("error", "La fecha de creación no es válida")).andReturn().getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+		assertThat(response.getForwardedUrl()).isEqualTo("facility/facility");
+
+	}
+
+	@Test
+	public void editarFacilityMalFechaEfectiva() throws Exception {
+		FacilityEntity facility = crearFacility(1, "TERM", "PENDING", 10, new Date(2023, 9, 22), new Date(2023, 9, 21),
+				new Date(2023, 9, 22), 2);
+		DealEntity deal = crearDeal(1, "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3, null, null);
+		when(iFacilityService.findOne(facility.getIdFacility())).thenReturn(facility);
+		when(dealService.puedeEditar(usuarioAdmin, deal)).thenReturn(true);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
+
+		MockHttpServletResponse response = mvc
+				.perform(post("/editarFacilitySave").sessionAttr("usuario", usuarioAdmin).content(facility.toString())
+						.contentType(MediaType.APPLICATION_FORM_URLENCODED))
+				.andExpect(model().attribute("error", "La fecha de creación no es válida")).andReturn().getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+		assertThat(response.getForwardedUrl()).isEqualTo("facility/facility");
+
+	}
+
+	@Test
+	public void editarFacilityMalFechaFinalizacion() throws Exception {
+		FacilityEntity facility = crearFacility(1, "TERM", "PENDING", 10, new Date(2023, 9, 21), new Date(2023, 9, 21),
+				new Date(2023, 9, 20), 2);
+		DealEntity deal = crearDeal(1, "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3, null, null);
+		when(iFacilityService.findOne(facility.getIdFacility())).thenReturn(facility);
+		when(dealService.puedeEditar(usuarioAdmin, deal)).thenReturn(true);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
+
+		MockHttpServletResponse response = mvc
+				.perform(post("/editarFacilitySave").sessionAttr("usuario", usuarioAdmin).content(facility.toString())
+						.contentType(MediaType.APPLICATION_FORM_URLENCODED))
+				.andExpect(model().attribute("error", "La fecha efectiva no es válida")).andReturn().getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+		assertThat(response.getForwardedUrl()).isEqualTo("facility/facility");
+
+	}
+
+	@Test
+	public void editarFacilitySuperiorDineroTotalDeal() throws Exception {
+		FacilityEntity facility = crearFacility(1, "TERM", "PENDING", 5, new Date(2023, 9, 20), new Date(2023, 9, 21),
+				new Date(2023, 9, 22), 2);
+		FacilityEntity facilityNew = crearFacility(1, "TERM", "PENDING", 20, new Date(2023, 9, 20),
+				new Date(2023, 9, 21), new Date(2023, 9, 22), 2);
+		DealEntity deal = crearDeal(facility.getDeal(), "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3,
+				null, null);
+		when(iFacilityService.findOne(facility.getIdFacility())).thenReturn(facility);
+		when(dealService.puedeEditar(usuarioAdmin, deal)).thenReturn(true);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
+		when(facilityDao.obtenerSumaFacilityDeal(facility.getDeal())).thenReturn(95.0);
+
+		Double sumaTotalAcumulada = facilityDao.obtenerSumaFacilityDeal(facility.getDeal()) == null ? 0
+				: facilityDao.obtenerSumaFacilityDeal(facility.getDeal());
+		sumaTotalAcumulada -= facility.getCantidad();
+		Double totalPrestamoDeal = dealService.findOne(facility.getDeal()).getCantidadPrestamo();
+
+		MockHttpServletResponse response = mvc
+				.perform(post("/editarFacilitySave").sessionAttr("usuario", usuarioAdmin)
+						.content(facilityNew.toString()).contentType(MediaType.APPLICATION_FORM_URLENCODED))
+				.andExpect(model().attribute("error", "La cantidad total de la facility no puede superar los "
+						+ (totalPrestamoDeal - sumaTotalAcumulada)))
+				.andReturn().getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+		assertThat(response.getForwardedUrl()).isEqualTo("facility/facility_edit");
+
+	}
+
+	@Test
+	public void editarFacilityCorrectamente() throws Exception {
+		FacilityEntity facility = crearFacility(1, "TERM", "PENDING", 5, new Date(2023, 9, 20), new Date(2023, 9, 21),
+				new Date(2023, 9, 22), 2);
+		FacilityEntity facilityNew = crearFacility(1, "TERM", "PENDING", 10, new Date(2023, 9, 20),
+				new Date(2023, 9, 21), new Date(2023, 9, 22), 2);
+		DealEntity deal = crearDeal(facility.getDeal(), "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3,
+				null, null);
+		when(iFacilityService.findOne(facility.getIdFacility())).thenReturn(facility);
+		when(dealService.puedeEditar(usuarioAdmin, deal)).thenReturn(true);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
+		when(facilityDao.obtenerSumaFacilityDeal(facility.getDeal())).thenReturn(95.0);
+
+		Double sumaTotalAcumulada = facilityDao.obtenerSumaFacilityDeal(facility.getDeal()) == null ? 0
+				: facilityDao.obtenerSumaFacilityDeal(facility.getDeal());
+		sumaTotalAcumulada -= facility.getCantidad();
+		Double totalPrestamoDeal = dealService.findOne(facility.getDeal()).getCantidadPrestamo();
+
+		MockHttpServletResponse response = mvc
+				.perform(post("/editarFacilitySave").sessionAttr("usuario", usuarioAdmin)
+						.content(facilityNew.toString()).contentType(MediaType.APPLICATION_FORM_URLENCODED))
+				.andExpect(flash().attribute("success", "Facility editada correctamente")).andReturn().getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarFacility");
 
 	}
 
@@ -191,7 +398,7 @@ public class FacilityControllerTest {
 	}
 
 	@Test
-	public void mostrarPantalallaListarFacilitiesAdmin() throws Exception {	
+	public void mostrarPantalallaListarFacilitiesAdmin() throws Exception {
 		MockHttpServletResponse response = mvc.perform(get("/listarFacility").sessionAttr("usuario", usuarioAdmin))
 				.andReturn().getResponse();
 
@@ -203,11 +410,136 @@ public class FacilityControllerTest {
 	@Test
 	public void mostrarPantalallaListarFacilitiesNOAdmin() throws Exception {
 
-		MockHttpServletResponse response = mvc.perform(get("/nuevaFacility")).andReturn().getResponse();
+		MockHttpServletResponse response = mvc
+				.perform(get("/listarFacility").sessionAttr("usuario", usuarioBancoSantander)).andReturn()
+				.getResponse();
 
 		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
-		assertThat(response.getForwardedUrl()).isEqualTo("facility/facility");
+		assertThat(response.getForwardedUrl()).isEqualTo("facility/facility_all");
 
 	}
 
+	@Test
+	public void eliminarFacilityIdIncorrecto() throws Exception {
+		int id = 20;
+		MockHttpServletResponse response = mvc
+				.perform(get("/eliminarFacility/" + id).sessionAttr("usuario", usuarioBancoSantander))
+				.andExpect(flash().attribute("error", "Ha intentado eliminar una facility que no existe")).andReturn()
+				.getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarFacility");
+
+	}
+
+	@Test
+	public void eliminarFacilitySinPermiso() throws Exception {
+		FacilityEntity facility = allFacilities.get(0);
+		DealEntity deal = crearDeal(facility.getDeal(), "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3,
+				null, null);
+
+		when(iFacilityService.findOne(facility.getIdFacility())).thenReturn(facility);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
+		when(dealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(false);
+
+		MockHttpServletResponse response = mvc
+				.perform(get("/eliminarFacility/" + facility.getIdFacility()).sessionAttr("usuario",
+						usuarioBancoSantander))
+				.andExpect(flash().attribute("error", "No tiene permiso para eliminar esa facility")).andReturn()
+				.getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarFacility");
+
+	}
+
+	@Test
+	public void eliminarFacilityCorrectamente() throws Exception {
+		FacilityEntity facility = allFacilities.get(0);
+		DealEntity deal = crearDeal(facility.getDeal(), "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3,
+				null, null);
+
+		when(iFacilityService.findOne(facility.getIdFacility())).thenReturn(facility);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
+		when(dealService.puedeEditar(usuarioAdmin, deal)).thenReturn(true);
+
+		MockHttpServletResponse response = mvc
+				.perform(get("/eliminarFacility/" + facility.getIdFacility()).sessionAttr("usuario", usuarioAdmin))
+				.andExpect(flash().attribute("success", "Facility eliminada correctamente")).andReturn().getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarFacility");
+
+	}
+
+	@Test
+	public void redireccionEditarFacilityIdIncorrecto() throws Exception {
+		int id = 20;
+		MockHttpServletResponse response = mvc
+				.perform(get("/editarFacility/" + id).sessionAttr("usuario", usuarioBancoSantander))
+				.andExpect(flash().attribute("error", "Ha intentado editar una facility que no existe")).andReturn()
+				.getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarFacility");
+
+	}
+
+	@Test
+	public void redireccionEditarFacilitySinPermiso() throws Exception {
+		FacilityEntity facility = allFacilities.get(0);
+		DealEntity deal = crearDeal(facility.getDeal(), "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3,
+				null, null);
+
+		when(iFacilityService.findOne(facility.getIdFacility())).thenReturn(facility);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
+		when(dealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(false);
+
+		MockHttpServletResponse response = mvc
+				.perform(get("/editarFacility/" + facility.getIdFacility()).sessionAttr("usuario",
+						usuarioBancoSantander))
+				.andExpect(flash().attribute("error", "No tiene permiso para editar esa facility")).andReturn()
+				.getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.FOUND.value());
+		assertThat(response.getHeader("Location")).isEqualTo("/listarFacility");
+
+	}
+
+	@Test
+	public void redireccionEditarFacilityCorrectamente() throws Exception {
+		FacilityEntity facility = allFacilities.get(0);
+		DealEntity deal = crearDeal(facility.getDeal(), "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 3, 3,
+				null, null);
+
+		when(iFacilityService.findOne(facility.getIdFacility())).thenReturn(facility);
+		when(dealService.findOne(facility.getDeal())).thenReturn(deal);
+		when(dealService.puedeEditar(usuarioAdmin, deal)).thenReturn(true);
+
+		MockHttpServletResponse response = mvc
+				.perform(get("/editarFacility/" + facility.getIdFacility()).sessionAttr("usuario", usuarioAdmin))
+				.andReturn().getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+		assertThat(response.getForwardedUrl()).isEqualTo("facility/facility_edit");
+
+	}
+
+	@Test
+	public void filtrarFacilitiesSiendoAdmin() throws Exception {
+		MockHttpServletResponse response = mvc.perform(get("/filtrarFacility").sessionAttr("usuario", usuarioAdmin))
+				.andReturn().getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+		assertThat(response.getForwardedUrl()).isEqualTo("facility/facility_all");
+	}
+
+	@Test
+	public void filtrarFacilitiesSinSerAdmin() throws Exception {
+		MockHttpServletResponse response = mvc
+				.perform(get("/filtrarFacility").sessionAttr("usuario", usuarioBancoCaixa)).andReturn().getResponse();
+
+		assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+		assertThat(response.getForwardedUrl()).isEqualTo("facility/facility_all");
+	}
 }

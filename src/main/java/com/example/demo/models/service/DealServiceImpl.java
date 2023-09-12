@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.demo.models.dao.DealCustom;
 import com.example.demo.models.dao.IDealDao;
 import com.example.demo.models.entity.DealEntity;
+import com.example.demo.models.entity.UsuarioEntity;
 
 @Service
 public class DealServiceImpl implements IDealService {
@@ -18,6 +19,9 @@ public class DealServiceImpl implements IDealService {
 
 	@Autowired
 	private DealCustom dealCustom;
+	
+	@Autowired
+	private IUsuarioService usuarioService;
 
 	@Override
 	@Transactional(readOnly = true)
@@ -56,6 +60,26 @@ public class DealServiceImpl implements IDealService {
 
 		return dealCustom.filtradoDeal(idBanco, estado, moneda, tipo, cliente, cantidadPrestamo, cantidadAbonada,
 				cantidadAPagar, descuento, creadoPor);
+	}
+	
+	public boolean puedeEditar(UsuarioEntity usuario, DealEntity deal) {
+		// Si es admin siempre puede editar
+		if (usuario.getRol().equals("ADMIN")) {
+			return true;
+		}
+
+		UsuarioEntity creadoPor = usuarioService.findOne(deal.getCreadoPor());
+		if (creadoPor == null) {
+			return false;
+		}
+
+		// Si lo ha creado un admin cualquiera puede editarlo
+		if (creadoPor.getRol().equals("ADMIN")) {
+			return true;
+		}
+
+		// Si no, sólo puede si es del mismo banco
+		return creadoPor.getBanco() == usuario.getBanco();
 	}
 
 }

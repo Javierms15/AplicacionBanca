@@ -76,98 +76,6 @@ public class DealController {
 		return "deal/deal_all";
 	}
 
-	public class DealFilter {
-		private String estado;
-		private String moneda;
-		private String tipo;
-		private String cliente;
-		private String cantidadPrestamo;
-		private String cantidadAbonada;
-		private String cantidadAPagar;
-		private String descuento;
-		private String creadoPor;
-
-		public String getEstado() {
-			return estado;
-		}
-
-		public void setEstado(String estado) {
-			this.estado = estado;
-		}
-
-		public String getMoneda() {
-			return moneda;
-		}
-
-		public void setMoneda(String moneda) {
-			this.moneda = moneda;
-		}
-
-		public String getTipo() {
-			return tipo;
-		}
-
-		public void setTipo(String tipo) {
-			this.tipo = tipo;
-		}
-
-		public String getCliente() {
-			return cliente;
-		}
-
-		public void setCliente(String cliente) {
-			this.cliente = cliente;
-		}
-
-		public String getCantidadPrestamo() {
-			return cantidadPrestamo;
-		}
-
-		public void setCantidadPrestamo(String cantidadPrestamo) {
-			this.cantidadPrestamo = cantidadPrestamo;
-		}
-
-		public String getCantidadAbonada() {
-			return cantidadAbonada;
-		}
-
-		public void setCantidadAbonada(String cantidadAbonada) {
-			this.cantidadAbonada = cantidadAbonada;
-		}
-
-		public String getCantidadAPagar() {
-			return cantidadAPagar;
-		}
-
-		public void setCantidadAPagar(String cantidadAPagar) {
-			this.cantidadAPagar = cantidadAPagar;
-		}
-
-		public String getDescuento() {
-			return descuento;
-		}
-
-		public void setDescuento(String descuento) {
-			this.descuento = descuento;
-		}
-
-		public String getCreadoPor() {
-			return creadoPor;
-		}
-
-		public void setCreadoPor(String creadoPor) {
-			this.creadoPor = creadoPor;
-		}
-
-		@Override
-		public String toString() {
-			return "estado=" + estado + '&' + "moneda=" + moneda + '&' + "tipo=" + tipo + '&' + "cliente=" + cliente
-					+ '&' + "cantidadPrestamo=" + cantidadPrestamo + '&' + "cantidadAbonada=" + cantidadAbonada + '&'
-					+ "cantidadAPagar=" + cantidadAPagar + '&' + "descuento=" + descuento + '&' + "creadoPor="
-					+ creadoPor;
-		}
-	}
-
 	@PostMapping({ "", "/" })
 	public String ver_todos(DealFilter filter, Model model, HttpSession session) {
 		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
@@ -193,12 +101,12 @@ public class DealController {
 		}
 
 		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
-		if (!puedeEditar(usuario, deal)) {
+		if (!dealService.puedeEditar(usuario, deal)) {
 			flash.addFlashAttribute("error", "No tiene permiso para ver el deal");
 			return "redirect:/deal";
 		}
 
-		if (((String) deal.getEstado()).equals("APPROVED")) {
+		if (deal.getEstado().equals("APPROVED")) {
 			List<UsuarioEntity> usuarios;
 			if (((String) usuario.getRol()).equals("ADMIN")) {
 				usuarios = usuarioService.findWithDifferentId(usuario.getIdUsuario());
@@ -484,40 +392,19 @@ public class DealController {
 				model.addAttribute("bancos", bancos);
 
 				model.addAttribute("agente", agenteId);
-				
+
 				return new String[] { "deal/deal_form", "error", "La suma del porcentaje de participación debe ser 1" };
 			}
 		}
 		return null;
 	}
 
-	private boolean puedeEditar(UsuarioEntity usuario, DealEntity deal) {
-		// Si es admin siempre puede editar
-		if (((String) usuario.getRol()).equals("ADMIN")) {
-			return true;
-		}
-
-		UsuarioEntity creadoPor = usuarioService.findOne(deal.getCreadoPor());
-		if (creadoPor == null) {
-			// TODO: Esto no deberia ocurrir
-			return false;
-		}
-
-		// Si es admin cualquiera puede editarlo
-		if (((String) creadoPor.getRol()).equals("ADMIN")) {
-			return true;
-		}
-
-		// Si no, sólo puede si es del mismo banco
-		return creadoPor.getBanco() == usuario.getBanco();
-	}
-
 	private boolean puedeCerrar(UsuarioEntity usuario, DealEntity deal) {
-		if (!puedeEditar(usuario, deal)) {
+		if (!dealService.puedeEditar(usuario, deal)) {
 			return false;
 		}
 
-		if (!((String) deal.getEstado()).equals("APPROVED")) {
+		if (!deal.getEstado().equals("APPROVED")) {
 			return false;
 		}
 
@@ -532,7 +419,7 @@ public class DealController {
 			return "redirect:/deal";
 		}
 
-		if (puedeEditar((UsuarioEntity) session.getAttribute("usuario"), deal)) {
+		if (dealService.puedeEditar((UsuarioEntity) session.getAttribute("usuario"), deal)) {
 			if (((String) deal.getEstado()).equals("PENDING")) {
 				deal.setEstado("APPROVED");
 				deal.setAprobadoPor(((UsuarioEntity) session.getAttribute("usuario")).getIdUsuario());
@@ -592,7 +479,7 @@ public class DealController {
 			return "redirect:/deal";
 		}
 
-		if (puedeEditar((UsuarioEntity) session.getAttribute("usuario"), deal)) {
+		if (dealService.puedeEditar((UsuarioEntity) session.getAttribute("usuario"), deal)) {
 			dealService.delete(id);
 			flash.addFlashAttribute("success", "Deal eliminado correctamente");
 		} else {
@@ -610,12 +497,12 @@ public class DealController {
 			return "redirect:/deal";
 		}
 
-		if (!puedeEditar((UsuarioEntity) session.getAttribute("usuario"), deal)) {
+		if (!dealService.puedeEditar((UsuarioEntity) session.getAttribute("usuario"), deal)) {
 			flash.addFlashAttribute("error", "No tiene permiso para editar el deal");
 			return "redirect:/deal";
 		}
 
-		if (!((String) deal.getEstado()).equals("PENDING")) {
+		if (!deal.getEstado().equals("PENDING")) {
 			flash.addFlashAttribute("error", "No se puede editar el deal");
 			return "redirect:/deal";
 		}
@@ -653,7 +540,7 @@ public class DealController {
 
 		UsuarioEntity usuarioFrom = (UsuarioEntity) session.getAttribute("usuario");
 
-		if (!puedeEditar(usuarioFrom, deal)) {
+		if (!dealService.puedeEditar(usuarioFrom, deal)) {
 			flash.addFlashAttribute("error", "No tiene permiso para editar el deal");
 			return "redirect:/deal";
 		}
@@ -671,7 +558,7 @@ public class DealController {
 			return "redirect:/deal";
 		}
 
-		if ((!((String) usuarioTo.getRol()).equals("ADMIN")) && (usuarioFrom.getBanco() != usuarioTo.getBanco())) {
+		if ((!usuarioTo.getRol().equals("ADMIN")) && usuarioFrom.getBanco() != usuarioTo.getBanco()) {
 			flash.addFlashAttribute("error", "No puede enviar una notificación a ese usuario");
 			return "redirect:/deal";
 		}
@@ -683,4 +570,97 @@ public class DealController {
 		flash.addFlashAttribute("success", "Notificación enviada correctamente");
 		return "redirect:/deal";
 	}
+
+	public class DealFilter {
+		private String estado;
+		private String moneda;
+		private String tipo;
+		private String cliente;
+		private String cantidadPrestamo;
+		private String cantidadAbonada;
+		private String cantidadAPagar;
+		private String descuento;
+		private String creadoPor;
+
+		public String getEstado() {
+			return estado;
+		}
+
+		public void setEstado(String estado) {
+			this.estado = estado;
+		}
+
+		public String getMoneda() {
+			return moneda;
+		}
+
+		public void setMoneda(String moneda) {
+			this.moneda = moneda;
+		}
+
+		public String getTipo() {
+			return tipo;
+		}
+
+		public void setTipo(String tipo) {
+			this.tipo = tipo;
+		}
+
+		public String getCliente() {
+			return cliente;
+		}
+
+		public void setCliente(String cliente) {
+			this.cliente = cliente;
+		}
+
+		public String getCantidadPrestamo() {
+			return cantidadPrestamo;
+		}
+
+		public void setCantidadPrestamo(String cantidadPrestamo) {
+			this.cantidadPrestamo = cantidadPrestamo;
+		}
+
+		public String getCantidadAbonada() {
+			return cantidadAbonada;
+		}
+
+		public void setCantidadAbonada(String cantidadAbonada) {
+			this.cantidadAbonada = cantidadAbonada;
+		}
+
+		public String getCantidadAPagar() {
+			return cantidadAPagar;
+		}
+
+		public void setCantidadAPagar(String cantidadAPagar) {
+			this.cantidadAPagar = cantidadAPagar;
+		}
+
+		public String getDescuento() {
+			return descuento;
+		}
+
+		public void setDescuento(String descuento) {
+			this.descuento = descuento;
+		}
+
+		public String getCreadoPor() {
+			return creadoPor;
+		}
+
+		public void setCreadoPor(String creadoPor) {
+			this.creadoPor = creadoPor;
+		}
+
+		@Override
+		public String toString() {
+			return "estado=" + estado + '&' + "moneda=" + moneda + '&' + "tipo=" + tipo + '&' + "cliente=" + cliente
+					+ '&' + "cantidadPrestamo=" + cantidadPrestamo + '&' + "cantidadAbonada=" + cantidadAbonada + '&'
+					+ "cantidadAPagar=" + cantidadAPagar + '&' + "descuento=" + descuento + '&' + "creadoPor="
+					+ creadoPor;
+		}
+	}
+
 }

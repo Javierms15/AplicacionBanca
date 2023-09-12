@@ -237,7 +237,8 @@ public class DealControllerTest {
 	public void verDealCorrectamente() throws Exception {
 		DealEntity deal = crearDeal(1, "PENDING", 100, 50, 50, "EUR", "SOLE_LENDER", (byte) 0, 3, 3, null, null);
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
-
+		when(iDealService.puedeEditar(usuarioAdmin, deal)).thenReturn(true);
+		
 		MockHttpServletResponse response = mvc
 				.perform(get("/deal/see/" + deal.getIdDeal()).sessionAttr("usuario", usuarioAdmin)).andReturn()
 				.getResponse();
@@ -399,7 +400,6 @@ public class DealControllerTest {
 	public void aprobarDealSinPermiso() throws Exception {
 		DealEntity deal = crearDeal(1, "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 1, 2, null, null);
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
-		when(usuarioService.findOne(deal.getCreadoPor())).thenReturn(usuarioBancoSantander);
 
 		MockHttpServletResponse response = mvc
 				.perform(get("/deal/approve/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoCaixa))
@@ -414,7 +414,7 @@ public class DealControllerTest {
 	public void aprobarDealConPermisoEstadoIncorrecto() throws Exception {
 		DealEntity deal = crearDeal(1, "CLOSED", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 1, 2, null, null);
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
-		when(usuarioService.findOne(deal.getCreadoPor())).thenReturn(usuarioBancoSantander);
+		when(iDealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(true);
 
 		MockHttpServletResponse response = mvc
 				.perform(get("/deal/approve/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoSantander))
@@ -428,7 +428,7 @@ public class DealControllerTest {
 	public void aprobarDealConPermisoEstadoCorrecto() throws Exception {
 		DealEntity deal = crearDeal(1, "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 1, 2, null, null);
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
-		when(usuarioService.findOne(deal.getCreadoPor())).thenReturn(usuarioBancoSantander);
+		when(iDealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(true);
 
 		MockHttpServletResponse response = mvc
 				.perform(get("/deal/approve/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoSantander))
@@ -454,10 +454,10 @@ public class DealControllerTest {
 	public void cerrarDealSinPermiso() throws Exception {
 		DealEntity deal = crearDeal(1, "APPROVED", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 1, 2, null, null);
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
-		when(usuarioService.findOne(deal.getCreadoPor())).thenReturn(usuarioBancoSantander);
+		when(iDealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(false);
 
 		MockHttpServletResponse response = mvc
-				.perform(get("/deal/close/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoCaixa))
+				.perform(get("/deal/close/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoSantander))
 				.andExpect(flash().attribute("error", "No tiene permiso para cerrar el deal")).andReturn()
 				.getResponse();
 
@@ -470,7 +470,7 @@ public class DealControllerTest {
 		DealEntity deal = crearDeal(1, "APPROVED", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 1, 2,
 				usuarioBancoSantander.getIdUsuario(), null);
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
-		when(usuarioService.findOne(deal.getCreadoPor())).thenReturn(usuarioBancoSantander);
+		when(iDealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(true);
 
 		MockHttpServletResponse response = mvc
 				.perform(get("/deal/close/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoSantander))
@@ -486,11 +486,12 @@ public class DealControllerTest {
 		DealEntity deal = crearDeal(1, "APPROVED", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 1, 2,
 				usuarioBancoSantander.getIdUsuario(), null);
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
-		when(usuarioService.findOne(deal.getCreadoPor())).thenReturn(usuarioBancoSantander);
 
 		UsuarioEntity usuarioBancoSantander2 = new UsuarioEntity();
 		usuarioBancoSantander2.setRol("BANCA");
 		usuarioBancoSantander2.setBanco(usuarioBancoSantander.getBanco());
+
+		when(iDealService.puedeEditar(usuarioBancoSantander2, deal)).thenReturn(true);
 
 		MockHttpServletResponse response = mvc
 				.perform(get("/deal/close/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoSantander2))
@@ -516,10 +517,10 @@ public class DealControllerTest {
 	public void eliminarDealSinPermiso() throws Exception {
 		DealEntity deal = crearDeal(1, "APPROVED", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 1, 2, null, null);
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
-		when(usuarioService.findOne(deal.getCreadoPor())).thenReturn(usuarioBancoSantander);
+		when(iDealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(false);
 
 		MockHttpServletResponse response = mvc
-				.perform(get("/deal/delete/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoCaixa))
+				.perform(get("/deal/delete/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoSantander))
 				.andExpect(flash().attribute("error", "No tiene permiso para eliminar el deal")).andReturn()
 				.getResponse();
 
@@ -531,7 +532,7 @@ public class DealControllerTest {
 	public void eliminarDealCorrectamente() throws Exception {
 		DealEntity deal = crearDeal(1, "APPROVED", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 1, 2, null, null);
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
-		when(usuarioService.findOne(deal.getCreadoPor())).thenReturn(usuarioBancoSantander);
+		when(iDealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(true);
 
 		MockHttpServletResponse response = mvc
 				.perform(get("/deal/delete/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoSantander))
@@ -557,10 +558,10 @@ public class DealControllerTest {
 	public void redireccionEditarDealSinPermiso() throws Exception {
 		DealEntity deal = crearDeal(1, "APPROVED", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 1, 2, null, null);
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
-		when(usuarioService.findOne(deal.getCreadoPor())).thenReturn(usuarioBancoSantander);
+		when(iDealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(false);
 
 		MockHttpServletResponse response = mvc
-				.perform(get("/deal/edit/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoCaixa))
+				.perform(get("/deal/edit/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoSantander))
 				.andExpect(flash().attribute("error", "No tiene permiso para editar el deal")).andReturn()
 				.getResponse();
 
@@ -572,7 +573,7 @@ public class DealControllerTest {
 	public void redireccionEditarDealEstadoIncorrecto() throws Exception {
 		DealEntity deal = crearDeal(1, "APPROVED", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 1, 2, null, null);
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
-		when(usuarioService.findOne(deal.getCreadoPor())).thenReturn(usuarioBancoSantander);
+		when(iDealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(true);
 
 		MockHttpServletResponse response = mvc
 				.perform(get("/deal/edit/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoSantander))
@@ -586,8 +587,8 @@ public class DealControllerTest {
 	public void redireccionEditarDealCorrectamente() throws Exception {
 		DealEntity deal = crearDeal(1, "PENDING", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 1, 2, null, null);
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
-		when(usuarioService.findOne(deal.getCreadoPor())).thenReturn(usuarioBancoSantander);
-
+		when(iDealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(true);
+		
 		MockHttpServletResponse response = mvc
 				.perform(get("/deal/edit/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoSantander))
 				.andReturn().getResponse();
@@ -614,10 +615,10 @@ public class DealControllerTest {
 	public void notificacionCerrarDealSinPermiso() throws Exception {
 		DealEntity deal = crearDeal(1, "APPROVED", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 1, 2, null, null);
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
-		when(usuarioService.findOne(deal.getCreadoPor())).thenReturn(usuarioBancoSantander);
+		when(iDealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(false);
 
 		MockHttpServletResponse response = mvc
-				.perform(post("/deal/notifyClose/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoCaixa)
+				.perform(post("/deal/notifyClose/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoSantander)
 						.contentType(MediaType.APPLICATION_FORM_URLENCODED).content("usuario=0"))
 				.andExpect(flash().attribute("error", "No tiene permiso para editar el deal")).andReturn()
 				.getResponse();
@@ -631,6 +632,7 @@ public class DealControllerTest {
 		DealEntity deal = crearDeal(1, "APPROVED", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 1, 2, null, null);
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
 		when(usuarioService.findOne(10)).thenReturn(null);
+		when(iDealService.puedeEditar(usuarioAdmin, deal)).thenReturn(true);
 
 		MockHttpServletResponse response = mvc
 				.perform(post("/deal/notifyClose/" + deal.getIdDeal()).sessionAttr("usuario", usuarioAdmin)
@@ -647,11 +649,12 @@ public class DealControllerTest {
 		DealEntity deal = crearDeal(1, "APPROVED", 100, 50, 50, "EUR", "SYNDICATED", (byte) 0, 1,
 				usuarioBancoSantander.getIdUsuario(), usuarioBancoSantander.getIdUsuario(), null);
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
-		when(usuarioService.findOne(10)).thenReturn(usuarioBancoCaixa);
-		when(usuarioService.findOne(usuarioBancoSantander.getIdUsuario())).thenReturn(usuarioBancoSantander);
+		when(usuarioService.findOne(10)).thenReturn(usuarioBancoSantander);
+		when(iDealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(false);
+		when(iDealService.puedeEditar(usuarioBancoCaixa, deal)).thenReturn(true);
 
 		MockHttpServletResponse response = mvc
-				.perform(post("/deal/notifyClose/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoSantander)
+				.perform(post("/deal/notifyClose/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoCaixa)
 						.contentType(MediaType.APPLICATION_FORM_URLENCODED).content("usuario=10"))
 				.andExpect(flash().attribute("error",
 						"El usuario al que quería enviar la notificación no tiene permiso para cerrar el deal"))
@@ -673,7 +676,8 @@ public class DealControllerTest {
 
 		when(iDealService.findOne(deal.getIdDeal())).thenReturn(deal);
 		when(usuarioService.findOne(10)).thenReturn(usuarioBancoSantander2);
-		when(usuarioService.findOne(usuarioBancoSantander.getIdUsuario())).thenReturn(usuarioBancoSantander);
+		when(iDealService.puedeEditar(usuarioBancoSantander, deal)).thenReturn(true);
+		when(iDealService.puedeEditar(usuarioBancoSantander2, deal)).thenReturn(true);
 
 		MockHttpServletResponse response = mvc
 				.perform(post("/deal/notifyClose/" + deal.getIdDeal()).sessionAttr("usuario", usuarioBancoSantander)

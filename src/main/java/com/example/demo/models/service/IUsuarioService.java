@@ -6,17 +6,19 @@ import java.util.List;
 
 public interface IUsuarioService {
 
-    List<UsuarioEntity> findAll();
+	List<UsuarioEntity> findAll();
 
-    UsuarioEntity findOne(int id);
+	UsuarioEntity findOne(int id);
 
-    void save (UsuarioEntity usuario);
+	void save(UsuarioEntity usuario);
 
-    void delete(int id);
+	void delete(int id);
 
 	List<UsuarioEntity> findByBancoWithDifferentId(int idBanco, int idUsuario);
-    
-    List<UsuarioEntity> findWithDifferentId(int idUsuario);
-    
-    public UsuarioEntity existeUsuario(String nombre, String contrasena);
+
+	List<UsuarioEntity> findWithDifferentId(int idUsuario);
+
+	public UsuarioEntity existeUsuario(String nombre, String contrasena);
+
+	UsuarioEntity findByName(String nombre);
 }
