@@ -38,7 +38,7 @@ public class NotificacionController {
 			flash.addFlashAttribute("error", "Ha intentado eliminar una notificacion que no existe");
 			return "redirect:/notificacion";
 		}
-		
+
 		UsuarioEntity usuario = (UsuarioEntity) session.getAttribute("usuario");
 		if (notificacion.getEnviadoA() != usuario.getIdUsuario()) {
 			flash.addFlashAttribute("error", "No puede eliminar esa notificacion");
@@ -46,6 +46,7 @@ public class NotificacionController {
 		}
 
 		notificacionService.delete(id);
+		flash.addFlashAttribute("success", "Notificacion eliminada correctamente");
 		return "redirect:/notificacion";
 	}
 }
