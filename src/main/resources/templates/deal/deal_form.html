@@ -117,7 +117,7 @@
 						<div class="form-group row">
 							<label class="col-sm-2 col-form-label">Agente</label>
 							<div class="col-sm-6">
-								<select name="agente" class="form-control">
+								<select name="agente" id="agente" class="form-control">
 									<option th:each="banco: ${bancos}" th:value="${banco.idBanco}"
 										th:text="${banco.nombre}" th:selected="${agente == banco.idBanco}"></option>
 								</select>
@@ -165,10 +165,11 @@
 			var soleLender = document.getElementById("seleccionSoleLender");
 			var sindicado = document.getElementById("seleccionSindicado");
 			var tipo = document.getElementById("tipo");
-
+			
 			var form = document.getElementById("formulario");
 			var checkboxes = document.querySelectorAll('input[type="checkbox"]')
 			var textboxes = document.querySelectorAll('input[name^="bancoPorcentaje"]')
+			var agente = document.getElementById("agente");
 
 			form.addEventListener('submit', function () {
 				if (tipo.value != 'SYNDICATED') {
@@ -176,17 +177,26 @@
 				}
 				
 				var cont = 0;
+				var agenteCorrecto = false;
 
 				checkboxes.forEach(function (checkbox) {
 					if (checkbox.checked) {
 						cont = cont + 1;
+						
+						if (checkbox.value == agente.value) {
+							agenteCorrecto = true;
+						}
 					}
 				})
 
 				if (cont <= 1) {
 					alert('Debe seleccionar al menos 2 bancos!')
 					event.preventDefault()
+				} else if (!agenteCorrecto) {
+					alert('El banco agente debe ser uno de los participantes')
+					event.preventDefault()
 				}
+
 			})
 
 			checkboxes.forEach(function (checkbox) {

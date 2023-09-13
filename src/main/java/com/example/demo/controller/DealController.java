@@ -333,7 +333,8 @@ public class DealController {
 			if (suma == 1 && bancoReq.length >= 2) {
 				return null;
 			}
-
+			
+			boolean agenteCorrecto = false;
 			for (String bancoIdStr : bancoReq) {
 				bancosParticipantes.add(Integer.parseInt(bancoIdStr));
 				String[] porcentajeParticipacionStr = req.getParameterValues("bancoPorcentaje" + bancoIdStr);
@@ -344,6 +345,7 @@ public class DealController {
 					participante.setIdBanco(bancoId);
 					if (bancoId == agenteId) {
 						participante.setAgente((byte) 1);
+						agenteCorrecto = true;
 					} else {
 						participante.setAgente((byte) 0);
 					}
@@ -363,6 +365,22 @@ public class DealController {
 				}
 			}
 
+			if (!agenteCorrecto) {
+				model.addAttribute("deal", deal);
+				List<ClienteEntity> clientes = clienteService.findAll();
+				model.addAttribute("clientes", clientes);
+
+				model.addAttribute("bancosParticipantesId", bancosParticipantes);
+				model.addAttribute("participantes", participantes);
+
+				List<BancoEntity> bancos = bancoService.findAll();
+				model.addAttribute("bancos", bancos);
+
+				model.addAttribute("agente", agenteId);
+				
+				return new String[] { "deal/deal_form", "error", "El banco agente debe de ser uno de los participantes" };
+			}
+			
 			if (deal.getTipo().equals("SYNDICATED") && participantes.size() < 2) {
 				model.addAttribute("deal", deal);
 				List<ClienteEntity> clientes = clienteService.findAll();
