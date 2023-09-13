@@ -13,7 +13,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-@Profile("!test")
+//@Profile("!test")
+@Profile("production")
 @Configuration
 @EnableScheduling
 public class SchedulerConfig {
