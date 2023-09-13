@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.sql.DataSource;
 
-@Profile("production")
+@Profile("!test")
 @Configuration
 @EnableTransactionManagement
 public class PersistenceConfig {
